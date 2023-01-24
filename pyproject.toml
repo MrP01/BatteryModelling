@@ -12,3 +12,6 @@ python = ">=3.10, <4.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.nitpick]
+style = ["github://MrP01/lint-me-now/nitpick-base-style.toml"]
