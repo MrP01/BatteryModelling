@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "batterymodelling"
+version = "0.1.0"
+description = "MMSC Case Study in Modelling :)"
+authors = ["Jad", "Nicholas", "Aoibheann", "Zella", "Peter"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
