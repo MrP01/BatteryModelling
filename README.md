@@ -1,6 +1,6 @@
 # Case Study in Mathematical Modelling
 
-This is a group project from the MSc in MMSC, focussed on battery modelling.
+This is a group project from the MSc in MMSC, focused on battery modelling.
 
 ## A Journal of the Journey
 
