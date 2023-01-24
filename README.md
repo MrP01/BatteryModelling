@@ -11,9 +11,15 @@ This is a group project from the MSc in MMSC, focussed on battery modelling.
 ### Week 2:
 
 - Tuesday: first meeting with Robert
-- Write a code to solve the ODE with "i" profile as input
+- Write code to solve the ODE with a current profile as input
 - Derive equations (fitting or approximate functions) for all variables to be included in the code later
 - write the exact solution of the equation by hand (check if code solution is similar)
 - find out how usually input is given and find a few input profiles that are interesting to examine
 
-### Week 1:
+### Week 3:
+
+## Repository Structure and Setup:
+
+... to be defined
+
+To use and sustain a Python virtual environment, install [poetry](https://python-poetry.org/), which works with the `pyproject.toml` file.
