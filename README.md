@@ -18,6 +18,7 @@ This is a group project from the MSc in MMSC, focused on battery modelling.
 
 Status updates: 
 - Zella/Nick MATLAB code takes in current input and outputs Voltage over time for ECM. Zella uses polynomial fit to find Voc as a function of state of charge [U(s)]
+- Need to model efficiency
 - Peter looking at PyBamm--does everything. Could we get our model to do the same thing? Compare our results to PyBamm's results? Also--LTSpice circuits might be helpful for checking results/simulating behavior
 - Aoibheann has looked into analytic solution--not too complicated to derive. 
 - Jad has looked into temperature, charge, and state of health dependence of R0, R1, and C1. 2021 paper--Jad looked at extending parameter fits from linear models to higher order models
