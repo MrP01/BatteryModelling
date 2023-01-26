@@ -19,4 +19,11 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.nitpick]
-style = ["github://MrP01/lint-me-now/nitpick-base-style.toml"]
+style = ["github://MrP01/lint-me-now/nitpick-base-style.toml", "github://MrP01/lint-me-now/nitpick-python-style.toml"]
+
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+line-length = 120
+exclude = [".git", "**/__pycache__"]
