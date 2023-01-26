@@ -7,7 +7,9 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10, <4.0"
+python = ">=3.8, <3.10"
+casadi = "3.5.5"
+pybamm = "^22.12"
 
 [build-system]
 requires = ["poetry-core"]
