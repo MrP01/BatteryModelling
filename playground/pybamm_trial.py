@@ -9,6 +9,9 @@ plt.switch_backend("tkagg")
 
 model_name = sys.argv[-1]
 model = lithium_ion.DFN() if model_name == "lithium-ion" else thevenin.Thevenin()
+print(model.name)
+model.print_parameter_info()
+
 simulation = pybamm.Simulation(model)
 simulation.solve([0, 3600])
 simulation.plot()
