@@ -4,11 +4,11 @@ This is a group project from the MSc in MMSC, focused on battery modelling.
 
 ## A Journal of the Journey
 
-### Week 1:
+## Week 1:
 
 - introductory meeting and presentation of available projects
 
-### Week 2:
+## Week 2:
 
 - Tuesday: first meeting with Robert
 - Write code to solve the ODE with a current profile as input
@@ -29,9 +29,9 @@ Q's for Robert:
 - PyBamm comparison? 
 
 
-### Week 3:
+## Week 3:
 
-## Repository Structure and Setup:
+### Repository Structure and Setup:
 
 ... to be defined
 
@@ -48,3 +48,6 @@ Wednesday meeting with Robert:
 - Possible end goal: if I throw different usage profiles at the model can I make recommendations about how the battery should be used? For example, if I have a weekly use profile for a car, when should I charge it? What can I optimize over? 
 - Can possibly break resistor up into cycle resistor and calendar resistor--one a function of time (long times) and other a function of "state of health"
 - Robert's recommendation: use model to get different fits for various states of charge (R0, R1, C1 at different states of charge). Want a function that takes in parameters and outputs error difference between model and experimental values of Voltage for a specific current profile. 
+
+### Data Used
+- [Dataset used](https://data.mendeley.com/datasets/wykht8y7tg/1) - Z (this has discharge pulses in case we don't find anything else that's more suitable)
