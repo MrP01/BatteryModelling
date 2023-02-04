@@ -39,12 +39,12 @@ currentGroupsInit = nonzeroIndicesOfCurrent[0 : indicesOfChange[0] + 1]
 
 currentGroups = [
     nonzeroIndicesOfCurrent[indicesOfChange[i] + 1 : indicesOfChange[i + 1] + 1]
-    for i in range(65)
+    for i in range(57)
 ]
 currentGroups.insert(0, currentGroupsInit)
 ##
 indexOffset = 50
-groupNumber = 65  # max of 65
+groupNumber = 57  # max of 65
 fig, (ax) = plt.subplots(figsize=(10, 4))
 ax.plot(
     time[
@@ -61,7 +61,7 @@ ax.plot(
 ax.set_title(f"V against T, group number {groupNumber}")
 plt.show()
 ##
-for groupIndex in range(66):
+for groupIndex in range(58):
     voltageName = f"voltage{groupIndex}"
     currentName = f"current{groupIndex}"
     ahName = f"ah{groupIndex}"
@@ -79,18 +79,21 @@ for groupIndex in range(66):
         + indexOffset
     ]
 
-    workingAh = ah[
-        currentGroups[groupIndex][0]
-        - int(indexOffset / 2) : currentGroups[groupIndex][-1]
-        + indexOffset
-    ]
+    workingAh = 1 - (
+        ah[
+            currentGroups[groupIndex][0]
+            - int(indexOffset / 2) : currentGroups[groupIndex][-1]
+            + indexOffset
+        ]
+        / 2.9
+    )
 
     flatVoltage = [item for sublist in workingVoltage for item in sublist]
     flatCurrent = [item for sublist in workingCurrent for item in sublist]
     flatAh = [item for sublist in workingAh for item in sublist]
-    with open(f"./cleanData/run{groupIndex}.csv", "w") as myfile:
+    with open(f"./cleanData/run{groupIndex+1}_10C.csv", "w") as myfile:
         wr = csv.writer(myfile)
-        wr.writerow(["voltage", "current", "Ah"])
+        wr.writerow(["voltage", "current", "SOC"])
         wr.writerows(zip(flatVoltage, flatCurrent, flatAh))
         # wr.writerow(flatVoltage)
         # wr.writerow(flatCurrent)
