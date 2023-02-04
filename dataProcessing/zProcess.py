@@ -61,7 +61,7 @@ ax.plot(
 ax.set_title(f"V against T, group number {groupNumber}")
 plt.show()
 ##
-for groupIndex in range(1):
+for groupIndex in range(66):
     voltageName = f"voltage{groupIndex}"
     currentName = f"current{groupIndex}"
     ahName = f"ah{groupIndex}"
@@ -88,14 +88,10 @@ for groupIndex in range(1):
     flatVoltage = [item for sublist in workingVoltage for item in sublist]
     flatCurrent = [item for sublist in workingCurrent for item in sublist]
     flatAh = [item for sublist in workingAh for item in sublist]
-    with open("./cleanData/test.csv", "w") as myfile:
+    with open(f"./cleanData/run{groupIndex}.csv", "w") as myfile:
         wr = csv.writer(myfile)
-        wr.writerow(workingVoltage)
+        wr.writerow(["voltage", "current", "Ah"])
+        wr.writerows(zip(flatVoltage, flatCurrent, flatAh))
+        # wr.writerow(flatVoltage)
+        # wr.writerow(flatCurrent)
 ##
-
-
-workingVoltage = voltage[
-    currentGroups[0][0] - int(indexOffset / 2) : currentGroups[0][-1] + indexOffset
-]
-
-flat_list = [item for sublist in workingVoltage for item in sublist]
