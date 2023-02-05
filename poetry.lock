@@ -1277,6 +1277,17 @@ files = [
 ]
 
 [[package]]
+name = "mat4py"
+version = "0.5.0"
+description = "Load and save data in the Matlab (TM) MAT-file format."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "mat4py-0.5.0-py2.py3-none-any.whl", hash = "sha256:a4832a1f36f068b96bbf9299323dff294ffb2a4d6bab3a16e3ee662bf9d480e8"},
+]
+
+[[package]]
 name = "matplotlib"
 version = "3.6.3"
 description = "Python plotting package"
@@ -2719,4 +2730,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.10"
-content-hash = "f7a142d044b6a0597ec63364da1a6b3dd31457168fbe197a28632bf1857f33b7"
+content-hash = "a0664c89611fde23e66745e0b692d25a760bebd50a3ef996b1ff552aa48cd7a3"

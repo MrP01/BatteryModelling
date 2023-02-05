@@ -10,6 +10,7 @@ readme = "README.md"
 python = ">=3.8, <3.10"
 casadi = "3.5.5"
 pybamm = "^22.12"
+mat4py = "^0.5.0"
 
 [tool.poetry.group.dev.dependencies]
 invoke = "^2.0.0"
