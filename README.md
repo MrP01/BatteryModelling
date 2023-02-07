@@ -56,9 +56,19 @@ Thursday:
 - Estimate SOC, SOH from V(t), I(t), etc.
 - Game?
 
-### Week 4:
+### Week 4 Feb 7:
 
-Monday: Meeting with Robert.
+Meeting with Robert
+- Parameter vs SOC curves are nice. 
+- Hinch Perturbation Methods for multiple timescale analysis -- maybe can say something about how we get a speedup for our computations? 
+- Heating of the battery may be an interesting question
+- Looking at optimization on a graph could be an interesting avenue--where to charge, how fast, etc. (performance)
+- Can also look at questions about battery death (from modeling capacity)
+
+Big Recommendations: 
+- Should also look at generating different controls (i.e. what if we have voltage instead of current, or have power instead of current/voltage, and should be able to generate each of these) 
+- Look at continuous time version and solve in matlab
+- Look at modeling capacity (linearly as a function of time and cycle use?)
 
 ## Repository Structure and Setup:
 
