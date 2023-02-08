@@ -1,5 +1,5 @@
 function [voltageAB] = getVoltageCurveConstOCV(samplingRate,capacity,current,eta,parameters, ...
-                                        iR10, OCV) % OCV is a constant! 
+                                        iR10, OCV) % OCV is a constant!
 
 R0 = parameters(1);
 R1 = parameters(2);

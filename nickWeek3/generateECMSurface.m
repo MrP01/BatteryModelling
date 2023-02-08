@@ -1,7 +1,7 @@
-%% 
+%%
 dataDir = "/Users/nickwest/Documents/Oxford/MMSC/Hilary/Battery Modeling/BatteryModelling/cleanData/";
 outputData = zeros([258 6]); % 258 total runs, R0 R1 C1 SOC T MeanSquaredError at each
-filenames = ["hello";"goodbye"]; 
+filenames = ["hello";"goodbye"];
 temperatures = [-20 -10 0 10 25];
 
 count = 1;
@@ -31,4 +31,3 @@ finalOutput = table(outputData(:,1), ...
                     'VariableNames', header);
 finalOutput
 writetable(finalOutput);
-

@@ -33,7 +33,7 @@ X = fminsearch(errorOfPrediction, initialParameters);
 % A = [-1 0 0; 0 -1 0; 0 0 -1;
 %      1 0 0 ; 0 1 0 ; 0 0 1];
 % b = [0; 0; 0; 10; 10; 100000];
-% X = fmincon(errorOfPrediction, initialParameters, A, b); % Positive values! 
+% X = fmincon(errorOfPrediction, initialParameters, A, b); % Positive values!
 R0 = X(1); R1 = X(2); C1 = X(3);
 
 predictedVoltage = getVoltageCurveConstOCV(samplingRate, ...

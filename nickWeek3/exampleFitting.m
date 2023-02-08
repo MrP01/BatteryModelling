@@ -2,9 +2,9 @@
 chargeData = importdata('c2.mat'); % load data
 dischargeData = importdata('dc2.mat');
 
-%% Calculate SOC curve ?? Need to do this more generally probably... might 
-% depend on temperature and stuff 
-capacity = 2.9; % 2.9Ahr cell 
+%% Calculate SOC curve ?? Need to do this more generally probably... might
+% depend on temperature and stuff
+capacity = 2.9; % 2.9Ahr cell
 %OCV = generateOCV(chargeData,dischargeData,capacity,5);
 
 %% Load specific current and voltage profile.
@@ -70,7 +70,3 @@ shg
 figure(2)
 plot(current)
 shg
-
-
-
-

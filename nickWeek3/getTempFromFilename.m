@@ -10,4 +10,3 @@ else
     temperature = str2num(newStr);
 end
 end
-
