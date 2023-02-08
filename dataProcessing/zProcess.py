@@ -9,7 +9,7 @@ time = np.array(data["meas"]["Time"])
 voltage = np.array(data["meas"]["Voltage"])
 current = np.array(data["meas"]["Current"]) * -1
 ah = np.array(data["meas"]["Ah"]) * -1
-##
+
 fig1, (ax1) = plt.subplots(figsize=(10, 4))
 ax1.plot(time, voltage)
 ax1.set_title("V against T")
