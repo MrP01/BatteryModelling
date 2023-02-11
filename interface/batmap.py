@@ -1,3 +1,4 @@
+import math
 import pathlib
 from typing import Optional
 
@@ -28,6 +29,7 @@ class BatMap(QLabel):
     def render(self):
         self.canvas.fill(Qt.GlobalColor.white)
         painter = QPainter(self.canvas)
+        self.paintBatGraph(painter)
         self.paintBatMobile(painter)
         painter.end()
         self.setPixmap(self.canvas)
@@ -50,10 +52,35 @@ class BatMap(QLabel):
             event.accept()
         return super().keyPressEvent(event)
 
-    def paintBatMobile(self, painter):
+    def paintBatMobile(self, painter: QPainter):
+        src = self.graph.nodes[self.batmobile.sourceNode]
+        dest = self.graph.nodes[self.batmobile.destinationNode]
+        edge = self.graph.edges[self.batmobile.sourceNode, self.batmobile.destinationNode]
+        x = src["lat"] + self.batmobile.position / edge["distance"] * (dest["lat"] - src["lat"])
+        y = src["long"] + self.batmobile.position / edge["distance"] * (dest["long"] - src["long"])
         transform = QTransform()
-        transform.translate(100 + self.batmobile.position, 100 + self.batmobile.position)
-        transform.rotate(-45)
-        transform.scale(0.8, 0.8)
+        transform.translate(x, y)
+        transform.rotate(math.degrees(math.atan2(dest["long"] - src["long"], dest["lat"] - src["lat"])) - 90)
+        transform.translate(-38, 0)
+        transform.scale(0.6, 0.6)
         painter.setTransform(transform)
         painter.drawPixmap(0, 0, self.batmobilePix)
+
+    def paintBatGraph(self, painter: QPainter):
+        originalPen = painter.pen()
+        for A, B in self.graph.edges():
+            nodeA, nodeB = self.graph.nodes[A], self.graph.nodes[B]
+            painter.drawLine(nodeA["lat"], nodeA["long"], nodeB["lat"], nodeB["long"])
+
+        pen = QtGui.QPen()
+        pen.setWidth(4)
+        pen.setColor(Qt.GlobalColor.darkBlue)
+        brush = QtGui.QBrush()
+        brush.setStyle(Qt.BrushStyle.SolidPattern)
+        for node, data in self.graph.nodes(data=True):
+            brush.setColor(Qt.GlobalColor.green if data["charger"] else Qt.GlobalColor.gray)
+            painter.setPen(pen)
+            painter.setBrush(brush)
+            painter.drawEllipse(data["lat"] - 15, data["long"] - 15, 30, 30)
+            painter.setPen(originalPen)
+            painter.drawText(data["lat"] - 5, data["long"] + 5, node)

@@ -3,12 +3,14 @@ from simulator.batmobile import BatMobile
 
 
 class Simulation:
-    dt = 1e-5
+    dt = 1e-2
 
     def __init__(self):
         super().__init__()
-        self.batgraph = BatGraph()
+        self.batgraph = BatGraph.exampleGraph()
         self.batmobile = BatMobile()
+        self.batmobile.sourceNode = "A"
+        self.batmobile.destinationNode = "B"
         self.totalTimeElapsed = 0
 
     def iterate(self):

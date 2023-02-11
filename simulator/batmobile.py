@@ -1,8 +1,13 @@
+from typing import Optional
+
+
 class BatMobile:
     def __init__(self):
-        self.position = 0  # x
-        self.velocity = 0  # v
-        self.acceleration = 0  # a
+        self.position: float = 0  # x
+        self.velocity: float = 0  # v
+        self.acceleration: float = 0  # a
+        self.sourceNode: Optional[str] = None
+        self.destinationNode: Optional[str] = None
 
     def accelerate(self, amount):
         print("Accelerating BatMobile by", amount)
