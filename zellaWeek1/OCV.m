@@ -3,10 +3,10 @@ function openCurrentVoltage = OCV(stateOfChargeValue)
     % as a function of SOC
     dischargeData = importdata('dc2.mat');
     capacity = 2.9; %Ah
-    x = flip((abs(min(dischargeData.Ah)) + dischargeData.Ah) /capacity);
+    x = flip((abs(min(dischargeData.Ah)) + dischargeData.Ah) / capacity);
     x = x(end - length(nonzeros(x)) +1:end);
     y = flip(dischargeData.Voltage);
     y = y(end - length(nonzeros(x)) +1:end);
-    p = polyfit(x,y,5);
-    openCurrentVoltage = polyval(p,stateOfChargeValue);
+    p = polyfit(x, y, 5);
+    openCurrentVoltage = polyval(p, stateOfChargeValue);
 end
