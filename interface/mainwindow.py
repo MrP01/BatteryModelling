@@ -1,7 +1,9 @@
+import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
 from interface.batmap import BatMap
+from interface.graphs import BatPlotCanvas
 from simulator.simulation import Simulation
 
 
@@ -19,6 +21,17 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         super().iterate()
         self.batmap.render()
 
+    def updatePlots(self):
+        self.voltageGraph.axes.plot(np.linspace(0, 20), 1 - np.linspace(0, 1) + 0.3 * (np.random.random((50,)) - 1))
+        # self.voltageGraph.axes.set_xlabel("Time $t$ / s")
+        self.voltageGraph.axes.set_ylabel("Voltage $V(t)$ / V")
+        self.currentGraph.axes.plot(np.linspace(0, 20), 1 - np.linspace(0, 1) + 0.3 * (np.random.random((50,)) - 1))
+        # self.currentGraph.axes.set_xlabel("Time $t$ / s")
+        self.currentGraph.axes.set_ylabel("Current $I(t)$ / A")
+        self.socGraph.axes.plot(np.linspace(0, 20), 1 - np.linspace(0, 1) + 0.3 * (np.random.random((50,)) - 1))
+        # self.socGraph.axes.set_xlabel("Time $t$ / s")
+        self.socGraph.axes.set_ylabel("State of Charge s(t) / 1")
+
     def startOrStop(self):
         if self.controlBtn.text() == "Start":
             self.iterationTimerId = self.startTimer(20)
@@ -35,10 +48,22 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.controlBtn = QtWidgets.QPushButton("Start", self)
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
+        self.voltageGraph = BatPlotCanvas()
+        self.currentGraph = BatPlotCanvas()
+        self.socGraph = BatPlotCanvas()
+
         self.batmap.render()
+        self.updatePlots()
+
         layout = QtWidgets.QGridLayout()
-        layout.addWidget(self.batmap)
-        layout.addWidget(self.controlBtn)
+        layout.addWidget(self.batmap, 0, 0)
+        layout.addWidget(self.controlBtn, 0, 1)
+        graphLayout = QtWidgets.QHBoxLayout()
+        graphLayout.addWidget(self.currentGraph)
+        graphLayout.addWidget(self.voltageGraph)
+        graphLayout.addWidget(self.socGraph)
+        # graphLayout.addStretch()
+        layout.addLayout(graphLayout, 1, 0)
         self.setLayout(layout)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
