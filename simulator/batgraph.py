@@ -1,8 +1,12 @@
-class Vertex:
-    def __init__(self, name) -> None:
-        pass
+import networkx
+import networkx.classes.graph
 
 
-class BatGraph:
-    def __init__(self) -> None:
-        self.vertices = []
+class BatGraph(networkx.classes.graph.Graph):
+    @staticmethod
+    def justASingleLine():
+        graph = BatGraph()
+        graph.add_node("A")
+        graph.add_node("B")
+        graph.add_edge("A", "B")
+        return graph

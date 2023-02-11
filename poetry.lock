@@ -752,14 +752,14 @@ test = ["flaky", "ipyparallel", "pre-commit", "pytest (>=7.0)", "pytest-asyncio"
 
 [[package]]
 name = "ipython"
-version = "8.9.0"
+version = "8.10.0"
 description = "IPython: Productive Interactive Computing"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "ipython-8.9.0-py3-none-any.whl", hash = "sha256:9c207b0ef2d276d1bfcfeb9a62804336abbe4b170574ea061500952319b1d78c"},
-    {file = "ipython-8.9.0.tar.gz", hash = "sha256:71618e82e6d59487bea059626e7c79fb4a5b760d1510d02fab1160db6fdfa1f7"},
+    {file = "ipython-8.10.0-py3-none-any.whl", hash = "sha256:b38c31e8fc7eff642fc7c597061fff462537cf2314e3225a19c906b7b0d8a345"},
+    {file = "ipython-8.10.0.tar.gz", hash = "sha256:b13a1d6c1f5818bd388db53b7107d17454129a70de2b87481d555daede5eb49e"},
 ]
 
 [package.dependencies]
@@ -777,7 +777,7 @@ stack-data = "*"
 traitlets = ">=5"
 
 [package.extras]
-all = ["black", "curio", "docrepr", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.20)", "pandas", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
+all = ["black", "curio", "docrepr", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.21)", "pandas", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
 black = ["black"]
 doc = ["docrepr", "ipykernel", "matplotlib", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "typing-extensions"]
 kernel = ["ipykernel"]
@@ -787,7 +787,7 @@ notebook = ["ipywidgets", "notebook"]
 parallel = ["ipyparallel"]
 qtconsole = ["qtconsole"]
 test = ["pytest (<7.1)", "pytest-asyncio", "testpath"]
-test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.20)", "pandas", "pytest (<7.1)", "pytest-asyncio", "testpath", "trio"]
+test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.21)", "pandas", "pytest (<7.1)", "pytest-asyncio", "testpath", "trio"]
 
 [[package]]
 name = "ipython-genutils"
@@ -965,25 +965,28 @@ test = ["codecov", "coverage", "ipykernel (>=6.14)", "mypy", "paramiko", "pre-co
 
 [[package]]
 name = "jupyter-console"
-version = "6.4.4"
+version = "6.5.0"
 description = "Jupyter terminal console"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "jupyter_console-6.4.4-py3-none-any.whl", hash = "sha256:756df7f4f60c986e7bc0172e4493d3830a7e6e75c08750bbe59c0a5403ad6dee"},
-    {file = "jupyter_console-6.4.4.tar.gz", hash = "sha256:172f5335e31d600df61613a97b7f0352f2c8250bbd1092ef2d658f77249f89fb"},
+    {file = "jupyter_console-6.5.0-py3-none-any.whl", hash = "sha256:87826ab6c8c418731fd78f14ec504df735e79554e35784d0a6379018bb3ef9d7"},
+    {file = "jupyter_console-6.5.0.tar.gz", hash = "sha256:67e68f1da16bc3f6f78ed846dd5543ec0679369f8504734f10bfd206faae39ea"},
 ]
 
 [package.dependencies]
-ipykernel = "*"
+ipykernel = ">=6.14"
 ipython = "*"
 jupyter-client = ">=7.0.0"
-prompt-toolkit = ">=2.0.0,<3.0.0 || >3.0.0,<3.0.1 || >3.0.1,<3.1.0"
+jupyter-core = ">=4.12,<5.0.0 || >=5.1.0"
+prompt-toolkit = ">=3.0.30"
 pygments = "*"
+pyzmq = ">=17"
+traitlets = ">=5.4"
 
 [package.extras]
-test = ["pexpect"]
+test = ["pexpect", "pytest"]
 
 [[package]]
 name = "jupyter-core"
@@ -1513,6 +1516,25 @@ files = [
 ]
 
 [[package]]
+name = "networkx"
+version = "3.0"
+description = "Python package for creating and manipulating graphs and networks"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "networkx-3.0-py3-none-any.whl", hash = "sha256:58058d66b1818043527244fab9d41a51fcd7dcc271748015f3c181b8a90c8e2e"},
+    {file = "networkx-3.0.tar.gz", hash = "sha256:9a9992345353618ae98339c2b63d8201c381c2944f38a2ab49cb45a4c667e412"},
+]
+
+[package.extras]
+default = ["matplotlib (>=3.4)", "numpy (>=1.20)", "pandas (>=1.3)", "scipy (>=1.8)"]
+developer = ["mypy (>=0.991)", "pre-commit (>=2.20)"]
+doc = ["nb2plots (>=0.6)", "numpydoc (>=1.5)", "pillow (>=9.2)", "pydata-sphinx-theme (>=0.11)", "sphinx (==5.2.3)", "sphinx-gallery (>=0.11)", "texext (>=0.6.7)"]
+extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.10)", "sympy (>=1.10)"]
+test = ["codecov (>=2.1)", "pytest (>=7.2)", "pytest-cov (>=4.0)"]
+
+[[package]]
 name = "notebook"
 version = "6.5.2"
 description = "A web-based notebook environment for interactive computing"
@@ -1913,21 +1935,21 @@ tests = ["pytest"]
 
 [[package]]
 name = "pybamm"
-version = "22.12"
+version = "23.1"
 description = "Python Battery Mathematical Modelling."
 category = "main"
 optional = false
 python-versions = ">=3.8,<3.10"
 files = [
-    {file = "pybamm-22.12-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:8d2959e8db1f6e3c1130185f5d898ad9c107bf49be817dcf41b30f754c9563e4"},
-    {file = "pybamm-22.12-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:702d0d36064278453a6d6544e1ab9835ab8d9d8f6c3cd1a2e83b613bb37e7735"},
-    {file = "pybamm-22.12-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:7f9ba1917b5d5152d126bf0f58919769b2db333f6d6ad65d6b3afdf6b2f13ef5"},
-    {file = "pybamm-22.12-cp38-cp38-win_amd64.whl", hash = "sha256:804f550ef1da85011a87cefa88cc5e71b6755484d69488c13f254e7277c6a679"},
-    {file = "pybamm-22.12-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:80d791755b523f30b13df8a45745afc069456234596d28d4558132d4d987e0dd"},
-    {file = "pybamm-22.12-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:ae552616a4761058d1d8f9cbbb5664b0c75f3744f2e1b68e03284ba3d30aaef2"},
-    {file = "pybamm-22.12-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:507b4e73f0a7d35a66fe9400293cbcf6e03400d8b19f40ce834a3b30673bec73"},
-    {file = "pybamm-22.12-cp39-cp39-win_amd64.whl", hash = "sha256:20054847cebecf7e2e9af2746b47cfe9a63ba2e5185fc7ec515a43cca1052dc4"},
-    {file = "pybamm-22.12.tar.gz", hash = "sha256:d3117df5e4cb397e607d8c1cacb11cc5789e827f75320730f8c4dc9e48feb080"},
+    {file = "pybamm-23.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:2ead70e2bca75e9c381332f3d56ed5166ded2dcecba91cf2e7f2e1db8ced1ffb"},
+    {file = "pybamm-23.1-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:32273c1f991a708e8f0707231a510b848f6e64ac2df9466b383f4642cb0622c4"},
+    {file = "pybamm-23.1-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:09b9afcc50c0fd76314eeeb40993df0dca28a635aee3668392c16ac4f37c5153"},
+    {file = "pybamm-23.1-cp38-cp38-win_amd64.whl", hash = "sha256:b8b6db37a5aed178637e5b620a63d2e05db3ff715d17497676cd1a84cfed7ec3"},
+    {file = "pybamm-23.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:bc35c185c62be65457e30ed93d1ab5159feaa7f7615deb89d3bf2dd40f1b6493"},
+    {file = "pybamm-23.1-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:149b842f1f6bb69d9988b8829b79a68136cabeb6fd2878ed4016f86ea27710db"},
+    {file = "pybamm-23.1-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:2d11ae928ddc10ead4d7d98d4d13c5587c1ecc597999236d515815fda8dfe683"},
+    {file = "pybamm-23.1-cp39-cp39-win_amd64.whl", hash = "sha256:7bb6124fa17ea946efd4a98b22548c5428cab663765743dc99911b8d16bbe68a"},
+    {file = "pybamm-23.1.tar.gz", hash = "sha256:3e379ea10f2123e32874f9c1999e8a30446e2380d42b2cdd50293d3e5e6c916f"},
 ]
 
 [package.dependencies]
@@ -1947,7 +1969,7 @@ sympy = ">=1.8"
 
 [package.extras]
 dev = ["black", "flake8 (>=3)"]
-docs = ["guzzle-sphinx-theme", "sphinx (>=1.5)"]
+docs = ["pydata-sphinx-theme", "sphinx (>=1.5)", "sphinx-copybutton", "sphinx-design"]
 
 [[package]]
 name = "pybtex"
@@ -2777,14 +2799,14 @@ files = [
 
 [[package]]
 name = "zipp"
-version = "3.12.1"
+version = "3.13.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "zipp-3.12.1-py3-none-any.whl", hash = "sha256:6c4fe274b8f85ec73c37a8e4e3fa00df9fb9335da96fb789e3b96b318e5097b3"},
-    {file = "zipp-3.12.1.tar.gz", hash = "sha256:a3cac813d40993596b39ea9e93a18e8a2076d5c378b8bc88ec32ab264e04ad02"},
+    {file = "zipp-3.13.0-py3-none-any.whl", hash = "sha256:e8b2a36ea17df80ffe9e2c4fda3f693c3dad6df1697d3cd3af232db680950b0b"},
+    {file = "zipp-3.13.0.tar.gz", hash = "sha256:23f70e964bc11a34cef175bc90ba2914e1e4545ea1e3e2f67c079671883f9cb6"},
 ]
 
 [package.extras]
@@ -2794,4 +2816,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.10"
-content-hash = "e8154183cab7e9b30edefe6fc871acd48e40a7c3b97ce4ce2156fc4adddf8dcb"
+content-hash = "a02b0f6597e107ec7d5b2149ba2cc81404a3d8a3e004d2a4245547f55a5f25fe"
