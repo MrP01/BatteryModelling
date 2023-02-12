@@ -65,7 +65,7 @@ class BatMap(QLabel):
         transform = QTransform()
         transform.translate(x, y)
         transform.rotate(math.degrees(math.atan2(dest["long"] - src["long"], dest["lat"] - src["lat"])) - 90)
-        transform.translate(-38, 0)
+        transform.translate(-38, -40)
         transform.scale(0.6, 0.6)
         painter.setTransform(transform)
         painter.drawPixmap(0, 0, self.batmobilePix)

@@ -6,6 +6,9 @@ from interface.graphs import BatTimeseriesCanvas
 from simulator.simulation import Simulation
 
 
+NUMERICAL_KEYS = (Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4, Qt.Key.Key_5)
+
+
 class MainWindow(Simulation, QtWidgets.QWidget):
     """Our Main Window Class that hosts all sub-widgets and has overall control over the GUI.
     All the simulation-related graphical items and code should be located in simulator/ to keep
@@ -19,8 +22,18 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.batmap = BatMap(self.batgraph, self.batmobile, self)
         self.setWindowTitle("Battery Modelling in the BatMobile")
         self.threadPool = QThreadPool()
+        self.userSelectedTurnIndex = None
 
     def iterate(self):
+        if (
+            self.userSelectedTurnIndex is None
+            and self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["distance"]
+        ):
+            print("Turning time")
+            self.turnLabel.setText("Where would you like to turn? Press 1, 2, 3, etc.")
+            self.turnLabel.setHidden(False)
+            self.startOrStop()
+            return
         super().iterate()  # calls the Simulation class's numerical integration step
         self.batmap.render()
         self.statsLabel.setText(
@@ -65,6 +78,9 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             "Press 'S' as a shortcut to start/stop."
         )
         self.statsLabel = QtWidgets.QLabel()
+        self.turnLabel = QtWidgets.QLabel()
+        self.turnLabel.setHidden(True)
+        self.turnLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
         self.batteryPlots = BatTimeseriesCanvas()
@@ -72,7 +88,8 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.batmap.render()
 
         layout = QtWidgets.QGridLayout()
-        layout.addWidget(self.batmap, 0, 0)
+        layout.addWidget(self.turnLabel, 0, 0)
+        layout.addWidget(self.batmap, 1, 0)
         buttonLayout = QtWidgets.QVBoxLayout()
         buttonLayout.addWidget(self.controlBtn)
         buttonLayout.addWidget(self.resetBtn)
@@ -80,11 +97,10 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         buttonLayout.addWidget(usageLabel)
         buttonLayout.addWidget(self.statsLabel)
         buttonLayout.addStretch()
-        layout.addLayout(buttonLayout, 0, 1)
+        layout.addLayout(buttonLayout, 1, 1)
         graphLayout = QtWidgets.QHBoxLayout()
         graphLayout.addWidget(self.batteryPlots)
-        # graphLayout.addStretch()
-        layout.addLayout(graphLayout, 1, 0, 1, 2)
+        layout.addLayout(graphLayout, 2, 0, 1, 2)
         self.setLayout(layout)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
@@ -92,4 +108,16 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             self.close()
         if event.key() == Qt.Key.Key_S:
             self.startOrStop()
+        elif event.key() in NUMERICAL_KEYS:
+            self.userSelectedTurnIndex = NUMERICAL_KEYS.index(event.key())
+            connections = self.getOnwardDestinations()
+            self.turnLabel.setText(
+                f"Selected destination {connections[self.userSelectedTurnIndex]}! "
+                "Click 'Start' or press 'S' to resume."
+            )
         return super().keyPressEvent(event)
+
+    def chooseTurnIndex(self):
+        index = self.userSelectedTurnIndex
+        self.userSelectedTurnIndex = None
+        return index

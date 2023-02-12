@@ -6,7 +6,7 @@ from simulator.battery import Battery
 class BatMobile:
     """Represents the battery car ("Bat-Mobile") driving on an edge of the BatGraph. Models everything."""
 
-    accelerationPerWatt = 450
+    accelerationPerWatt = 350
     friction = -120.0
     currentJump = 0.1
 
