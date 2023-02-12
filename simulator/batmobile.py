@@ -6,6 +6,10 @@ from simulator.battery import Battery
 class BatMobile:
     """Represents the battery car ("Bat-Mobile") driving on an edge of the BatGraph. Models everything."""
 
+    accelerationPerWatt = 450
+    friction = -120.0
+    currentJump = 0.1
+
     def __init__(self):
         self.battery = Battery()
 
@@ -13,7 +17,7 @@ class BatMobile:
         self.velocity: float = 0.1  # meters / second
         self.acceleration: float = 0  # true acceleration that determines velocity. in meters / second².
         self.motorAcceleration: float = 0  # goal acceleration, positively affects the true acceleration
-        self.dragAcceleration: float = 0  # acceleration caused by drag, it negatively affects the true acceleration
+        self.dragAcceleration: float = self.friction  # acceleration caused by drag, negatively affects the true accel,
 
         self.P_motor: float = 0
 
@@ -23,9 +27,11 @@ class BatMobile:
     def iterate(self, dt):
         self.battery.iterate(dt)
 
-        dP_motor = self.battery.voltage * self.battery.current - self.P_motor
-        self.motorAcceleration = (3 / (0.01 + self.velocity)) * (dP_motor / dt)
+        # dP_motor = self.battery.voltage * self.battery.current - self.P_motor
+        self.motorAcceleration = self.accelerationPerWatt * self.battery.voltage * self.battery.current
         self.simulateDrag()
+
+        self.P_motor = self.battery.voltage * self.battery.current
 
         self.acceleration = self.motorAcceleration + self.dragAcceleration
         self.velocity += self.acceleration * dt
@@ -40,7 +46,7 @@ class BatMobile:
 
     def simulateDrag(self):
         """Computes the drag acceleration which increases with v²."""
-        self.dragAcceleration = -1e-5 * self.velocity**2
+        self.dragAcceleration = -6e-3 * self.velocity**2 + self.friction
 
     def halt(self):
         self.battery.current = 0

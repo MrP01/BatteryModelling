@@ -12,30 +12,33 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     this file as short and clean as possible.
     """
 
-    STEPS_PER_FRAME = 20
+    STEPS_PER_FRAME = 15
 
     def __init__(self):
         super().__init__()
         self.batmap = BatMap(self.batgraph, self.batmobile, self)
-        self.threadPool = QThreadPool()
         self.setWindowTitle("Battery Modelling in the BatMobile")
+        self.threadPool = QThreadPool()
 
     def iterate(self):
         super().iterate()  # calls the Simulation class's numerical integration step
         self.batmap.render()
         self.statsLabel.setText(
-            f"Position: {self.batmobile.position:.2f}\n"
-            f"Velocity: {self.batmobile.velocity:.2f}\n"
-            f"Acceleration: {self.batmobile.acceleration:.2f}"
+            f"Time: {self.totalTimeElapsed:.2f} s\n"
+            f"Position: {self.batmobile.position:.2f} m\n"
+            f"Velocity: {self.batmobile.velocity:.2f} m/s\n"
+            f"Acceleration: {self.batmobile.acceleration:.2f} m/s²\n"
+            f"Motor Consumption: {self.batmobile.P_motor:.2f} W"
         )
 
-        if self.step % self.STEPS_PER_FRAME == 0:
+        if self.step % self.STEPS_PER_FRAME == 1:
             self.updatePlots()
 
     def updatePlots(self):
         """Updates the plots and redraws them. This is an expensive operation, so we run it outside the main thread."""
         measurement = self.batmobile.battery.measurement()
         measurement.time = self.totalTimeElapsed
+        # self.batteryPlots.addMeasurement(measurement)
         self.threadPool.start(lambda: self.batteryPlots.addMeasurement(measurement))
 
     def startOrStop(self):
@@ -56,8 +59,8 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.exportBtn = QtWidgets.QPushButton("Export", self)
         usageLabel = QtWidgets.QLabel(
             "Controls:\n"
-            "Press 'Start' to begin the simulation.\n"
-            "Use Up/Down arrow keys to steer.\n"
+            "Click 'Start' to begin the simulation.\n"
+            "Use Up/Down arrow keys to drive.\n"
             "Press 'H' to halt the car.\n"
             "Press 'S' as a shortcut to start/stop."
         )
@@ -65,7 +68,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
         self.batteryPlots = BatTimeseriesCanvas()
-
+        self.batteryPlots.draw()
         self.batmap.render()
 
         layout = QtWidgets.QGridLayout()

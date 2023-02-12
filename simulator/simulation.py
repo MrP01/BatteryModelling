@@ -3,7 +3,7 @@ from simulator.batmobile import BatMobile
 
 
 class Simulation:
-    dt = 5e-3
+    dt = 0.01
 
     def __init__(self):
         super().__init__()
