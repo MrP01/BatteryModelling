@@ -17,7 +17,7 @@ class Battery:
     capacity = 2.9 * 3600  # Ampere seconds of 2.9Ah battery
 
     def __init__(self):
-        self.voltage: float = 0  # total (AB) voltage of the battery / ECM Model
+        self.voltage: float = 4.2  # total (AB) voltage of the battery / ECM Model
         self.current: float = 0  # current through the battery (positive <=> discharging)
         self.soc: float = 1
         self.soh: float = 1
@@ -26,7 +26,7 @@ class Battery:
         # Auxiliary "internal" values
         self.iR1: float = 0
 
-    def iterate(self):
+    def iterate(self, dt):
         """Does the numerical integration step in time."""
         eta = 1
         samplingRate = 30

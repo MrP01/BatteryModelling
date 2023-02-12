@@ -12,7 +12,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     this file as short and clean as possible.
     """
 
-    STEPS_PER_FRAME = 30
+    STEPS_PER_FRAME = 20
 
     def __init__(self):
         super().__init__()
@@ -47,6 +47,15 @@ class MainWindow(Simulation, QtWidgets.QWidget):
 
     def buildUI(self):
         self.controlBtn = QtWidgets.QPushButton("Start", self)
+        self.resetBtn = QtWidgets.QPushButton("Reset", self)
+        self.exportBtn = QtWidgets.QPushButton("Export", self)
+        self.statsLabel = QtWidgets.QLabel(
+            "Controls:\n"
+            "Press 'Start' to begin the simulation.\n"
+            "Use Up/Down arrow keys to steer.\n"
+            "Press 'H' to halt the car.\n"
+            "Press 'S' as a shortcut to start/stop."
+        )
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
         self.batteryPlots = BatTimeseriesCanvas()
@@ -55,11 +64,17 @@ class MainWindow(Simulation, QtWidgets.QWidget):
 
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.batmap, 0, 0)
-        layout.addWidget(self.controlBtn, 0, 1)
+        buttonLayout = QtWidgets.QVBoxLayout()
+        buttonLayout.addWidget(self.controlBtn)
+        buttonLayout.addWidget(self.resetBtn)
+        buttonLayout.addWidget(self.exportBtn)
+        buttonLayout.addWidget(self.statsLabel)
+        buttonLayout.addStretch()
+        layout.addLayout(buttonLayout, 0, 1)
         graphLayout = QtWidgets.QHBoxLayout()
         graphLayout.addWidget(self.batteryPlots)
         # graphLayout.addStretch()
-        layout.addLayout(graphLayout, 1, 0)
+        layout.addLayout(graphLayout, 1, 0, 1, 2)
         self.setLayout(layout)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):

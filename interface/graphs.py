@@ -15,8 +15,8 @@ class BatPlotCanvas(FigureCanvasQTAgg):
     def __init__(self, width=5, height=4):
         self.figure = Figure(figsize=(width, height))
         super().__init__(self.figure)
-        self.setMinimumHeight(200)
-        self.setMinimumWidth(200)
+        self.setMinimumWidth(250)
+        self.setMinimumHeight(250)
 
 
 class BatTimeseriesCanvas(BatPlotCanvas):
@@ -32,7 +32,7 @@ class BatTimeseriesCanvas(BatPlotCanvas):
         (self.line3,) = self.axes3.plot([], [])
         self.axes1.set_ylabel("Current $I(t)$ / A")
         self.axes2.set_ylabel("Voltage $V(t)$ / V")
-        self.axes3.set_ylabel("State of Charge s(t) / 1")
+        self.axes3.set_ylabel("SOC s(t) / 1")
 
     def appendValueToLine(self, line, axes, time: float, value: float):
         XY = line.get_xydata()

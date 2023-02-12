@@ -15,6 +15,6 @@ class Simulation:
         self.totalTimeElapsed = 0
 
     def iterate(self):
-        self.batmobile.iterate()
+        self.batmobile.iterate(self.dt)
         self.totalTimeElapsed += self.dt
         self.step += 1
