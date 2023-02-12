@@ -30,7 +30,7 @@ class Battery:
         """Does the numerical integration step in time."""
         eta = 1
         samplingRate = 30
-        self.soc = self.soc - (samplingRate / self.capacity) * eta * self.current
+        self.soc = min(max(self.soc - (samplingRate / self.capacity) * eta * self.current, 0), 1)
         self.iR1 = self.current - np.exp(-samplingRate / (self.R1() * self.C1())) * (self.current - self.iR1)
         self.voltage = self.ocv() - self.R0() * self.current - self.R1() * self.iR1
 

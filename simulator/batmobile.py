@@ -24,11 +24,12 @@ class BatMobile:
         self.battery.iterate(dt)
 
         dP_motor = self.battery.voltage * self.battery.current - self.P_motor
-        self.motorAcceleration = (1 / self.velocity) * (dP_motor / dt)
+        self.motorAcceleration = (3 / (0.01 + self.velocity)) * (dP_motor / dt)
         self.simulateDrag()
 
         self.acceleration = self.motorAcceleration + self.dragAcceleration
-        self.velocity += max(self.acceleration * dt, 0)  # velocity is at least 0..
+        self.velocity += self.acceleration * dt
+        self.velocity = max(self.velocity, 0)  # velocity is at least 0..
         self.position += self.velocity * dt
 
     def accelerate(self, currentIncrease):
@@ -39,8 +40,8 @@ class BatMobile:
 
     def simulateDrag(self):
         """Computes the drag acceleration which increases with v²."""
-        self.dragAcceleration = -0.1 * self.velocity**2
+        self.dragAcceleration = -1e-5 * self.velocity**2
 
     def halt(self):
-        self.acceleration = 0
+        self.battery.current = 0
         self.velocity = 0

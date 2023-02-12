@@ -37,9 +37,9 @@ class BatMap(QLabel):
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         if self.controlsEnabled:
             if event.key() == Qt.Key.Key_Up:
-                self.batmobile.accelerate(0.4)
+                self.batmobile.accelerate(0.2)
             elif event.key() == Qt.Key.Key_Down:
-                self.batmobile.accelerate(-0.4)
+                self.batmobile.accelerate(-0.2)
             elif event.key() == Qt.Key.Key_H:
                 self.batmobile.halt()
             event.accept()

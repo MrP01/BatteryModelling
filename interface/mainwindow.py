@@ -23,6 +23,11 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     def iterate(self):
         super().iterate()  # calls the Simulation class's numerical integration step
         self.batmap.render()
+        self.statsLabel.setText(
+            f"Position: {self.batmobile.position:.2f}\n"
+            f"Velocity: {self.batmobile.velocity:.2f}\n"
+            f"Acceleration: {self.batmobile.acceleration:.2f}"
+        )
 
         if self.step % self.STEPS_PER_FRAME == 0:
             self.updatePlots()
@@ -49,13 +54,14 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.controlBtn = QtWidgets.QPushButton("Start", self)
         self.resetBtn = QtWidgets.QPushButton("Reset", self)
         self.exportBtn = QtWidgets.QPushButton("Export", self)
-        self.statsLabel = QtWidgets.QLabel(
+        usageLabel = QtWidgets.QLabel(
             "Controls:\n"
             "Press 'Start' to begin the simulation.\n"
             "Use Up/Down arrow keys to steer.\n"
             "Press 'H' to halt the car.\n"
             "Press 'S' as a shortcut to start/stop."
         )
+        self.statsLabel = QtWidgets.QLabel()
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
         self.batteryPlots = BatTimeseriesCanvas()
@@ -68,6 +74,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         buttonLayout.addWidget(self.controlBtn)
         buttonLayout.addWidget(self.resetBtn)
         buttonLayout.addWidget(self.exportBtn)
+        buttonLayout.addWidget(usageLabel)
         buttonLayout.addWidget(self.statsLabel)
         buttonLayout.addStretch()
         layout.addLayout(buttonLayout, 0, 1)
