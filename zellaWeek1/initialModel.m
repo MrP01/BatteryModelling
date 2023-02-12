@@ -18,3 +18,5 @@ function [stateOfCharge, iR1, voltageAB, r] = initialModel(samplingRate, ...
         iR1(i + 1) = exp(-samplingRate / (R1 * C1)) * iR1(i) + (1 - exp(- samplingRate / (R1 * C1))) * current(i);
         voltageAB(i) = polyval(r, stateOfCharge(i)) - R1 * iR1(i) - R0 * current(i); %might need to change polyval to OCV(SOC)
     end
+
+end

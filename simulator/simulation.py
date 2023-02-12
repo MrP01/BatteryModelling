@@ -11,8 +11,10 @@ class Simulation:
         self.batmobile = BatMobile()
         self.batmobile.sourceNode = "A"
         self.batmobile.destinationNode = "B"
+        self.step = 0
         self.totalTimeElapsed = 0
 
     def iterate(self):
         self.batmobile.iterate()
         self.totalTimeElapsed += self.dt
+        self.step += 1

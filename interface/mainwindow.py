@@ -1,9 +1,8 @@
-import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThreadPool
 
 from interface.batmap import BatMap
-from interface.graphs import BatPlotCanvas
+from interface.graphs import BatTimeseriesCanvas
 from simulator.simulation import Simulation
 
 
@@ -13,24 +12,26 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     this file as short and clean as possible.
     """
 
+    STEPS_PER_FRAME = 30
+
     def __init__(self):
         super().__init__()
         self.batmap = BatMap(self.batgraph, self.batmobile, self)
+        self.threadPool = QThreadPool()
+        self.setWindowTitle("Battery Modelling in the BatMobile")
 
     def iterate(self):
-        super().iterate()
+        super().iterate()  # calls the Simulation class's numerical integration step
         self.batmap.render()
 
+        if self.step % self.STEPS_PER_FRAME == 0:
+            self.updatePlots()
+
     def updatePlots(self):
-        self.voltageGraph.axes.plot(np.linspace(0, 20), 1 - np.linspace(0, 1) + 0.3 * (np.random.random((50,)) - 1))
-        # self.voltageGraph.axes.set_xlabel("Time $t$ / s")
-        self.voltageGraph.axes.set_ylabel("Voltage $V(t)$ / V")
-        self.currentGraph.axes.plot(np.linspace(0, 20), 1 - np.linspace(0, 1) + 0.3 * (np.random.random((50,)) - 1))
-        # self.currentGraph.axes.set_xlabel("Time $t$ / s")
-        self.currentGraph.axes.set_ylabel("Current $I(t)$ / A")
-        self.socGraph.axes.plot(np.linspace(0, 20), 1 - np.linspace(0, 1) + 0.3 * (np.random.random((50,)) - 1))
-        # self.socGraph.axes.set_xlabel("Time $t$ / s")
-        self.socGraph.axes.set_ylabel("State of Charge s(t) / 1")
+        """Updates the plots and redraws them. This is an expensive operation, so we run it outside the main thread."""
+        measurement = self.batmobile.battery.measurement()
+        measurement.time = self.totalTimeElapsed
+        self.threadPool.start(lambda: self.batteryPlots.addMeasurement(measurement))
 
     def startOrStop(self):
         if self.controlBtn.text() == "Start":
@@ -48,20 +49,15 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.controlBtn = QtWidgets.QPushButton("Start", self)
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
-        self.voltageGraph = BatPlotCanvas()
-        self.currentGraph = BatPlotCanvas()
-        self.socGraph = BatPlotCanvas()
+        self.batteryPlots = BatTimeseriesCanvas()
 
         self.batmap.render()
-        self.updatePlots()
 
         layout = QtWidgets.QGridLayout()
         layout.addWidget(self.batmap, 0, 0)
         layout.addWidget(self.controlBtn, 0, 1)
         graphLayout = QtWidgets.QHBoxLayout()
-        graphLayout.addWidget(self.currentGraph)
-        graphLayout.addWidget(self.voltageGraph)
-        graphLayout.addWidget(self.socGraph)
+        graphLayout.addWidget(self.batteryPlots)
         # graphLayout.addStretch()
         layout.addLayout(graphLayout, 1, 0)
         self.setLayout(layout)
