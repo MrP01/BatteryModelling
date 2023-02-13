@@ -1,5 +1,4 @@
 """The graphical interface / visualisation layer of our simulation!"""
-
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QThreadPool
 

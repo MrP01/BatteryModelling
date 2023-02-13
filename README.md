@@ -2,6 +2,10 @@
 
 This is a group project from the MSc in MMSC, focused on battery modelling.
 
+Here is a screenshot to get a taste:
+
+![Screenshot of the simulator interface](interface/assets/screenshot.png)
+
 ## A Journal of the Journey
 
 ### Week 1:

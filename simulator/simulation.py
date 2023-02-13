@@ -6,7 +6,6 @@ To run,
 simulation = Simulation()
 simulation.runMe(60)
 """
-
 from simulator.batgraph import BatGraph
 from simulator.batmobile import BatMobile
 
