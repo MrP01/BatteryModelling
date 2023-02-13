@@ -29,7 +29,6 @@ class Simulation:
         Passes further details on to batmobile and battery.
         """
         if self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["distance"]:
-            print("Simulator also recognised...")
             self.turnBatMobile()
 
         self.batmobile.iterate(self.dt)
@@ -54,6 +53,8 @@ class Simulation:
         self.batmobile.destinationNode = self.getOnwardDestinations()[self.chooseTurnIndex()]
         self.batmobile.sourceNode = destNode
         self.batmobile.position = 0
+        if self.batgraph.nodes[destNode]["charger"]:
+            self.batmobile.chargeUp()
 
     def currentEdge(self):
         return (self.batmobile.sourceNode, self.batmobile.destinationNode)

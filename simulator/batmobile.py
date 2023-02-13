@@ -51,3 +51,7 @@ class BatMobile:
     def halt(self):
         self.battery.current = 0
         self.velocity = 0
+
+    def chargeUp(self):
+        self.battery.soc = 1
+        print("Charged up!")

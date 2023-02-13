@@ -64,6 +64,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         if self.controlBtn.text() == "Start":
             self.iterationTimerId = self.startTimer(20)
             self.controlBtn.setText("Stop")
+            self.batmap.setFocus()
         else:
             self.killTimer(self.iterationTimerId)
             self.controlBtn.setText("Start")
