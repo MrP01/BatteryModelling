@@ -113,6 +113,7 @@ The relevant code structure is:
   - `mainwindow.py` defines the general layout and actions in the user interface.
   - `batmap.py` exports the central widget that renders / animates the BatMobile car on the BatGraph.
   - `graphs.py` handles the connection of the interface and (live) plots. The plots are handled by `matplotlib` and are very intuitive to use, further almost all commands are the same as they are in MatLab.
+- `main.py` creates a `MainWindow` and runs the simulator GUI.
 
 ### Data Used
 

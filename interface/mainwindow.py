@@ -1,3 +1,5 @@
+"""The graphical interface / visualisation layer of our simulation!"""
+
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QThreadPool
 
@@ -13,6 +15,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     """Our Main Window Class that hosts all sub-widgets and has overall control over the GUI.
     All the simulation-related graphical items and code should be located in simulator/ to keep
     this file as short and clean as possible.
+    I am a subclass of the Simulation class.
     """
 
     STEPS_PER_FRAME = 15
@@ -25,6 +28,10 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.userSelectedTurnIndex = None
 
     def iterate(self):
+        """The iteration method of the simulation, representing a single numerical integration step in time by dt.
+        We slightly modify it here on the visualisation layer, but our superclass's iterate() method is still called by
+        super().iterate().
+        """
         if (
             self.userSelectedTurnIndex is None
             and self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["distance"]
@@ -120,4 +127,5 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     def chooseTurnIndex(self):
         index = self.userSelectedTurnIndex
         self.userSelectedTurnIndex = None
+        self.turnLabel.setHidden(True)
         return index
