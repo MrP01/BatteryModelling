@@ -16,7 +16,7 @@ class BatPlotCanvas(FigureCanvasQTAgg):
         self.figure = Figure(figsize=(width, height))
         super().__init__(self.figure)
         self.setMinimumWidth(250)
-        self.setMinimumHeight(250)
+        self.setMinimumHeight(190)
 
 
 class BatTimeseriesCanvas(BatPlotCanvas):

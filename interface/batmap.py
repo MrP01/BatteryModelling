@@ -20,7 +20,7 @@ class BatMap(QLabel):
         self.graph = batgraph
         self.batmobile = batmobile
 
-        self.canvas = QPixmap(960, 640)
+        self.canvas = QPixmap(960, 580)
         self.setPixmap(self.canvas)
         self.batmobilePix = QPixmap(SIMULATOR_DIRECTORY / "assets" / "batmobile-outlined.png")
         self.controlsEnabled = True
