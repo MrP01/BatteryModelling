@@ -3,7 +3,7 @@ import pathlib
 from typing import Optional
 
 import matplotlib.pyplot as plt
-from PySide6 import QtGui
+from PySide6 import QtCore, QtGui, QtMultimedia
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QPixmap, QTransform
 from PySide6.QtWidgets import QLabel, QWidget
@@ -11,10 +11,12 @@ from PySide6.QtWidgets import QLabel, QWidget
 from simulator.batgraph import BatGraph
 from simulator.batmobile import BatMobile
 
-SIMULATOR_DIRECTORY = pathlib.Path(__file__).parent
+INTERFACE_DIRECTORY = pathlib.Path(__file__).parent
 
 
 class BatMap(QLabel):
+    PLAY_SOUND = False
+
     def __init__(self, batgraph: BatGraph, batmobile: BatMobile, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.graph = batgraph
@@ -22,13 +24,16 @@ class BatMap(QLabel):
 
         self.canvas = QPixmap(960, 520)
         self.setPixmap(self.canvas)
-        self.batmobilePix = QPixmap(SIMULATOR_DIRECTORY / "assets" / "batmobile-outlined.png")
+        self.batmobilePix = QPixmap(INTERFACE_DIRECTORY / "assets" / "batmobile-outlined.png")
         self.controlsEnabled = True
         self.backgroundColor = self.palette().color(self.backgroundRole())
         self.themeColors = [c["color"] for c in plt.rcParams["axes.prop_cycle"]]
         plt.rcParams["figure.facecolor"] = self.backgroundColor.name()
         plt.rcParams["axes.facecolor"] = self.backgroundColor.name()
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+
+        self.effect = QtMultimedia.QSoundEffect()
+        self.effect.setSource(QtCore.QUrl.fromLocalFile(INTERFACE_DIRECTORY / "assets" / "vroom-vroom.wav"))
 
     def render(self):
         self.canvas.fill(self.backgroundColor)
@@ -41,6 +46,8 @@ class BatMap(QLabel):
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         if self.controlsEnabled:
             if event.key() == Qt.Key.Key_Up:
+                if self.PLAY_SOUND and self.batmobile.velocity == 0:
+                    self.effect.play()
                 self.batmobile.accelerate(self.batmobile.currentJump)
             elif event.key() == Qt.Key.Key_Down:
                 self.batmobile.accelerate(-self.batmobile.currentJump)

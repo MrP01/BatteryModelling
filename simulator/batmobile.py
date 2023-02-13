@@ -14,7 +14,7 @@ class BatMobile:
         self.battery = Battery()
 
         self.position: float = 0  # meters
-        self.velocity: float = 0.1  # meters / second
+        self.velocity: float = 0  # meters / second
         self.acceleration: float = 0  # true acceleration that determines velocity. in meters / second².
         self.motorAcceleration: float = 0  # goal acceleration, positively affects the true acceleration
         self.dragAcceleration: float = self.friction  # acceleration caused by drag, negatively affects the true accel,
