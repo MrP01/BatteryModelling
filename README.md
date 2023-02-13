@@ -2,6 +2,10 @@
 
 This is a group project from the MSc in MMSC, focused on battery modelling.
 
+Here is a screenshot to get a taste:
+
+![Screenshot of the simulator interface](interface/assets/screenshot.png)
+
 ## A Journal of the Journey
 
 ### Week 1:
@@ -72,11 +76,48 @@ Big Recommendations:
 - Look at continuous time version and solve in matlab
 - Look at modeling capacity (linearly as a function of time and cycle use?)
 
+### Week 5:
+
+Meeting on Monday:
+
 ## Repository Structure and Setup:
 
-... to be defined
-
 To use and sustain a Python virtual environment, install [poetry](https://python-poetry.org/), which works with the `pyproject.toml` file.
+After installing poetry (and subsequently after pulling, each time), run
+
+```bash
+poetry install
+```
+
+in the project folder.
+To install PyBamm as well (which has 1/epsilon number of dependencies), run
+
+```bash
+poetry install --with=pybamm
+```
+
+instead or additionally. This sadly requires Python 3.8 based on a pybamm restriction. Without pybamm, 3.11 should be fine too.
+
+Having all dependencies installed, the main interface may be launched up by
+
+```bash
+python3 main.py
+```
+
+which starts a graphical user interface (with looks depending on your operating system).
+
+The relevant code structure is:
+
+- The folder `simulator/` is responsible for the (numerical) simulation itself, which may be invoked without any interface at all.
+  - `simulation.py` features the Simulation class with an `iterate()` method that represents a numerical integration step in time by an amount of `dt`.
+  - `batgraph.py` exports a class `BatGraph` that represents a graph (a tuple of sets of edges and vertices) that the car will drive on.
+  - `batmobile.py` contains the `BatMobile` class that represents our battery mobile i.e. car. **Much of the simulation takes place in this file!**
+  - `battery.py` is the central file for our battery modelling project, which exports a `Battery` class, also featuring an `iterate()` method. **Most of the battery simulation takes place in this file!**
+- The interface code is contained within the `interface/` folder.
+  - `mainwindow.py` defines the general layout and actions in the user interface.
+  - `batmap.py` exports the central widget that renders / animates the BatMobile car on the BatGraph.
+  - `graphs.py` handles the connection of the interface and (live) plots. The plots are handled by `matplotlib` and are very intuitive to use, further almost all commands are the same as they are in MatLab.
+- `main.py` creates a `MainWindow` and runs the simulator GUI.
 
 ### Data Used
 

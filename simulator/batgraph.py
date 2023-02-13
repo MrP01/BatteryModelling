@@ -22,7 +22,7 @@ class BatGraph(networkx.classes.graph.Graph):
         graph.add_node("C", lat=150, long=360, charger=True)
         graph.add_node("D", lat=650, long=150, charger=False)
         graph.add_node("E", lat=400, long=470, charger=False)
-        graph.add_node("F", lat=900, long=550, charger=False)
+        graph.add_node("F", lat=700, long=500, charger=False)
         graph.add_edge("A", "B")
         graph.add_edge("A", "C")
         graph.add_edge("B", "C")
