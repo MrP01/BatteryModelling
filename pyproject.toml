@@ -13,6 +13,9 @@ networkx = "^3.0"
 numpy = "^1.24.2"
 matplotlib = "^3.6.3"
 
+[tool.poetry.group.pybamm]
+optional = true
+
 [tool.poetry.group.pybamm.dependencies]
 casadi = "3.5.5"
 pybamm = "^23.1"
