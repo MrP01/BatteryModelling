@@ -3,7 +3,6 @@ import csv
 from mat4py import loadmat
 import matplotlib.pyplot as plt
 import scipy as sp
-
 # last 2 entries are synthetic data, rest taken from plot
 x = np.array([0, 100, 200, 260, 300, 400, 500, 575, 590])
 y = np.array([2.9, 2.75, 2.56, 2.5, 2.45, 2.38, 2.31, 1.25, 0.25])
