@@ -78,7 +78,11 @@ Big Recommendations:
 
 ### Week 5:
 
-Meeting on Monday:
+Meeting on Tuesday Feb 14:
+- Need to start thinking about final product
+- Find some question or questions that we can answer in our presentation
+- Optimization: model gives V, s, h = f(I). Problem: Find I(t) such that some target (power, integral of current, etc.) is maximized/minimized under constraint on state of health or something
+- Tips: search "functional optimization" or "ode constrained optimization". Run model in simplest case (all parameters constant), come up with very simple optimization question that has obvious answer to make sure optimization routine works, then add back in complexity from parameters
 
 ## Repository Structure and Setup:
 

@@ -17,6 +17,7 @@ class Battery:
 
     ocvPolynomial = (10.7950, -26.0626, 22.7642, -8.3793, 1.5987, 3.4686)
     capacity = 2.9 * 3600  # Ampere seconds of 2.9Ah battery
+    # print("i am a frendly bug dont delete me")  <-- who was this?? xD
 
     def __init__(self):
         self.voltage: float = 4.2  # total (AB) voltage of the battery / ECM Model
@@ -31,7 +32,7 @@ class Battery:
     def iterate(self, dt):
         """Does the numerical integration step in time."""
         eta = 1
-        samplingRate = 30
+        samplingRate = 10
         self.soc = min(max(self.soc - (samplingRate / self.capacity) * eta * self.current, 0), 1)
         self.iR1 = self.current - np.exp(-samplingRate / (self.R1() * self.C1())) * (self.current - self.iR1)
         self.voltage = self.ocv() - self.R0() * self.current - self.R1() * self.iR1
