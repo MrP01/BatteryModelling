@@ -180,8 +180,6 @@ plt.ylabel("Degradation Ratio")
 plt.show()
 ##
 # Out[14]: array([ 1.01576599,  0.88279821, -5.06803394])
-
-
 def scaleDegrading(current):
     currentInC = current / 2.9
     return np.clip(
