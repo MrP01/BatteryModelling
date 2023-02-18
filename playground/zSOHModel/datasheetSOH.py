@@ -36,30 +36,6 @@ plt.legend(["actual data", "fit data"])
 ax2 = plt.gca()
 fig2 = plt.gcf()
 plt.show()
-##
-
-
-def calAge(initialCapacity, timeInSeconds, temp=25):
-    # Capacity is agnostic to units
-    if temp > 20:
-        timeInMonths = 3.805e-7 * timeInSeconds
-        return max(initialCapacity * (1 - 0.2 * timeInMonths / 3), 0)
-    else:
-        timeInYears = 3.171e-8 * timeInSeconds
-        return max(initialCapacity * (1 - 0.2 * timeInYears), 0)
-
-
-def cycleAge(cycles):
-    # Capacity is agnostic to units
-    return max(2.9 * (1 - 4.58e-04 * cycles - np.exp(5.07e-02 * (cycles - 600))), 0)
-
-
-def ageBat(totNumCycles, timeElapsed, tempUsed):
-    # Reasoning is cyclic aging occurs on a much shorter timescale and thus impacts the battery 'first'
-    # We then use this degraded capacity to calculate any calendar aging that has occurred
-    cycleAgingDegradedCapacity = cycleAge(totNumCycles)
-    totalDegradedCapacity = calAge(cycleAgingDegradedCapacity, timeElapsed, tempUsed)
-    return totalDegradedCapacity
 
 
 ##
@@ -182,19 +158,19 @@ degradationRatios = [
 ]
 
 
-def scaleFit(x, a1, a2, a3):
-    return a1 - np.exp(a2 * x + a3)
+def degradingFactor(current, a1, a2, a3):
+    return a1 - np.exp(a2 * current + a3)
 
 
-popt3, pcov = sp.optimize.curve_fit(
-    scaleFit,
+optimalDegradingFactorParameters, pcov = sp.optimize.curve_fit(
+    degradingFactor,
     x,
     degradationRatios,
     p0=(1, 3, -1),
 )
 
 xx = np.linspace(0, 6)
-yy = scaleFit(xx, *popt3)
+yy = degradingFactor(xx, *optimalDegradingFactorParameters)
 
 plt.plot(xx * 2.9, yy, "orange")
 plt.title("Degradation Ratios against Current")
@@ -202,3 +178,48 @@ plt.xlabel("Current (A)")
 plt.ylabel("Degradation Ratio")
 # plt.legend(["actual data", "fit data"])
 plt.show()
+##
+# Out[14]: array([ 1.01576599,  0.88279821, -5.06803394])
+
+
+def scaleDegrading(current):
+    currentInC = current / 2.9
+    return np.clip(
+        optimalDegradingFactorParameters[0]
+        - np.exp(
+            optimalDegradingFactorParameters[1] * currentInC
+            + optimalDegradingFactorParameters[2]
+        ),
+        0,
+        1,
+    )
+
+
+def calAge(initialCapacity, timeInSeconds, temp=25):
+    # Capacity is agnostic to units
+    if temp > 20:
+        timeInMonths = 3.805e-7 * timeInSeconds
+        return max(initialCapacity * (1 - 0.2 * timeInMonths / 3), 0)
+    else:
+        timeInYears = 3.171e-8 * timeInSeconds
+        return max(initialCapacity * (1 - 0.2 * timeInYears), 0)
+
+
+def cycleAgeNoScaling(cycles):
+    # Capacity is agnostic to units
+    return max(2.9 * (1 - 4.58e-04 * cycles - np.exp(5.07e-02 * (cycles - 600))), 0)
+
+
+def ageBat(totNumCycles, timeElapsed, tempUsed):
+    # Reasoning is cyclic aging occurs on a much shorter timescale and thus impacts the battery 'first'
+    # We then use this degraded capacity to calculate any calendar aging that has occurred
+    cycleAgingDegradedCapacity = cycleAgeNoScaling(totNumCycles)
+    totalDegradedCapacity = calAge(cycleAgingDegradedCapacity, timeElapsed, tempUsed)
+    return totalDegradedCapacity
+
+
+def cycleAgeBattery(cycles, current):
+    return cycleAgeNoScaling(cycles) * scaleDegrading(current)
+
+
+cycleAgeBattery(300, 2)
