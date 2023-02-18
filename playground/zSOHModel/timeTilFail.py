@@ -20,17 +20,21 @@ def cycleAgeBattery(cycles, current):
     return cycleAgeNoScaling(cycles) * scaleDegrading(current)
 
 
-def objFun(n, current):
-    return cycleAgeBattery(n, current) - 2.9 * 0.8
+def objFun(n, current, threshold):
+    return cycleAgeBattery(n, current) - 2.9 * threshold
 
 
-def getCyclesTilDegradedCapacity(current):
-    root = fsolve(objFun, 10, args=current)
+def getCyclesTilDegradedCapacity(current, threshold):
+    root = fsolve(objFun, 10, args=[current, threshold])
     return root
 
 
-def getTotalDegradationTime(current):
-    numCyclesNeededToDegrade = getCyclesTilDegradedCapacity(current)
+def getTotalDegradationTime(current, threshold):
+    """
+    Current = current in Amperes
+    Threshold = percentage of original Q_00 at which we claim battery is dead
+    """
+    numCyclesNeededToDegrade = getCyclesTilDegradedCapacity(current, threshold)
     print(np.ceil(numCyclesNeededToDegrade[0]))
     totalTimeNeeded = 0
     for i in range(1, int(numCyclesNeededToDegrade + 1)):
