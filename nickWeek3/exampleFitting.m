@@ -8,8 +8,8 @@ capacity = 2.9; % 2.9Ahr cell
 %OCV = generateOCV(chargeData,dischargeData,capacity,5);
 
 %% Load specific current and voltage profile.
-dataDir = "/Users/nickwest/Documents/Oxford/MMSC/Hilary/Battery Modeling/BatteryModelling/cleanData/n20c/cleanDataN20C/";
-filename = "run24_n20C.csv";
+dataDir = "/Users/nickwest/Documents/Oxford/MMSC/Hilary/Battery Modeling/BatteryModelling/cleanData/10c/cleanData10C/";
+filename = "run30_10C.csv";
 runData = readtable(dataDir + filename);
 measuredVoltage = runData.voltage;
 % OCV = mean(measuredVoltage([1:3 length(measuredVoltage)-3:length(measuredVoltage)]))

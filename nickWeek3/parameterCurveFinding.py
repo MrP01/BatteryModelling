@@ -5,6 +5,40 @@ import matplotlib.pyplot as plt
 def load_data():
     return pd.read_csv("finalOutput.txt")
 
+def plot_curves_no_temperature_data(df):
+    tempfunc = lambda x: int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
+    df["RunNum"] = df["Run"].apply(tempfunc)
+    try:
+        df.drop(df.index[df["T"] != 10], axis=0, inplace=True) # Only working with 10C
+    except:
+        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved like this
+    df.drop(df.index[df["R1"] < 0], axis=0, inplace=True) # No negative resistances
+    df.drop(df.index[df["C1"] < 100], axis=0, inplace=True) # Bad data
+    df.drop(df.index[df["RunNum"]%5 == 0], axis=0, inplace=True) # Get rid of high current runs because messes up R1
+    df.drop(df.index[df["SOC"] <= 0.1], axis=0, inplace=True) # one bad data point in R1
+
+    plt.figure(1, figsize=(9, 3))
+    ax = plt.subplot(1,3,1)
+    plt.scatter(df["SOC"], df["R0"])
+    myTemp = np.polyfit(df["SOC"], df["R0"], 4)
+    x = np.linspace(0, 1, 101)
+    plt.plot(x, np.polyval(myTemp, x))
+    print("R0 Fit:"+str(myTemp))
+    ax = plt.subplot(1, 3, 2)
+    plt.scatter(df["SOC"], df["R1"])
+    myTemp = np.polyfit(df["SOC"], df["R1"], 4)
+    x = np.linspace(0, 1, 101)
+    plt.plot(x, np.polyval(myTemp, x))
+    print("R1 Fit:" + str(myTemp))
+    ax = plt.subplot(1, 3, 3)
+    plt.scatter(df["SOC"], df["C1"])
+    myTemp = np.polyfit(df["SOC"], df["C1"], 4)
+    x = np.linspace(0, 1, 101)
+    y = np.array([max(i, df["C1"].min()) for i in np.polyval(myTemp, x)])
+    plt.plot(x, y)
+    print("C1 Fit:" + str(myTemp))
+    plt.savefig("paramsNoTemp.png")
+
 def plot_curves(df):
     tempfunc = lambda x: int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
     df["RunNum"] = df["Run"].apply(tempfunc)
@@ -69,5 +103,7 @@ def plot_curves(df):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    print("Running")
     df = load_data()
-    plot_curves(df)
+    #plot_curves(df)
+    plot_curves_no_temperature_data(df)
