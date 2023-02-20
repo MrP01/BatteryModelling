@@ -45,7 +45,14 @@ def getTotalDegradationTime(current, threshold):
     return totalTimeNeeded
 
 
-# t = getTotalDegradationTime(2.9, 0.8)
+#
+# currents = np.linspace(0, 15)
+# times = [1 / getTotalDegradationTime(current, 0.8) for current in currents]
+# # t = getTotalDegradationTime(2.9, 0.8)
+# plt.plot(currents, times)
+# plt.show()
+
+##
 def getBestCurrent(a, b, powerLaw, threshold, plotArg="n"):
     currents = np.linspace(1e-4, 15)
     times = np.array(
@@ -54,7 +61,13 @@ def getBestCurrent(a, b, powerLaw, threshold, plotArg="n"):
 
     with np.errstate(divide="ignore"):
         inverseTimes = np.divide(1, times) ** powerLaw
-    costFun = a * np.square(currents[0 : len(inverseTimes)]) - b * inverseTimes
+    costFun = (
+        a
+        * np.multiply(
+            np.square(currents[0 : len(inverseTimes)]), times[0 : len(inverseTimes)]
+        )
+        - b * inverseTimes
+    )
     if plotArg == "y":
         print(f"Best current is {currents[costFun.argmax()]:.1f}A")
         if np.max(costFun) < 0:
@@ -64,28 +77,34 @@ def getBestCurrent(a, b, powerLaw, threshold, plotArg="n"):
         else:
             print("You are at a net POSIITVE")
         plt.plot(currents, costFun, "red")
-        plt.title(f"evaluation of cost function C,p={powerLaw}")
-        plt.xlabel("current")
-        plt.ylabel("utility")
-        plt.legend([rf"$C = {a}I^2-{b}\frac{1}{{t_f}}$"])
+        plt.title(
+            f"Evaluation of Cost Function C with Death at {threshold}$Q_{{00}}$\np ={powerLaw}, Ratio of Benefit = {b:.2e}"
+        )
+        plt.xlabel("Current")
+        plt.ylabel("Net Utility")
+        plt.legend([rf"$C = I^2t_f-RoB \times \frac{1}{{t_f^p}}$"])
         plt.show()
-    return currents[costFun.argmax()]
+    return currents[costFun.argmax()], costFun
 
 
-ratioOfBenefit = 1000
-cb = getBestCurrent(1, ratioOfBenefit, 1, 0.8, "y")
+ratioOfBenefit = 1e6
+bc, cf = getBestCurrent(1, ratioOfBenefit, 1, 0.8, "y")
 ##
-laws = [0.5, 1, 2, 3, 4]
+laws = [0.5, 1, 2]
 
 
 def examinePowerlaw(laws):
     for law in laws:
         print(law)
-        ratios = np.linspace(1, 5000, 250)
-        bestCurs = [getBestCurrent(1, ratio, law, 0.8) for ratio in ratios]
+        ratios = np.logspace(3, 5.5, 100)
+        bestCurs = [getBestCurrent(1, ratio, law, 0.8)[0] for ratio in ratios]
+        print(bestCurs)
         plt.figure()
-        plt.plot(ratios, bestCurs)
-        plt.title(f"best currents as a function of ratio of benefit\np={law}")
+        plt.plot(ratios, bestCurs, "red")
+        plt.xlabel("RoB")
+        plt.ylabel("Best Current")
+        plt.legend([rf"$C = I^2t_f-RoB \times \frac{1}{{t_f^p}}$"])
+        plt.title(f"Best Currents as Functions of Ratio of Benefit\np={law}")
         plt.show()
 
 
