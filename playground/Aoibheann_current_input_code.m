@@ -13,7 +13,7 @@ options = odeset('Mass',M,'RelTol',1e-4,'AbsTol',[1e-6 1e-10 1e-6 1e-6 1e-6 1e-6
 z0=1; I0=1; T0=10; %wrong initial condition - ;
 % Initialisation y(1)=z, y(2)=VC1(t), y(3)=v(t), y(4)=IR1(t), y(5)=T(t), y(6)=I(t)y(3),
 % y(6) = P(t) power = I(t)v(t)
-y0_1 = [z0,I0*R0(T0,z0),ocv(z0)-I0*R1(T0,z0)-I(z0)*R0(T0,z0),I0, T0, I(z0)*(ocv(z0)-I0*R1(T0,z0)-I(z0)*R0(T0,z0))];
+y0_1 = [z0,I0*R0(T0,z0),ocv(z0)-I0*R1(T0,z0)-I(0)*R0(T0,z0),I0, T0, I(0)*(ocv(z0)-I0*R1(T0,z0)-I(0)*R0(T0,z0))];
 tspan_1 = linspace(0,67);
 [t1,y1] = ode15s(@f,tspan_1,y0_1,options);
 
