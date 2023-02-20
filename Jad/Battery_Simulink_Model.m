@@ -1,37 +1,99 @@
 clc
-%% Battery State-of-Health Estimation
-% This example shows how to estimate the battery internal resistance and 
-% state-of-health (SOH) by using an adaptive Kalman filter. The initial 
-% state-of-charge (SOC) of the battery is equal to 0.6. The estimator uses 
-% an initial condition for the SOC equal to 0.65. The battery keeps 
-% charging and discharging for 10 hours. The unscented Kalman filter
-% estimator converges to the real value of the SOC while also estimating 
-% the internal resistance. To use a different Kalman filter implementation, 
-% in the SOC Estimator (Kalman Filter) block, set the Filter type parameter 
-% to the desired value.
-
-% Copyright 2022 The MathWorks, Inc.
+for v = 112:112
+%% Required Power from velocity
+r = 0.135;
+N = 25/(3*pi)/r*v;
+Pgrid = 0:1000:7000;
+Pdata = [0  24.9  49 73.5 91 95 90 82];
+p1 = polyfit(Pgrid,Pdata,2);
+figure
+P = @(v) p1(1,1)*v^2+p1(1,2)*v+p1(1,3);
+fplot(P,[0 7000])
+Po = P(N);
 
 %% Model
-
-openExample('simscapebattery/BatterySOHEstimationExample')
-
-open_system('BatterySOHEstimation')
-
-set_param(find_system('BatterySOHEstimation','FindAll', 'on','type','annotation','Tag','ModelFeatures'),'Interpreter','off')
-
-%% Defining DATA in Simulink
-SOC_vec = [0 0.1 0.25 0.5 0.75 0.9 1]; %SOC Lookup values
-T_vec = [278 293 313]; %Temperature Lookup Values
-V0_mat = [3.49,3.5,3.51;3.55,3.57,3.56;3.62,3.63,3.64;3.71,3.71,3.72;3.91,3.93,3.94;4.07,4.08,4.08;4.19,4.19,4.19]; %Voc(f(SOC,T))
-R0_mat = [0.0117 0.0085 0.009;0.011 0.0085 0.009;0.0114 0.0087 0.0092;0.0107 0.0082 0.0088;0.0107 0.0083 0.0091;0.0113 0.0085 0.0089;0.01166 0.0085 0.0089]; %R0(f(SOC,T))
-AH = 2.7; %cell capacity in AH
-R1_mat = [0.0109 0.0029 0.0013;0.0069 0.0024 0.0012;0.0047 0.0026 0.0013;0.0034 0.0016 0.001;0.0033 0.0023 0.0014;0.0033 0.0018 0.0011;0.0028 0.0017 0.0011];%R1(f(SOC,T))
-tau1_mat = [20 36 39;31 45 39;109 105 61;36 29 26;59 77 67;40 33 29;25 39 33];
-
+[SOC0,SOCb,SOCa,SOCh]= Aoibheann(P);
+%% System Parameters specified by us
+%In order
+Ccharge = 1; 
+Chome = 1;
+Cost_1 = 5; %dollars for 0 -- 1
+Cost_2 = 10; %Dollars for 0 -- 1
+%% SIMULINK
+%% Parameters
+SOC_vec = [0, .1, .25, .5, .75, .9, 1]; % Vector of state-of-charge values, SOC
+T_vec   = [278, 293, 313];              % Vector of temperatures, T, (K)
+AH      = 27;                           % Cell capacity, AH, (A*hr) [40 120]
+thermal_mass = 100;                     % Thermal mass (J/K)
+initialSOC = 0.65;                       % Battery initial SOC
+V0_mat  = [3.49, 3.5, 3.51; 3.55, 3.57, 3.56; 3.62, 3.63, 3.64;3.71, 3.71, 3.72; 3.91, 3.93, 3.94; 4.07, 4.08, 4.08;4.19, 4.19, 4.19];% Open-circuit voltage, V0(SOC,T), (V)
+R0_mat  = [.0117, .0085, .009; .011, .0085, .009;...
+    .0114, .0087, .0092; .0107, .0082, .0088; .0107, .0083, .0091;...
+    .0113, .0085, .0089; .0116, .0085, .0089];  % Terminal resistance, R0(SOC,T), (ohm)
+R1_mat  = [.0109, .0029, .0013; .0069, .0024, .0012;...
+    .0047, .0026, .0013; .0034, .0016, .001; .0033, .0023, .0014;...
+    .0033, .0018, .0011; .0028, .0017, .0011];  % First polarization resistance, R1(SOC,T), (ohm)
+tau1_mat = [20, 36, 39; 31, 45, 39; 109, 105, 61;36, 29, 26; 59, 77, 67; 40, 33, 29; 25, 39, 33]; % First time constant, tau1(SOC,T), (s)
+cell_area = 0.1019; % Cell area (m^2)
+h_conv    = 5;      % Heat transfer coefficient (W/(K*m^2))
+%% Kalman Filter
+Q    = [1e-4 0 0;0 1e-4 0;0 0 1e-4]; % Covariance of the process noise, Q
+R    = 0.05;                         % Covariance of the measurement noise, R
+P0   = [1e-5 0 0; 0 1 0; 0 0 1e-5];  % Initial state error covariance, P0
+R00  = 0.008;                        % Estimator initial R0 
+Ts   = 1;                            % Sample time (s)
+n_cycles = 39;
+Tstop = 10*36000;
+%% Open system
+%open_system('BatterySOHEstimationJad')
+sim('BatterySOHEstimationJad')
 %% Extracting SOH from simulink
-J = zeros(1,length(simout));
-for z = 1:length(simout)
-J(1,z)=simout(1,1,z);
+S = zeros(1,length(SOH));
+for z = 1:length(SOH)
+S(1,z)=SOH(1,1,z);
 end
-plot(1:length(J),J)
+% figure
+% plot(1:length(S),S,'LineWidth',2)
+Z = zeros(1,length(SOC));
+for z = 1:length(SOC)
+Z(1,z)=SOC(1,1,z);
+end
+% figure
+% plot(1:length(Z),Z,'LineWidth',2)
+% figure
+% plot(1:length(Cu),Cu,'LineWidth',2)
+p = polyfit(1:length(S),S,1);
+A=0.2*n_cycles/(1-(p(1,1)*length(S)+p(1,2)))/10;
+t_change = A;
+disp(t_change)
+% fsoh = @(x) (1 - 4.54*10^-4*x -exp(5.07*10^-2 * (x - (A+100))));
+% figure
+% idx=inf;
+% for i =0:A+100
+%     if fsoh(i)<0
+%         idx = i;
+%     end
+% end
+% fplot(fsoh,[0 idx],'linewidth',2)
+
+%% Cost estimation
+C = 1:52*10; %(10 years in weeks)
+C_charging = @(C) C*Cost_1; %(or Cost_2)
+C_change = t_change/2;
+counter = 1;
+C_SOH = @(C) 0;
+for N = C(rem(C,round(C_change))==0)
+    C_SOH = @(C) C_SOH(C) + heaviside(C-N)*3000;
+end
+Ct = @(C) C_charging(C)+C_SOH(C);
+figure
+fplot(Ct,[C(1,1) C(1,end)])
+end
+
+
+function [SOC0,SOCb,SOCa,SOCh]=Aoibheann(P)
+SOC0 = 0.65;
+SOCb = 0.1;
+SOCa = 0.8;
+SOCh = 0.3;
+end

@@ -5,6 +5,7 @@ from scipy.optimize import curve_fit
 from numpy import loadtxt
 
 
+# https://www.electrogenic.co.uk/under-the-bonnet/technology/choosing-a-motor
 def func1(X, a, b, c):
     x, y = X
     f = a*x + b*y + c
@@ -105,5 +106,5 @@ for col in columns:
         surf = ax.plot_surface(xig, yig, zlin, linewidth=0)
         surf2 = ax.plot_surface(xig,yig,z2lin,linewidth=0)
         z2 = np.logical_not(np.isnan(zlin - z2lin))
-        print(str, a[0][:].round(4), 'Error:',np.linalg.norm(Z-Z2)/np.mean(Z))
+        print(str, a[0][:].round(6), 'Error:',np.linalg.norm(Z-Z2)/np.mean(Z))
 plt.show()
