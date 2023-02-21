@@ -90,7 +90,7 @@ xlabel('t');
 function out = f(t,y)
 out = [  -y(6)./Q(y(5),t)
     y(6)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10-1e-6*t
    y(6)-P(t)./y(3)];
@@ -99,7 +99,7 @@ end
 function out = f2(t,y)
 out = [  -y(6)./Q(y(5),t)
     y(6)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10-1e-6*t
    y(6)-P2(t)./y(3)];
@@ -120,7 +120,7 @@ function R = R0(T,z)
     R = -1.297e-3*T-4.26e-3*z+6.4201e-2;
 end
 
-%Function defining Capacity using cycles 
+%Function defining Capacity using cycles
 function q = Q(T,t)
     q = 2.9*(1-4.58e-4*cycle(t)-exp(5.07e-2*(cycle(t)-600)))*g(T,t);
 end
@@ -130,7 +130,7 @@ end
 
 %Function defining cycles set to charge every 2 hours
 function c = cycle(t)
-    c = (t-mod(t,7.2e3))/7.2e3;    
+    c = (t-mod(t,7.2e3))/7.2e3;
 end
 
 %Function called in capacity function
@@ -143,10 +143,10 @@ function fn = g(T,t)
 end
 
 %Power function
-function ir = P(t)    
+function ir = P(t)
     ir = 1e-3;
 end
-function ir = P2(t)    
+function ir = P2(t)
     ir = 1e-3;
 end
 

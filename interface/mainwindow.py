@@ -58,6 +58,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         measurement = self.batmobile.battery.measurement()
         measurement.time = self.totalTimeElapsed
         # self.batteryPlots.addMeasurement(measurement)
+        # TODO: could add finely-grained data here in batch (instead of just one measurement!)
         self.threadPool.start(lambda: self.batteryPlots.addMeasurement(measurement))
 
     def startOrStop(self):

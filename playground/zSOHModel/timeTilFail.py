@@ -55,18 +55,12 @@ def getTotalDegradationTime(current, threshold):
 ##
 def getBestCurrent(a, b, powerLaw, threshold, plotArg="n"):
     currents = np.linspace(1e-4, 15)
-    times = np.array(
-        [getTotalDegradationTime(current, threshold) for current in currents]
-    )
+    times = np.array([getTotalDegradationTime(current, threshold) for current in currents])
 
     with np.errstate(divide="ignore"):
         inverseTimes = np.divide(1, times) ** powerLaw
     costFun = (
-        a
-        * np.multiply(
-            np.square(currents[0 : len(inverseTimes)]), times[0 : len(inverseTimes)]
-        )
-        - b * inverseTimes
+        a * np.multiply(np.square(currents[0 : len(inverseTimes)]), times[0 : len(inverseTimes)]) - b * inverseTimes
     )
     if plotArg == "y":
         print(f"Best current is {currents[costFun.argmax()]:.1f}A")

@@ -15,7 +15,7 @@ Po = P(N);
 [SOC0,SOCb,SOCa,SOCh]= Aoibheann(P);
 %% System Parameters specified by us
 %In order
-Ccharge = 1; 
+Ccharge = 1;
 Chome = 1;
 Cost_1 = 5; %dollars for 0 -- 1
 Cost_2 = 10; %Dollars for 0 -- 1
@@ -40,7 +40,7 @@ h_conv    = 5;      % Heat transfer coefficient (W/(K*m^2))
 Q    = [1e-4 0 0;0 1e-4 0;0 0 1e-4]; % Covariance of the process noise, Q
 R    = 0.05;                         % Covariance of the measurement noise, R
 P0   = [1e-5 0 0; 0 1 0; 0 0 1e-5];  % Initial state error covariance, P0
-R00  = 0.008;                        % Estimator initial R0 
+R00  = 0.008;                        % Estimator initial R0
 Ts   = 1;                            % Sample time (s)
 n_cycles = 39;
 Tstop = 10*36000;

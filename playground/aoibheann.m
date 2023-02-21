@@ -87,7 +87,7 @@ fplot(h,[0,2*6.048e5],'g.')
 function out = f(t,y)
 out = [  -I(t)./Q(y(5),t)
     I(t)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+I(y(1)).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+I(y(1)).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10-1e-6*t
    y(6)-I(t)*y(3)];
@@ -96,7 +96,7 @@ end
 function out = f2(t,y)
 out = [  -I2(t)./Q(y(5),t)
     I2(t)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+I2(y(1)).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+I2(y(1)).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10-10e-6*t
    y(6)-I(t)*y(3)];
@@ -122,7 +122,7 @@ end
 %end
 
 function c = cycle(t)
-    c = (t-mod(t,6.048e5))/6.048e5;    
+    c = (t-mod(t,6.048e5))/6.048e5;
 end
 
 function fn = g(T,t)
@@ -133,10 +133,10 @@ function fn = g(T,t)
     end
 end
 
-%function ir = I(t)    
+%function ir = I(t)
 %    ir = 2.9e-2*(1+sin(t));
 %end
-%function ir = I2(t)    
+%function ir = I2(t)
 %    ir = -2.9;
 %end
 function ir = I(t)
