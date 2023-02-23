@@ -3,45 +3,26 @@ import matplotlib.pyplot as plt
 import scipy as sp
 
 plt.rcParams["text.usetex"] = True
-##
-# last 2 entries are synthetic data, rest taken from plot
-x = np.array([0, 100, 200, 260, 300, 400, 500, 575, 590])
-y = np.array([2.9, 2.75, 2.56, 2.5, 2.45, 2.38, 2.31, 1.25, 0.25])
 
+# This file generates a 'current scaling factor' CSF, NOT to be confused with
+# the SOC, s. The variable CSF is a measure of how much further a battery's capacity Q(t)
+# should degrade when ran at higher temperatures, compared to being run at 1C
+# which we use as baseline. s takes a maximum at 1 when current is equal to 1C
+# and a minimum of 0, which is effectively when using the battery at such a current
+# would cause it to instantly die.
+#
+# We take results from:
+# https://spiral.imperial.ac.uk/bitstream/10044/1/60288/6/Final_Manuscript__Characterization_of_the_Degradation_Process_of_Lithium_ion_Batteries_when_Discharged_at_Different_Current_Rates.pdf
+# and adapt them to our usecase. This paper suggests we model the degradation process
+# as a curve of the form
+# f(t) = C1 * exp(a*t) + C2 exp(b*t)
+# for constants C1,C2,a,b. We make the approximation that C1, C2 are agnostic to current
+# and thus seek to find a(I), and b(I) via curve-fitting.
 
-fig1, ax1 = plt.subplots(figsize=(12, 4))
-ax1.plot(x, y, "o")
-ax1.set_title("Q_0 against C, synthetic tail")
-plt.show()
+# Firstly, we fit a(I):
 
-
-def exponentialFit(x, b, c, d):
-    return 2.9 * (1 - d * x - np.exp(b * (x - c)))
-
-
-popt, pcov = sp.optimize.curve_fit(exponentialFit, x, y, p0=(1 / 600, 300, 1 / 2000))
-# Best values for b,c,d:
-# b = 5.07e-02
-# c = 600
-# d = 4.58e-04
-
-xx = np.linspace(10, 600, 1000)
-yy = exponentialFit(xx, *popt)
-
-plt.plot(x, y, "o", xx, yy)
-plt.title("fit of Q_0 against C with synthetic tail")
-plt.legend(["actual data", "fit data"])
-ax2 = plt.gca()
-fig2 = plt.gcf()
-plt.show()
-
-
-##
-# now checking degradation vs current draw
-# last 2 entries are synthetic data, rest taken from plot
-
-a = np.array([1, 2, 3])
-b = np.array([-0.02905, -0.02896, -0.02093])
+currentValuesInC = np.array([1, 2, 3])
+aValues = np.array([-0.02905, -0.02896, -0.02093])
 
 
 def cycleCurFit(x, a1, a2, a3):
@@ -50,8 +31,8 @@ def cycleCurFit(x, a1, a2, a3):
 
 poptA, pcov = sp.optimize.curve_fit(
     cycleCurFit,
-    a,
-    b,
+    currentValuesInC,
+    aValues,
     p0=(-0.03, 3, -14),
 )
 
@@ -60,28 +41,28 @@ def aFunc(current):
     return poptA[0] + np.exp(poptA[1] * current + poptA[2])
 
 
-xx = np.linspace(1, 3)
-yy = cycleCurFit(xx, *poptA)
+rangeOfCurrentValues = np.linspace(1, 3)
+fittedAValues = cycleCurFit(rangeOfCurrentValues, *poptA)
 
-plt.plot(a, b, "o", xx, yy)
+plt.plot(currentValuesInC, aValues, "o", rangeOfCurrentValues, fittedAValues)
 plt.title("Fit of $a$ against current")
 plt.legend(["Raw data", "Fit data"])
 plt.xlabel("Current (A)")
 plt.ylabel("$a$ (1/cycles)")
 plt.show()
 ##
-c = np.array([1, 2, 3])
-d = np.array([-0.0001406, -0.0002115, -0.0003943])
+# Next we seek to fit b(I)
+bValues = np.array([-0.0001406, -0.0002115, -0.0003943])
 
 
-def cycleCurFit2(x, a1, a2, a3):
+def cycleCurFitBValues(x, a1, a2, a3):
     return a1 - np.exp(a2 * x + a3)
 
 
-poptB, pcov = sp.optimize.curve_fit(
-    cycleCurFit2,
-    c,
-    d,
+poptB, pcovB = sp.optimize.curve_fit(
+    cycleCurFitBValues,
+    currentValuesInC,
+    bValues,
     p0=(-0.0003, 3, -14),
 )
 
@@ -90,18 +71,18 @@ def bFunc(current):
     return poptB[0] - np.exp(poptB[1] * current + poptB[2])
 
 
-xx = np.linspace(1, 3)
-yy = cycleCurFit2(xx, *poptB)
+rangeOfCurrentValues = np.linspace(1, 3)
+fittedBValues = cycleCurFitBValues(rangeOfCurrentValues, *poptB)
 
-plt.plot(c, d, "o", xx, yy)
+plt.plot(currentValuesInC, bValues, "o", rangeOfCurrentValues, fittedBValues)
 plt.title("Fit of $b$ against current")
 plt.legend(["Raw data", "Fit data"])
 plt.xlabel("Current (A)")
 plt.ylabel("$b$ (1/cycles)")
-# ax2 = plt.gca()
-# fig2 = plt.gcf()
+plt.ticklabel_format(style="sci", scilimits=(-3, 4), axis="both")
 plt.show()
 ##
+# Now, having a(I) and b(I), we create a function to degrade capacity based on arbitrary current.
 def degradeFunRaw(current, cycles):
     a = aFunc(current)
     b = bFunc(current)
@@ -124,10 +105,12 @@ ax1.plot(cycles, degradation2C, "g")
 ax1.plot(cycles, degradation3C, "b")
 ax1.set_title("Plot of raw degradation on supplementary data against current")
 plt.xlabel("Current (A)")
-plt.ylabel("Degradation (%)")
+plt.ylabel("Capacity (Percentage of Initial)")
 plt.legend(["1C", "2C", "3C"])
 plt.show()
 ##
+# Next, we find the ratios Q(I)/Q(1C) and plot these; these work only for
+# 1C < I < 3C
 cycles = np.linspace(0, 300)
 degradation2CRatio = degradation2C / degradation1C
 degradation25CRatio = degradation25C / degradation1C
@@ -146,6 +129,9 @@ plt.ylabel("Degradation")
 # plt.legend(["1C", "2C", "3C"])
 plt.show()
 ##
+# Then we construct a function to get the ratio Q(I)/Q(1C)
+# for an arbitrary current. We then plot this function; this function
+# returns the variable 'CSF'
 x = [2, 2.25, 2.5, 2.8, 3]
 degradationRatios = [
     0.9789551462062951,
@@ -167,52 +153,27 @@ optimalDegradingFactorParameters, pcov = sp.optimize.curve_fit(
     p0=(1, 3, -1),
 )
 
-xx = np.linspace(0, 6)
-yy = degradingFactor(xx, *optimalDegradingFactorParameters)
+rangeOfCurrentValues = np.linspace(0, 6)
+yy = degradingFactor(rangeOfCurrentValues, *optimalDegradingFactorParameters)
 
-plt.plot(xx * 2.9, yy, "orange")
+plt.plot(rangeOfCurrentValues * 2.9, yy, "orange")
 plt.title("Degradation Ratios against Current")
 plt.xlabel("Current (A)")
 plt.ylabel("Degradation Ratio")
 # plt.legend(["actual data", "fit data"])
 plt.show()
 ##
+# To simply view results, either see the hardcoded comment below
+# or run the code below after running all code above.
 # Out[14]: array([ 1.01576599,  0.88279821, -5.06803394])
 def scaleDegrading(current):
     currentInC = current / 2.9
     return np.clip(
         optimalDegradingFactorParameters[0]
-        - np.exp(optimalDegradingFactorParameters[1] * currentInC + optimalDegradingFactorParameters[2]),
+        - np.exp(
+            optimalDegradingFactorParameters[1] * currentInC
+            + optimalDegradingFactorParameters[2]
+        ),
         0,
         1,
     )
-
-
-def calAge(initialCapacity, timeInSeconds, temp=25):
-    # Capacity is agnostic to units
-    if temp > 20:
-        timeInMonths = 3.805e-7 * timeInSeconds
-        return max(initialCapacity * (1 - 0.2 * timeInMonths / 3), 0)
-    else:
-        timeInYears = 3.171e-8 * timeInSeconds
-        return max(initialCapacity * (1 - 0.2 * timeInYears), 0)
-
-
-def cycleAgeNoScaling(cycles):
-    # Capacity is agnostic to units
-    return max(2.9 * (1 - 4.58e-04 * cycles - np.exp(5.07e-02 * (cycles - 600))), 0)
-
-
-def ageBat(totNumCycles, timeElapsed, tempUsed):
-    # Reasoning is cyclic aging occurs on a much shorter timescale and thus impacts the battery 'first'
-    # We then use this degraded capacity to calculate any calendar aging that has occurred
-    cycleAgingDegradedCapacity = cycleAgeNoScaling(totNumCycles)
-    totalDegradedCapacity = calAge(cycleAgingDegradedCapacity, timeElapsed, tempUsed)
-    return totalDegradedCapacity
-
-
-def cycleAgeBattery(cycles, current):
-    return cycleAgeNoScaling(cycles) * scaleDegrading(current)
-
-
-cycleAgeBattery(300, 2)
