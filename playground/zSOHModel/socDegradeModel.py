@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 
+# TODO: I'll comment this file properly and explain everything - z
 plt.rcParams["text.usetex"] = True
 
 
@@ -123,32 +124,32 @@ plt.title("Comparison of Current and Aging Profiles with Cycles on Capacity")
 plt.xlabel("Cycles")
 plt.ylabel("Capacity (Ah)")
 plt.show()
-##
-twoC = 2 * 2.9 * np.ones_like(cycles)
-threeC = 3 * 2.9 * np.ones_like(cycles)
-fourC = 4 * 2.9 * np.ones_like(cycles)
-fiveC = 5 * 2.9 * np.ones_like(cycles)
-sixC = 6 * 2.9 * np.ones_like(cycles)
-profile = totalScaling(cycles, oneC)
-profile2 = totalScaling(cycles, twoC)
-profile3 = totalScaling(cycles, threeC)
-profile4 = totalScaling(cycles, fourC)
-profile5 = totalScaling(cycles, fiveC)
-profile6 = totalScaling(cycles, sixC)
-plt.plot(cycles, profile, "r", label="1C")
-plt.plot(cycles, profile2, "black", label="2C")
-plt.plot(cycles, profile3, "g", label="3C")
-plt.plot(cycles, profile4, "b", label="4C")
-plt.plot(cycles, profile5, "orange", label="5C")
-plt.plot(cycles, profile6, "magenta", label="6C")
-plt.title("Plot of Capacity Against Cycle Number for Varying Currents")
-plt.ylabel("Capacity (Ah)")
-plt.xlabel("Cycle Number")
-plt.legend(loc="upper right")
-plt.show()
-##
-times = np.logspace(1, 8)
-socs = 0.65 * np.ones_like(times)
-ages = [calAge(0.65, time) for time in times]
-plt.plot(times, ages)
-plt.show()
+# ##
+# twoC = 2 * 2.9 * np.ones_like(cycles)
+# threeC = 3 * 2.9 * np.ones_like(cycles)
+# fourC = 4 * 2.9 * np.ones_like(cycles)
+# fiveC = 5 * 2.9 * np.ones_like(cycles)
+# sixC = 6 * 2.9 * np.ones_like(cycles)
+# profile = totalScaling(cycles, oneC)
+# profile2 = totalScaling(cycles, twoC)
+# profile3 = totalScaling(cycles, threeC)
+# profile4 = totalScaling(cycles, fourC)
+# profile5 = totalScaling(cycles, fiveC)
+# profile6 = totalScaling(cycles, sixC)
+# plt.plot(cycles, profile, "r", label="1C")
+# plt.plot(cycles, profile2, "black", label="2C")
+# plt.plot(cycles, profile3, "g", label="3C")
+# plt.plot(cycles, profile4, "b", label="4C")
+# plt.plot(cycles, profile5, "orange", label="5C")
+# plt.plot(cycles, profile6, "magenta", label="6C")
+# plt.title("Plot of Capacity Against Cycle Number for Varying Currents")
+# plt.ylabel("Capacity (Ah)")
+# plt.xlabel("Cycle Number")
+# plt.legend(loc="upper right")
+# plt.show()
+# ##
+# times = np.logspace(1, 8)
+# socs = 0.65 * np.ones_like(times)
+# ages = [calAge(0.65, time) for time in times]
+# plt.plot(times, ages)
+# plt.show()
