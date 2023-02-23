@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def load_data():
-    return pd.read_csv("finalOutput.txt")
+    return pd.read_csv("finalOutputWithOCV.txt")
 
 def plot_curves_no_temperature_data(df):
     tempfunc = lambda x: int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
@@ -17,27 +17,57 @@ def plot_curves_no_temperature_data(df):
     df.drop(df.index[df["RunNum"]%5 == 0], axis=0, inplace=True) # Get rid of high current runs because messes up R1
     df.drop(df.index[df["SOC"] <= 0.1], axis=0, inplace=True) # one bad data point in R1
 
-    plt.figure(1, figsize=(9, 3))
-    ax = plt.subplot(1,3,1)
+    # Start plotting
+    plt.figure(1, figsize=(16, 7))
+
+    #Plot of R0 with fit
+    ax = plt.subplot(2,4,1)
     plt.scatter(df["SOC"], df["R0"])
-    myTemp = np.polyfit(df["SOC"], df["R0"], 4)
-    x = np.linspace(0, 1, 101)
+    myTemp = np.polyfit(df["SOC"], df["R0"], 6)
+    x = np.linspace(0.1, 1, 101)
     plt.plot(x, np.polyval(myTemp, x))
-    print("R0 Fit:"+str(myTemp))
-    ax = plt.subplot(1, 3, 2)
+    print("R0 Fit: "+str(myTemp))
+    #Plot of residuals
+    ax = plt.subplot(2,4,1+4)
+    plt.scatter(df["SOC"], df["R0"]-np.polyval(myTemp, df["SOC"]))
+
+    #Plot of R1 with fit
+    ax = plt.subplot(2, 4, 2)
     plt.scatter(df["SOC"], df["R1"])
-    myTemp = np.polyfit(df["SOC"], df["R1"], 4)
-    x = np.linspace(0, 1, 101)
+    myTemp = np.polyfit(df["SOC"], df["R1"], 6)
+    x = np.linspace(0.1, 1, 101)
     plt.plot(x, np.polyval(myTemp, x))
     print("R1 Fit:" + str(myTemp))
-    ax = plt.subplot(1, 3, 3)
+    #Plot of residuals
+    ax = plt.subplot(2, 4, 2 + 4)
+    plt.scatter(df["SOC"], df["R1"] - np.polyval(myTemp, df["SOC"]))
+
+    #Plot of C1 with fit
+    ax = plt.subplot(2, 4, 3)
     plt.scatter(df["SOC"], df["C1"])
     myTemp = np.polyfit(df["SOC"], df["C1"], 4)
-    x = np.linspace(0, 1, 101)
+    x = np.linspace(0.1, 1, 101)
     y = np.array([max(i, df["C1"].min()) for i in np.polyval(myTemp, x)])
     plt.plot(x, y)
-    print("C1 Fit:" + str(myTemp))
+    print("C1 Fit: " + str(myTemp))
+    #Plot of residuals
+    ax = plt.subplot(2, 4, 3 + 4)
+    plt.scatter(df["SOC"], df["C1"] - np.polyval(myTemp, df["SOC"]))
+
+    #Plot of OCV with fit
+    ax = plt.subplot(2,4,4)
+    plt.scatter(df["OCV_SOC"], df["OCV"])
+    myTemp = np.polyfit(df["OCV_SOC"], df["OCV"], 5)
+    x = np.linspace(0.1, 1, 101)
+    plt.plot(x, np.polyval(myTemp, x))
+    print("OCV Fit: "+str(myTemp))
+    #Plot of residuals
+    ax = plt.subplot(2, 4, 4 + 4)
+    plt.scatter(df["SOC"], df["OCV"] - np.polyval(myTemp, df["OCV_SOC"]))
     plt.savefig("paramsNoTemp.png")
+
+
+
 
 def plot_curves(df):
     tempfunc = lambda x: int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
