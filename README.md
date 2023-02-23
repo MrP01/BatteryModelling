@@ -79,6 +79,7 @@ Big Recommendations:
 ### Week 5:
 
 Meeting on Tuesday Feb 14:
+
 - Need to start thinking about final product
 - Find some question or questions that we can answer in our presentation
 - Optimization: model gives V, s, h = f(I). Problem: Find I(t) such that some target (power, integral of current, etc.) is maximized/minimized under constraint on state of health or something

@@ -41,6 +41,7 @@ class Simulation:
             self.iterate()
 
     def chooseTurnIndex(self):
+        print("Turned at the next best corner")
         return 0
 
     def getOnwardDestinations(self):

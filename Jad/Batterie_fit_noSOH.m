@@ -2,20 +2,20 @@ clearvars;
 %% INFO
 % Output of the code: Error with cross terms is printed in command window,
 % error for all aproximations is also printed in a table in the command
-% window. The best approximation is drawn and the corresponding coefficients 
+% window. The best approximation is drawn and the corresponding coefficients
 % are printed last in the command window.
 
 % How to provide data
 %-----------------------------------------
-%    T  |   SOC  |   R0  |   R1   |  C   |  
-%    5  |   10   |  5910 |  7850  | 5075 |   
-%    5  |   20   |  5810 |  6360  | 5981 |   
-%    .       .       .       .        .       
-%    .       .       .       .        .        
-%    .       .       .       .        .        
-%    5  |   90   |  5850 |  6300  | 5810 |   
-%   15  |   10   |  ...  |  ....  | .... |  
-%   15  |   20   |  ...  |  ....  | .... | 
+%    T  |   SOC  |   R0  |   R1   |  C   |
+%    5  |   10   |  5910 |  7850  | 5075 |
+%    5  |   20   |  5810 |  6360  | 5981 |
+%    .       .       .       .        .
+%    .       .       .       .        .
+%    .       .       .       .        .
+%    5  |   90   |  5850 |  6300  | 5810 |
+%   15  |   10   |  ...  |  ....  | .... |
+%   15  |   20   |  ...  |  ....  | .... |
 %-----------------------------------------
 % etc.. (for fixed T, all SOC, then change T, all SOH ...)
 
@@ -26,10 +26,10 @@ Data = Data(1:45,:);
 %Provide the SOC values (even though they were mentioned in DATA)
 SOCvals = [10 20 30 40 50 60 70 80 90];
 %Provide the T values (even though they were mentioned in DATA)
-Tvals = [5 15 25 35 45]; 
+Tvals = [5 15 25 35 45];
 %This specifies what we want to approximate (3 for R0, 4 for R1, 5 for C1)
-Which_Data = 5; 
-%Pvec shows the order of approximation (i.e. [1 1] means first order in T, 
+Which_Data = 5;
+%Pvec shows the order of approximation (i.e. [1 1] means first order in T,
 % first order in SOC), I only included up to order 4 but feel free to add
 % more if you want.
 pvec = [1 1;1 2;2 1;2 2;1 3;2 3;3 1;3 2;3 3;1 4;2 4;3 4;4 1;4 2;4 3;4 4];
@@ -70,9 +70,9 @@ for z = 1:length(pvec)+1
         check = 1;
     end
 pl = pvec(z,:);
-p1 = pl(1,1);  
+p1 = pl(1,1);
 p2 = pl(1,2);
-[f,fm] = cr_f(p1,p2,check); %Crf creates the function used to aproximate the fitting 
+[f,fm] = cr_f(p1,p2,check); %Crf creates the function used to aproximate the fitting
 fn = @(b,x) 0;
 fmn = @(b,X,Y) 0;
 for m = 1:length(f)
@@ -135,10 +135,10 @@ counter = 2;
         if z<=p2
         f{counter} = @(b,x) b(counter)*x(:,2).^z;
         fm{counter} = @(b,X,Y) b(counter)*Y.^z;
-        counter = counter+1; 
+        counter = counter+1;
         end
         if q == 1
-            if (p1~=p2) 
+            if (p1~=p2)
                 error('Ps should be equal 2!')
             end
         f{counter} = @(b,x) b(counter)*x(:,1).*x(:,2);

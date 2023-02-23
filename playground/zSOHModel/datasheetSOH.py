@@ -1,6 +1,4 @@
 import numpy as np
-import csv
-from mat4py import loadmat
 import matplotlib.pyplot as plt
 import scipy as sp
 
@@ -184,10 +182,7 @@ def scaleDegrading(current):
     currentInC = current / 2.9
     return np.clip(
         optimalDegradingFactorParameters[0]
-        - np.exp(
-            optimalDegradingFactorParameters[1] * currentInC
-            + optimalDegradingFactorParameters[2]
-        ),
+        - np.exp(optimalDegradingFactorParameters[1] * currentInC + optimalDegradingFactorParameters[2]),
         0,
         1,
     )

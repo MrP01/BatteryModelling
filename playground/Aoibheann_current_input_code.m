@@ -92,7 +92,7 @@ Below here the functions are defined.
 function out = f(t,y)
 out = [  -I(t)./Q(y(5),t)
     I(t)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+I(t).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+I(t).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10-1e-6*t
    y(6)-I(t)*y(3)];
@@ -102,7 +102,7 @@ end
 function out = f2(t,y)
 out = [  -I2(t)./Q(y(5),t)
     I2(t)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+I2(t).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+I2(t).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10-10e-6*t
    y(6)-I(t)*y(3)];
@@ -135,7 +135,7 @@ end
 %Cycle function to charge once a week t=60x60x24x7=6.048e5
 %We are not using long enough times to implement this function yet
 function c = cycle(t)
-    c = (t-mod(t,6.048e5))/6.048e5;    
+    c = (t-mod(t,6.048e5))/6.048e5;
 end
 
 %Function called in capacitance
@@ -148,11 +148,11 @@ function fn = g(T,t)
 end
 
 %Function defining current to be constant
-function ir = I(t)    
+function ir = I(t)
     ir = 2.9e-2;
 end
 %Negative current to recharge cell
-function ir = I2(t)    
+function ir = I2(t)
     ir = -0.2;
 end
 
@@ -178,7 +178,7 @@ end
 %         ir=2.9e-2;
 %     end
 % end
-% 
+%
 % function ir = I2(t)
 % %    if t<70
 %         ir=-0.2;
@@ -190,5 +190,3 @@ end
 % %        ir=0;
 % %    end
 % end
-
-
