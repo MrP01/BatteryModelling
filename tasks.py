@@ -14,13 +14,14 @@ def run_trial(ctx, model="lithium-ion"):
 
 
 @invoke.task()
-def run_simulation(ctx, name="constant-current-1.5A", T_max=6.0):
+def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
     """Runs the simulation for some given test setting."""
     simulation = Simulation()
-    simulation.batmobile.battery.current = 1.5  # set the current
-    simulation.chooseTurnIndex = lambda: 0
     log = []
     while simulation.totalTimeElapsed < T_max:
+        simulation.batmobile.battery.current = (
+            8 * simulation.totalTimeElapsed**2 * np.exp(-1.4 * simulation.totalTimeElapsed)
+        )
         simulation.iterate()
         log.append(
             (
@@ -34,7 +35,7 @@ def run_simulation(ctx, name="constant-current-1.5A", T_max=6.0):
         )
     log = np.array(log)
     t = np.linspace(0, T_max, log.shape[0])
-    plt.title(f"Running with current control I = {simulation.batmobile.battery.current} A.")
+    plt.title("Running with current control")
     plt.plot(t, log[:, 0], label="Position")
     plt.plot(t, log[:, 1], label="Velocity")
     plt.plot(t, log[:, 2], label="Acceleration")
