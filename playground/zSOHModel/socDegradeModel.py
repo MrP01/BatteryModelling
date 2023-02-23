@@ -100,14 +100,15 @@ def totalScaling(cycles, current):
 
 
 timeOfSit = 0.2e8
-cycles = np.linspace(0, 300)
+cycles = np.linspace(0, 600)
 oneC = 2.9 * np.ones_like(cycles)
 profile1C = [totalScalingWithTime(cycle, 2.9, 0.65, timeOfSit) for cycle in cycles]
 profile1CShort = [
     totalScalingWithTime(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles
 ]
 profile0C = [totalScalingWithTime(cycle, 0 * 2.9, 0.65, timeOfSit) for cycle in cycles]
-profile3C = [totalScalingWithTime(cycle, 7 * 2.9, 0.65, timeOfSit) for cycle in cycles]
+profile3C = [totalScalingWithTime(cycle, 3 * 2.9, 0.65, timeOfSit) for cycle in cycles]
+profile4C = [totalScalingWithTime(cycle, 4 * 2.9, 0.65, timeOfSit) for cycle in cycles]
 profile3CHighSOC = [
     totalScalingWithTime(cycle, 3 * 2.9, 0.9, timeOfSit) for cycle in cycles
 ]
@@ -115,6 +116,7 @@ plt.plot(cycles, profile1C, "r", label=f"1C Time={timeOfSit:.2e}s")
 plt.plot(cycles, profile1CShort, "g", label=f"1C Time={0.5*timeOfSit:.2e}s")
 plt.plot(cycles, profile0C, "b", label=f"0C Time={timeOfSit:.2e}")
 plt.plot(cycles, profile3C, "magenta", label=f"3C Time={timeOfSit:.2e}")
+plt.plot(cycles, profile4C, "cyan", label=f"4C Time={timeOfSit:.2e}")
 plt.plot(cycles, profile3CHighSOC, "orange", label=f"3C, High SOC Time={timeOfSit:.2e}")
 plt.legend(loc="best")
 plt.title("Comparison of Current and Aging Profiles with Cycles on Capacity")
