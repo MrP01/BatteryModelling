@@ -49,7 +49,7 @@ def currentScalingFactor(current):
     )
 
 
-def totalScalingWithTime(cycles, current, soc, timeInSecs):
+def totalDegradation(cycles, current, soc=0.65, timeInSecs=1e7):
     """
     Given a number of cycles run for, with the current ran at,
     as well as battery aging time in seconds along with the (average) SOC
@@ -57,6 +57,8 @@ def totalScalingWithTime(cycles, current, soc, timeInSecs):
 
     # Q(cycles,current,SOC,time) = Q_0 - (CACDF(cycles)/CSF(current)) - CDF(SOC,time)
     """
+    # To view background for CACDF view:
+    # 'generateCurrentAgnosticDegradation.py'
     CACDF = (
         2.9
         * 4.58e-04
@@ -78,27 +80,32 @@ def totalScalingWithTime(cycles, current, soc, timeInSecs):
 # The code above is all that is needed for our degradation model.
 #######
 # This next code just generating capacity profiles for different current profiles
-timeOfSit = 0.2e8
-cycles = np.linspace(0, 600)
-oneC = 2.9 * np.ones_like(cycles)
-profile1C = [totalScalingWithTime(cycle, 2.9, 0.65, timeOfSit) for cycle in cycles]
-profile1CShort = [
-    totalScalingWithTime(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles
-]
-profile0C = [totalScalingWithTime(cycle, 0 * 2.9, 0.65, timeOfSit) for cycle in cycles]
-profile3C = [totalScalingWithTime(cycle, 3 * 2.9, 0.65, timeOfSit) for cycle in cycles]
-profile4C = [totalScalingWithTime(cycle, 4 * 2.9, 0.65, timeOfSit) for cycle in cycles]
-profile3CHighSOC = [
-    totalScalingWithTime(cycle, 3 * 2.9, 0.9, timeOfSit) for cycle in cycles
-]
-plt.plot(cycles, profile1C, "r", label=f"1C Time={timeOfSit:.2e}s")
-plt.plot(cycles, profile1CShort, "g", label=f"1C Time={0.5*timeOfSit:.2e}s")
-plt.plot(cycles, profile0C, "b", label=f"0C Time={timeOfSit:.2e}")
-plt.plot(cycles, profile3C, "magenta", label=f"3C Time={timeOfSit:.2e}")
-plt.plot(cycles, profile4C, "cyan", label=f"4C Time={timeOfSit:.2e}")
-plt.plot(cycles, profile3CHighSOC, "orange", label=f"3C, High SOC Time={timeOfSit:.2e}")
-plt.legend(loc="best")
-plt.title("Comparison of Current and Aging Profiles with Cycles on Capacity")
-plt.xlabel("Cycles")
-plt.ylabel("Capacity (Ah)")
-plt.show()
+def generatePlots():
+    timeOfSit = 0.2e8
+    cycles = np.linspace(0, 600)
+    profile1C = [totalDegradation(cycle, 2.9, 0.65, timeOfSit) for cycle in cycles]
+    profile1CShort = [
+        totalDegradation(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles
+    ]
+    profile0C = [totalDegradation(cycle, 0 * 2.9, 0.65, timeOfSit) for cycle in cycles]
+    profile3C = [totalDegradation(cycle, 3 * 2.9, 0.65, timeOfSit) for cycle in cycles]
+    profile4C = [totalDegradation(cycle, 4 * 2.9, 0.65, timeOfSit) for cycle in cycles]
+    profile3CHighSOC = [
+        totalDegradation(cycle, 3 * 2.9, 0.9, timeOfSit) for cycle in cycles
+    ]
+    plt.plot(cycles, profile1C, "r", label=f"1C Time={timeOfSit:.2e}s")
+    plt.plot(cycles, profile1CShort, "g", label=f"1C Time={0.5*timeOfSit:.2e}s")
+    plt.plot(cycles, profile0C, "b", label=f"0C Time={timeOfSit:.2e}")
+    plt.plot(cycles, profile3C, "magenta", label=f"3C Time={timeOfSit:.2e}")
+    plt.plot(cycles, profile4C, "cyan", label=f"4C Time={timeOfSit:.2e}")
+    plt.plot(
+        cycles, profile3CHighSOC, "orange", label=f"3C, High SOC Time={timeOfSit:.2e}"
+    )
+    plt.legend(loc="best")
+    plt.title("Comparison of Current and Aging Profiles with Cycles on Capacity")
+    plt.xlabel("Cycles")
+    plt.ylabel("Capacity (Ah)")
+    plt.show()
+
+
+generatePlots()

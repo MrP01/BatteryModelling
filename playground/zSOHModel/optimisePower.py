@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import timeTilFail as ttf
+import evaluateCostFunctions as ttf
 import scipy.integrate as integrate
+
+##
 
 
 def getModelParams():  # Should read from file but I am just copying from other program--parameterCurveFinding.py
