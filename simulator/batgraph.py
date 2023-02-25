@@ -11,7 +11,7 @@ class BatGraph(networkx.classes.graph.Graph):
         graph.add_node("A", lat=60, long=200, charger=False)
         graph.add_node("B", lat=900, long=300, charger=False)
         graph.add_edge("A", "B")
-        graph.computeAirlineDistances()
+        graph.storeEdgeAirlineDistances()
         return graph
 
     @staticmethod
@@ -32,11 +32,20 @@ class BatGraph(networkx.classes.graph.Graph):
         graph.add_edge("D", "E")
         graph.add_edge("D", "F")
         graph.add_edge("E", "F")
-        graph.computeAirlineDistances()
+        graph.storeEdgeAirlineDistances()
         return graph
 
-    def computeAirlineDistances(self):
+    def airlineDistance(self, A, B):
+        """Returns airline distance (heuristic) between A and B."""
+        dx = self.nodes[A]["lat"] - self.nodes[B]["lat"]
+        dy = self.nodes[A]["long"] - self.nodes[B]["long"]
+        return math.hypot(dx, dy)
+
+    def storeEdgeAirlineDistances(self):
+        """Computes airline distances and stores them."""
         for A, B in self.edges():
-            dx = self.nodes[A]["lat"] - self.nodes[B]["lat"]
-            dy = self.nodes[A]["long"] - self.nodes[B]["long"]
-            self.edges[A, B]["distance"] = math.hypot(dx, dy)
+            self.edges[A, B]["distance"] = self.airlineDistance(A, B)
+
+    def findShortestPath(self, source, destination):
+        """Determine the literal shortest path from source to target, in terms of distance."""
+        return networkx.algorithms.shortest_paths.astar_path(self, source, destination, heuristic=self.airlineDistance)
