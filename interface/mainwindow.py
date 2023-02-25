@@ -33,7 +33,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         """
         if (
             self.userSelectedTurnIndex is None
-            and self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["distance"]
+            and self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["length"]
         ):
             print("Turning time")
             self.turnLabel.setText("Where would you like to turn? Press 1, 2, 3, etc.")

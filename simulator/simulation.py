@@ -18,13 +18,13 @@ class Simulation:
 
     def __init__(self):
         super().__init__()
-        self.batgraph = BatGraph.exampleGraph()
+        self.batgraph = BatGraph.fetch("Jericho, Oxfordshire, England, United Kingdom")
         self.reset()
 
     def reset(self):
         self.batmobile = BatMobile()
-        self.batmobile.sourceNode = "A"
-        self.batmobile.destinationNode = "B"
+        self.batmobile.sourceNode = next(iter(self.batgraph.nodes))
+        self.batmobile.destinationNode = next(self.batgraph.neighbors(self.batmobile.sourceNode))
         self.totalTimeElapsed = 0
         self.step = 0
 
@@ -32,7 +32,7 @@ class Simulation:
         """The main iteration representing a single time-step forwards.
         Passes further details on to batmobile and battery.
         """
-        if self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["distance"]:
+        if self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["length"]:
             self.turnBatMobile()
 
         self.batmobile.iterate(self.dt)

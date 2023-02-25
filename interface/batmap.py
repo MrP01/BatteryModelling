@@ -67,8 +67,8 @@ class BatMap(QLabel):
         src = self.graph.nodes[self.batmobile.sourceNode]
         dest = self.graph.nodes[self.batmobile.destinationNode]
         edge = self.graph.edges[self.batmobile.sourceNode, self.batmobile.destinationNode]
-        x = src["x"] + self.batmobile.position / edge["distance"] * (dest["x"] - src["x"])
-        y = src["y"] + self.batmobile.position / edge["distance"] * (dest["y"] - src["y"])
+        x = self.X(src["x"] + self.batmobile.position / edge["length"] * (dest["x"] - src["x"]))
+        y = self.Y(src["y"] + self.batmobile.position / edge["length"] * (dest["y"] - src["y"]))
         transform = QTransform()
         transform.translate(x, y)
         transform.rotate(math.degrees(math.atan2(dest["y"] - src["y"], dest["x"] - src["x"])) - 90)
@@ -85,7 +85,7 @@ class BatMap(QLabel):
         painter.setPen(linePen)
         for A, B in self.graph.edges():
             nodeA, nodeB = self.graph.nodes[A], self.graph.nodes[B]
-            painter.drawLine(nodeA["x"], nodeA["y"], nodeB["x"], nodeB["y"])
+            painter.drawLine(self.X(nodeA["x"]), self.Y(nodeA["y"]), self.X(nodeB["x"]), self.Y(nodeB["y"]))
 
         pen = QtGui.QPen()
         pen.setWidth(4)
@@ -96,6 +96,12 @@ class BatMap(QLabel):
             brush.setColor(QtGui.QColor("#e2dd00") if data["charger"] else Qt.GlobalColor.white)
             painter.setPen(pen)
             painter.setBrush(brush)
-            painter.drawEllipse(data["x"] - 15, data["y"] - 15, 30, 30)
+            painter.drawEllipse(self.X(data["x"]) - 15, self.Y(data["y"]) - 15, 30, 30)
             painter.setPen(originalPen)
-            painter.drawText(data["x"] - 5, data["y"] + 5, node)
+            painter.drawText(self.X(data["x"]) - 5, self.Y(data["y"]) + 5, str(node)[:2])
+
+    def X(self, x):
+        return (x - self.graph.center[0]) * self.canvas.width() / self.graph.maxDx + 960 // 2
+
+    def Y(self, y):
+        return (y - self.graph.center[1]) * self.canvas.height() / self.graph.maxDy + 520 // 2
