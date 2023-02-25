@@ -2,16 +2,17 @@ import math
 import random
 
 import networkx
-import networkx.classes.graph
 import networkx.algorithms.shortest_paths as shortest_paths
+import networkx.classes.graph
+import osmnx
 
 
 class BatGraph(networkx.classes.graph.Graph):
     @staticmethod
     def justASingleLine():
         graph = BatGraph()
-        graph.add_node("A", lat=60, long=200, charger=False)
-        graph.add_node("B", lat=900, long=300, charger=False)
+        graph.add_node("A", x=60, y=200, charger=False)
+        graph.add_node("B", x=900, y=300, charger=False)
         graph.add_edge("A", "B")
         graph.storeEdgeAirlineDistances()
         return graph
@@ -19,12 +20,12 @@ class BatGraph(networkx.classes.graph.Graph):
     @staticmethod
     def exampleGraph():
         graph = BatGraph()
-        graph.add_node("A", lat=60, long=100, charger=False)
-        graph.add_node("B", lat=380, long=60, charger=False)
-        graph.add_node("C", lat=150, long=360, charger=True)
-        graph.add_node("D", lat=650, long=150, charger=False)
-        graph.add_node("E", lat=400, long=470, charger=False)
-        graph.add_node("F", lat=700, long=500, charger=False)
+        graph.add_node("A", x=60, y=100, charger=False)
+        graph.add_node("B", x=380, y=60, charger=False)
+        graph.add_node("C", x=150, y=360, charger=True)
+        graph.add_node("D", x=650, y=150, charger=False)
+        graph.add_node("E", x=400, y=470, charger=False)
+        graph.add_node("F", x=700, y=500, charger=False)
         graph.add_edge("A", "B")
         graph.add_edge("A", "C")
         graph.add_edge("B", "C")
@@ -37,10 +38,16 @@ class BatGraph(networkx.classes.graph.Graph):
         graph.storeEdgeAirlineDistances()
         return graph
 
+    @staticmethod
+    def fetch(locality="Oxford, Oxfordshire, England, United Kingdom"):
+        """Using the OpenStreetMap API, fetch some real-world street data."""
+        graph = osmnx.graph_from_place(locality, network_type="drive")
+        return graph
+
     def airlineDistance(self, A, B):
         """Returns airline distance (heuristic) between A and B."""
-        dx = self.nodes[A]["lat"] - self.nodes[B]["lat"]
-        dy = self.nodes[A]["long"] - self.nodes[B]["long"]
+        dx = self.nodes[A]["x"] - self.nodes[B]["x"]
+        dy = self.nodes[A]["y"] - self.nodes[B]["y"]
         return math.hypot(dx, dy)
 
     def storeEdgeAirlineDistances(self):
