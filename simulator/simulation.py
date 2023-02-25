@@ -58,6 +58,9 @@ class Simulation:
         while self.batmobile.sourceNode != destination:
             self.batmobile.battery.current = current(self.totalTimeElapsed, self.batmobile.battery.soc)
             self.iterate()
+            if self.batmobile.battery.soc == 0.0:
+                print("Batmobile ran out of battery without reaching the destination on this route.")
+                break
 
     def chooseTurnIndex(self):
         print("Turned at the next best corner")

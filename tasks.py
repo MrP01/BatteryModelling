@@ -58,6 +58,6 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
 def optimise(ctx):
     """Optimise"""
     optimiser = Optimiser()
-    print("Shortest path:", optimiser.route)
+    print("Shortest path:", optimiser.route, optimiser.testedRoutes[optimiser.route])
     for i in range(20):
         optimiser.mcmcStep()

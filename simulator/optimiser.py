@@ -16,6 +16,7 @@ class Optimiser:
         return self.simulator.totalTimeElapsed
 
     def measureRoute(self, route):
+        """Test out a given route in the simulator."""
         self.simulator.reset()
         self.simulator.runOnPath(route, lambda t, soc: 1)
         self.testedRoutes[route] = self.metric()
@@ -23,18 +24,25 @@ class Optimiser:
 
     def mcmcStep(self):
         """Perform a Monte-Carlo Markov-Chain, Metropolis-Hastings iteration step."""
+        perturbationAttempt = 0
         while True:
             try:
+                # print("Perturbing...")
                 newRoute = self.simulator.batgraph.perturbRoute(self.route)
+                perturbationAttempt += 1
                 if newRoute not in self.testedRoutes:
                     break
             except KeyError:  # perturbRoute() was unsuccessful
-                continue
+                pass
+            if perturbationAttempt > 20:
+                print("Giving up perturbation.")
+                return
 
+        # negative delta is good!!
         delta = self.measureRoute(newRoute) - self.testedRoutes[self.route]
         acceptanceProbability = min(1, math.exp(-delta / self.temperature))
         if random.random() < acceptanceProbability:
             self.route = newRoute
-            print(f"Accepted new route {newRoute} with delta: {delta}.")
+            print(f"Accepted new route {newRoute} with delta: {delta:.2f}. Total: {self.testedRoutes[newRoute]:.2f}.")
         else:
-            print(f"Rejected route {newRoute} with delta: {delta}.")
+            print(f"Rejected route {newRoute} with delta: {delta:.2f}.")
