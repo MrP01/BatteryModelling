@@ -1,8 +1,10 @@
-function [ze,Ie,Te] = Power_Control (Pow,check,ti,tf,z0,I0,T0)
+function [ze,Ie,Te] = Power_Control (Pow,check,ti,fval,z0,I0,T0,s)
 
 %Pow specifies either current or power
 %Check is 1 for power control and 0 for current control
-%ti and tf are initial time and final time
+%ti is the initial time
+%tf is either final time or final SOC, this is determined by s = "Time" for
+%the first and SOC for the latter
 %All other entries are intial conditions, the function outputs are final
 %conditions which will be used as initial conditions in the next simulation
 
@@ -20,7 +22,15 @@ M = @(t,y)[1 0 0 0 0 0 0 0%SOC
 
 % Use the LSODI example tolerances.  The 'MassSingular' property is
 % left at its default 'maybe' to test the automatic detection of a DAE.
+if s == "Time"
+tf = fval;
 options = odeset('Mass',M,'RelTol',1e-4,'AbsTol',[1e-6 1e-10 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6],'MStateDependence','strong');
+elseif s == "SOC"
+tf = 100000;
+options = odeset('Mass',M,'RelTol',1e-4,'AbsTol',[1e-6 1e-10 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6],'MStateDependence','strong','Events',@myEvent);
+else
+    error('Wrong string inserted')
+end
 %I0=1; T0=10; %wrong initial condition - ;
 % Initialisation y(1)=z, y(2)=VC1(t), y(3)=v(t), y(4)=IR1(t), y(5)=T(t), y(6)=I(t),
 if check == 1
@@ -29,57 +39,58 @@ else
 IC = Pow;
 end
 y0_1 = [z0,I0*R0(T0,z0),ocv(z0)-I0*R1(T0,z0)-Pow./ocv(z0)*R0(T0,z0),I0, T0, IC,2.9,0];
+
 tspan_1 = linspace(ti,tf);
 [t1,y1] = ode15s(@f,tspan_1,y0_1,options);
 ze = y1(end,1); Ie = y1(end,4); Te = y1(end,5);
 
-figure(1);
-plot(t1,y1(:,1), 'r.-');
-ylabel('z');
-title('state of charge');
-xlabel('t');
+% figure(1);
+% plot(t1,y1(:,1), 'r.-');
+% ylabel('z');
+% title('state of charge');
+% xlabel('t');
+% % 
+% figure(2);
+% plot(t1,y1(:,2),'g.-');
+% ylabel('Vc1(t)');
+% title('capacitor voltage');
+% xlabel('t');
 % 
-figure(2);
-plot(t1,y1(:,2),'g.-');
-ylabel('Vc1(t)');
-title('capacitor voltage');
-xlabel('t');
-
-figure(3);
-plot(t1,y1(:,3),'b.-');
-ylabel('v(t)');
-title('voltage');
-xlabel('t');
-
-figure(4);
-plot(t1,y1(:,4),'k.-');
-ylabel('IR1(t)');
-title('current');
-xlabel('t');
-
-figure(5);
-plot(t1,y1(:,5),'y.-');
-ylabel('T(t)');
-title('temperature');
-xlabel('t');
+% figure(3);
+% plot(t1,y1(:,3),'b.-');
+% ylabel('v(t)');
+% title('voltage');
+% xlabel('t');
 % 
-figure(6);
-plot(t1,y1(:,6),'y.-');
-ylabel('I(t)');
-title('Current');
-xlabel('t');
-
-figure(7);
-plot(t1,y1(:,7),'y.-');
-ylabel('Q(t)');
-title('Capacity');
-xlabel('t');
-
-figure(8);
-plot(t1,y1(:,8)/3600,'y.-');
-ylabel('C');
-title('Cycle');
-xlabel('t');
+% figure(4);
+% plot(t1,y1(:,4),'k.-');
+% ylabel('IR1(t)');
+% title('current');
+% xlabel('t');
+% 
+% figure(5);
+% plot(t1,y1(:,5),'y.-');
+% ylabel('T(t)');
+% title('temperature');
+% xlabel('t');
+% % 
+% figure(6);
+% plot(t1,y1(:,6),'y.-');
+% ylabel('I(t)');
+% title('Current');
+% xlabel('t');
+% 
+% figure(7);
+% plot(t1,y1(:,7),'y.-');
+% ylabel('Q(t)');
+% title('Capacity');
+% xlabel('t');
+% 
+% figure(8);
+% plot(t1,y1(:,8)/3600,'y.-');
+% ylabel('C');
+% title('Cycle');
+% xlabel('t');
 %--------------------------------------------------------------------------
 
 
@@ -90,12 +101,12 @@ xlabel('t');
 % fplot(h,[0,2*6.048e5],'g.')
 
 
-function out = f(t,y)
+function out = f(~,y)
 out = [  -y(6)./y(7)/3600
     y(6)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
    y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1)) 
    y(4)-y(2)./R1(y(5),y(1))
-   y(5)-10-1e-6*t
+   y(5)-10
    equ(Pow,y(6),y(3),check)
    -2.9*0.2*Temp_C(y(5))*(4*y(1).^2-4*1.3*y(1)+1.3^2+1)
    0.5*abs(y(6))./y(7)];
@@ -165,5 +176,11 @@ function [m] = Temp_C (T)
     else
         m = 3.171*10^-8;
     end
+end
+
+function [value, isterminal, direction] = myEvent(~, Y)
+value      = abs((Y(1) - fval))<=0.005;
+isterminal = 1;   % Stop the integration
+direction  = 0;
 end
 end
