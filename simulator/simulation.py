@@ -6,7 +6,6 @@ To run,
 simulation = Simulation()
 simulation.run(60)
 """
-from typing import List
 
 from simulator.batgraph import BatGraph
 from simulator.batmobile import BatMobile
@@ -45,13 +44,17 @@ class Simulation:
         while self.totalTimeElapsed < stoppingTime:
             self.iterate()
 
-    def runOnPath(self, destination: str, turningIndices: List[int], current):
+    def runOnPath(self, route: tuple, current):
         """Simulates the car driving on a given path.
         Can be used to obtain some goal metric (i.e. totalTimeElapsed) and minimise that over the inputs.
         Could in turn be used for a Monte Carlo simulation to find the optimal path
         over a subset of paths as predetermined by A-star.
         """
-        self.chooseTurnIndex = lambda: turningIndices.pop(0)
+        destination = route[-1]
+        self.batmobile.sourceNode = route[0]
+        self.batmobile.destinationNode = route[1]
+        onward = list(route[2:]) + [None]  # add one extra element that is not needed
+        self.chooseNextDestination = lambda: onward.pop(0)
         while self.batmobile.sourceNode != destination:
             self.batmobile.battery.current = current(self.totalTimeElapsed, self.batmobile.battery.soc)
             self.iterate()
@@ -65,9 +68,12 @@ class Simulation:
         connectedEdges.remove(self.batmobile.sourceNode)
         return connectedEdges
 
+    def chooseNextDestination(self):
+        return self.getOnwardDestinations()[self.chooseTurnIndex()]
+
     def turnBatMobile(self):
         destNode = self.batmobile.destinationNode
-        self.batmobile.destinationNode = self.getOnwardDestinations()[self.chooseTurnIndex()]
+        self.batmobile.destinationNode = self.chooseNextDestination()
         self.batmobile.sourceNode = destNode
         self.batmobile.position = 0
         if self.batgraph.nodes[destNode]["charger"]:

@@ -1,7 +1,9 @@
 import math
+import random
 
 import networkx
 import networkx.classes.graph
+import networkx.algorithms.shortest_paths as shortest_paths
 
 
 class BatGraph(networkx.classes.graph.Graph):
@@ -46,6 +48,22 @@ class BatGraph(networkx.classes.graph.Graph):
         for A, B in self.edges():
             self.edges[A, B]["distance"] = self.airlineDistance(A, B)
 
-    def findShortestPath(self, source, destination):
+    def findShortestPath(self, source, destination) -> tuple:
         """Determine the literal shortest path from source to target, in terms of distance."""
-        return networkx.algorithms.shortest_paths.astar_path(self, source, destination, heuristic=self.airlineDistance)
+        return tuple(shortest_paths.astar_path(self, source, destination, heuristic=self.airlineDistance))
+
+    def perturbRoute(self, route: tuple) -> tuple:
+        """Return a type 1 or type 2 perturbation of a given path.
+        type-1: turn one edge into two edges -> route length increases by one
+        type-2: replace one node along the route with another adjacent one -> route length stays the same
+        """
+        i = random.randrange(0, len(route))
+        j = random.choice([x for x in (i + 1, i + 2, i - 1, i - 2) if 0 <= x < len(route)])
+        indexA, indexB = min(i, j), max(i, j)
+        nodeA, nodeB = route[indexA], route[indexB]
+        sharedNeighbours = set(self.neighbors(nodeA)).intersection(self.neighbors(nodeB))
+        if indexB - indexA == 2:  # type-2 perturbation
+            inbetween = route[indexA + 1]
+            sharedNeighbours.remove(inbetween)  # remove the element that is already part of the route
+        # choose any shared neighbour
+        return route[: indexA + 1] + (sharedNeighbours.pop(),) + route[indexB:]

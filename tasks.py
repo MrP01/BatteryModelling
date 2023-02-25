@@ -3,6 +3,7 @@ import sys
 import invoke
 import matplotlib.pyplot as plt
 import numpy as np
+from simulator.optimiser import Optimiser
 
 from simulator.simulation import Simulation
 
@@ -51,3 +52,12 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
     plt.legend()
     plt.savefig(f"results/{name}-battery-stats.png")
     plt.show()
+
+
+@invoke.task()
+def optimise(ctx):
+    """Optimise"""
+    optimiser = Optimiser()
+    print("Shortest path:", optimiser.route)
+    for i in range(20):
+        optimiser.mcmcStep()
