@@ -1,18 +1,26 @@
 clc
 clearvars
-dt = 220; d2 = 120; d1 = 80;
-vec1 = [80 140];
-C1 = ones(1,length(vec1));
-Co1 = [20 10];
-Cbattery = 3000;
-vec2 = 80;
-ncycles = 30;
+close all
+dt = 220; %Total distance (to granny*2)
+vec1 = 150; %Distances of charging stations 
+C1 = ones(1,length(vec1)); %Charging rate of stations
+Co1 = [10 20 20 30 30]; %Cost of charging in stations
+Cbattery = 3000; %Cost of a battery
+vec2 = 80; %Speeds to test on
+ncycles = 20; %number of cycles to test
+
+if length(vec1)>1
 vec = vec1;
 name = "dc";
+else
+vec = vec2;
+name = "V";
+end
+
 counter = 0;
-for dc = vec1%vec1%[d1 d2 d2+(dt/2-d2)*2 d1+(dt/2-d1)*2]
+for dc = vec1
     counter = counter+1;
-for v = vec2 %[60 80 100 120]
+for v = vec2 
 %% Required Power from velocity
 r = 0.135;
 N = 25/(3*pi)/r*v;
@@ -68,11 +76,29 @@ legend(s(1:length(vec)))
 figure(3)
 legend(s(1:length(vec)))
 
+%% Plotting cost
+%This part will only show up if different charging stations are compared! 
+% (i.e. not for velocities)
+if length(vec1)~=1
+    counter = 1;
+    for l = 1:length(vec1)-1
+        counter = counter+1;
 for z = 1:ncycles
         tcomp = (t_1_cycle*z)+1;
         idx = find(abs(tvec-tcomp)== min(abs(tvec-tcomp)));
-        Ccharging(1,idx(1,1):end) = Ccharging(1,idx(1,1):end)+(Co1(1,1)-Co1(1,2));
+        Ccharging(1,idx(1,1):end) = Ccharging(1,idx(1,1):end)+(Co1(1,1)-Co1(1,counter));
 end
-Cost = Ccharging+(Compare(1,:)-Compare(2,:))/0.4*Cbattery;
+Cost = Ccharging-(Compare(1,:)-Compare(counter,:))/0.4*Cbattery;
 figure(4)
-plot(tvec,Cost)
+hold on
+plot(tvec,Cost,'linewidth',2)
+    end
+figure(4)
+hold on
+s = strings(1,length(vec1)-1);
+for i = 2:length(vec1)
+s(1,i-1) = "dc = "+vec1(i);
+end
+legend(s,'location','southeast')
+title("Comparing "+num2str(vec1(1,1)))
+end
