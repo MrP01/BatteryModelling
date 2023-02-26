@@ -1,4 +1,4 @@
-function [ze,Ie,Te] = Power_Control (Pow,check,ti,fval,z0,I0,T0,s)
+function [ze,Ie,Te,h0,c0,tf,tvals,SOCvals,CycleVals,SOHVals] = Power_Control (Pow,check,ti,fval,z0,I0,T0,h0,c0,s)
 
 %Pow specifies either current or power
 %Check is 1 for power control and 0 for current control
@@ -17,33 +17,40 @@ M = @(t,y)[1 0 0 0 0 0 0 0%SOC
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
-   2.9*0.2*Temp_C(y(5))*t*(8*y(1)-4*1.3) 0 0 0 0 varyM1(y(6),y(8)/3600,check,Pow)  1 varyM2(y(6),check,Pow)
+   0 0 0 0 0 varyM1(y(6),y(8)/3600,check,Pow)  1 varyM2(y(6),check,Pow)
    0 0 0 0 0 0 0 1];
-
+%2.9*0.2*Temp_C(y(5))*t*(8*y(1)-4*1.3)
 % Use the LSODI example tolerances.  The 'MassSingular' property is
 % left at its default 'maybe' to test the automatic detection of a DAE.
 if s == "Time"
 tf = fval;
 options = odeset('Mass',M,'RelTol',1e-4,'AbsTol',[1e-6 1e-10 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6],'MStateDependence','strong');
 elseif s == "SOC"
-tf = 100000;
+tf = 100000*10^6;
 options = odeset('Mass',M,'RelTol',1e-4,'AbsTol',[1e-6 1e-10 1e-6 1e-6 1e-6 1e-6 1e-6 1e-6],'MStateDependence','strong','Events',@myEvent);
 else
     error('Wrong string inserted')
 end
 %I0=1; T0=10; %wrong initial condition - ;
-% Initialisation y(1)=z, y(2)=VC1(t), y(3)=v(t), y(4)=IR1(t), y(5)=T(t), y(6)=I(t),
+% Initialisation y(1)=z, y(2)=VC1(t), y(3)=v(t), y(4)=IR1(t), y(5)=T(t),
+% y(6)=I(t), y(7) = SOH, y(8) = Cycles
 if check == 1
 IC = Pow./ocv(z0);
 else
 IC = Pow;
 end
-y0_1 = [z0,I0*R0(T0,z0),ocv(z0)-I0*R1(T0,z0)-Pow./ocv(z0)*R0(T0,z0),I0, T0, IC,2.9,0];
+y0_1 = [z0,I0*R0(T0,z0),ocv(z0)-I0*R1(T0,z0)-Pow./ocv(z0)*R0(T0,z0),I0, T0, IC,h0,c0];
 
 tspan_1 = linspace(ti,tf);
 [t1,y1] = ode15s(@f,tspan_1,y0_1,options);
 ze = y1(end,1); Ie = y1(end,4); Te = y1(end,5);
-
+tf = t1(end,1);
+tvals = t1(:,1);
+SOCvals = y1(:,1);
+CycleVals = y1(:,8)/3600;
+SOHVals = y1(:,7);
+h0 = y1(end,7);
+c0 = y1(end,8);
 % figure(1);
 % plot(t1,y1(:,1), 'r.-');
 % ylabel('z');
@@ -179,7 +186,7 @@ function [m] = Temp_C (T)
 end
 
 function [value, isterminal, direction] = myEvent(~, Y)
-value      = abs((Y(1) - fval))<=0.005;
+value      = abs((Y(1) - fval))<=0.04;
 isterminal = 1;   % Stop the integration
 direction  = 0;
 end
