@@ -4,14 +4,18 @@ The interface code is contained within interface/mainwindow.py.
 Get to know the code by starting from there (or simulator/simulation.py).
 """
 import sys
+import argparse
 
 from PySide6 import QtWidgets
 
 from interface.mainwindow import MainWindow
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--locality", default="example")
+    args = parser.parse_args()
     app = QtWidgets.QApplication()
-    mainWindow = MainWindow()
+    mainWindow = MainWindow(args.locality)
     mainWindow.buildUI()
     mainWindow.show()
     sys.exit(app.exec())

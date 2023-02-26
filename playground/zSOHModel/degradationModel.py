@@ -59,12 +59,7 @@ def totalDegradation(cycles, current, soc=0.65, timeInSecs=1e7):
     """
     # To view background for CACDF view:
     # 'generateCurrentAgnosticDegradation.py'
-    CACDF = (
-        2.9
-        * 4.58e-04
-        * cycles
-        * (1 + (1 / 4.58e-04) * np.exp(5.07e-02 * (cycles - 700)))
-    )
+    CACDF = 2.9 * 4.58e-04 * cycles * (1 + (1 / 4.58e-04) * np.exp(5.07e-02 * (cycles - 700)))
     CSF = currentScalingFactor(current)
     CDF = 2.9 - calendarDegradationFactor(soc, timeInSecs)
     if currentScalingFactor == -1:
@@ -84,23 +79,17 @@ def generatePlots():
     timeOfSit = 0.2e8
     cycles = np.linspace(0, 600)
     profile1C = [totalDegradation(cycle, 2.9, 0.65, timeOfSit) for cycle in cycles]
-    profile1CShort = [
-        totalDegradation(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles
-    ]
+    profile1CShort = [totalDegradation(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles]
     profile0C = [totalDegradation(cycle, 0 * 2.9, 0.65, timeOfSit) for cycle in cycles]
     profile3C = [totalDegradation(cycle, 3 * 2.9, 0.65, timeOfSit) for cycle in cycles]
     profile4C = [totalDegradation(cycle, 4 * 2.9, 0.65, timeOfSit) for cycle in cycles]
-    profile3CHighSOC = [
-        totalDegradation(cycle, 3 * 2.9, 0.9, timeOfSit) for cycle in cycles
-    ]
+    profile3CHighSOC = [totalDegradation(cycle, 3 * 2.9, 0.9, timeOfSit) for cycle in cycles]
     plt.plot(cycles, profile1C, "r", label=f"1C Time={timeOfSit:.2e}s")
     plt.plot(cycles, profile1CShort, "g", label=f"1C Time={0.5*timeOfSit:.2e}s")
     plt.plot(cycles, profile0C, "b", label=f"0C Time={timeOfSit:.2e}")
     plt.plot(cycles, profile3C, "magenta", label=f"3C Time={timeOfSit:.2e}")
     plt.plot(cycles, profile4C, "cyan", label=f"4C Time={timeOfSit:.2e}")
-    plt.plot(
-        cycles, profile3CHighSOC, "orange", label=f"3C, High SOC Time={timeOfSit:.2e}"
-    )
+    plt.plot(cycles, profile3CHighSOC, "orange", label=f"3C, High SOC Time={timeOfSit:.2e}")
     plt.legend(loc="best")
     plt.title("Comparison of Current and Aging Profiles with Cycles on Capacity")
     plt.xlabel("Cycles")

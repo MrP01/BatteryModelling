@@ -12,6 +12,7 @@ from simulator.batgraph import BatGraph
 from simulator.batmobile import BatMobile
 
 INTERFACE_DIRECTORY = pathlib.Path(__file__).parent
+NODE_SIZE = 12
 
 
 class BatMap(QLabel):
@@ -67,11 +68,12 @@ class BatMap(QLabel):
         src = self.graph.nodes[self.batmobile.sourceNode]
         dest = self.graph.nodes[self.batmobile.destinationNode]
         edge = self.graph.edges[self.batmobile.sourceNode, self.batmobile.destinationNode]
-        x = src["lat"] + self.batmobile.position / edge["distance"] * (dest["lat"] - src["lat"])
-        y = src["long"] + self.batmobile.position / edge["distance"] * (dest["long"] - src["long"])
+        x = self.X(src["x"] + self.batmobile.position / edge["length"] * (dest["x"] - src["x"]))
+        y = self.Y(src["y"] + self.batmobile.position / edge["length"] * (dest["y"] - src["y"]))
+        dy, dx = self.Y(dest["y"]) - self.Y(src["y"]), self.X(dest["x"]) - self.X(src["x"])
         transform = QTransform()
         transform.translate(x, y)
-        transform.rotate(math.degrees(math.atan2(dest["long"] - src["long"], dest["lat"] - src["lat"])) - 90)
+        transform.rotate(math.degrees(math.atan2(dy, dx)) - 90)
         transform.translate(-38, -40)
         transform.scale(0.6, 0.6)
         painter.setTransform(transform)
@@ -85,7 +87,7 @@ class BatMap(QLabel):
         painter.setPen(linePen)
         for A, B in self.graph.edges():
             nodeA, nodeB = self.graph.nodes[A], self.graph.nodes[B]
-            painter.drawLine(nodeA["lat"], nodeA["long"], nodeB["lat"], nodeB["long"])
+            painter.drawLine(self.X(nodeA["x"]), self.Y(nodeA["y"]), self.X(nodeB["x"]), self.Y(nodeB["y"]))
 
         pen = QtGui.QPen()
         pen.setWidth(4)
@@ -96,6 +98,17 @@ class BatMap(QLabel):
             brush.setColor(QtGui.QColor("#e2dd00") if data["charger"] else Qt.GlobalColor.white)
             painter.setPen(pen)
             painter.setBrush(brush)
-            painter.drawEllipse(data["lat"] - 15, data["long"] - 15, 30, 30)
+            painter.drawEllipse(
+                self.X(data["x"]) - NODE_SIZE // 2,
+                self.Y(data["y"]) - NODE_SIZE // 2,
+                NODE_SIZE,
+                NODE_SIZE,
+            )
             painter.setPen(originalPen)
-            painter.drawText(data["lat"] - 5, data["long"] + 5, node)
+            painter.drawText(self.X(data["x"]) - NODE_SIZE / 6, self.Y(data["y"]) + NODE_SIZE / 6, str(node)[:1])
+
+    def X(self, x):
+        return (x - self.graph.center[0]) * 0.9 * self.canvas.width() / self.graph.maxDx + 960 // 2
+
+    def Y(self, y):
+        return -(y - self.graph.center[1]) * 0.9 * self.canvas.height() / self.graph.maxDy + 520 // 2

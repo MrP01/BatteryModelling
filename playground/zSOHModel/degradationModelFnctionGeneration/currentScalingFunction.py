@@ -81,6 +81,8 @@ plt.xlabel("Current (A)")
 plt.ylabel("$b$ (1/cycles)")
 plt.ticklabel_format(style="sci", scilimits=(-3, 4), axis="both")
 plt.show()
+
+
 ##
 # Now, having a(I) and b(I), we create a function to degrade capacity based on arbitrary current.
 def degradeFunRaw(current, cycles):
@@ -162,6 +164,8 @@ plt.xlabel("Current (A)")
 plt.ylabel("Degradation Ratio")
 # plt.legend(["actual data", "fit data"])
 plt.show()
+
+
 ##
 # To simply view results, either see the hardcoded comment below
 # or run the code below after running all code above.
@@ -170,10 +174,7 @@ def scaleDegrading(current):
     currentInC = current / 2.9
     return np.clip(
         optimalDegradingFactorParameters[0]
-        - np.exp(
-            optimalDegradingFactorParameters[1] * currentInC
-            + optimalDegradingFactorParameters[2]
-        ),
+        - np.exp(optimalDegradingFactorParameters[1] * currentInC + optimalDegradingFactorParameters[2]),
         0,
         1,
     )
