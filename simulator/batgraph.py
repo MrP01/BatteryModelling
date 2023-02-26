@@ -15,20 +15,21 @@ class BatGraph(networkx.classes.graph.Graph):
         self.limsY = min([d["y"] for n, d in self.nodes(data=True)]), max([d["y"] for n, d in self.nodes(data=True)])
         self.maxDx, self.maxDy = self.limsX[1] - self.limsX[0], self.limsY[1] - self.limsY[0]
         self.center = (self.limsX[0] + self.maxDx / 2, self.limsY[0] + self.maxDy / 2)
-        print(self.center, self.maxDx, self.maxDy)
 
     @staticmethod
     def justASingleLine():
-        graph = BatGraph()
+        graph = networkx.Graph()
         graph.add_node("A", x=60, y=200, charger=False)
         graph.add_node("B", x=900, y=300, charger=False)
         graph.add_edge("A", "B")
+        graph = BatGraph(graph)
         graph.storeEdgeAirlineDistances()
         return graph
 
     @staticmethod
     def fetch(locality="Oxford, Oxfordshire, England, United Kingdom"):
         """Using the OpenStreetMap API, fetch some real-world street data."""
+        print(f"Fetching OpenStreetMap Graph data for {locality}...")
         graph = osmnx.graph_from_place(locality, network_type="drive")
         graph = BatGraph(graph)
         for node in graph.nodes:
@@ -71,7 +72,7 @@ class BatGraph(networkx.classes.graph.Graph):
 
     @staticmethod
     def exampleGraph():
-        graph = BatGraph()
+        graph = networkx.Graph()
         graph.add_node("A", x=60, y=100, charger=False)
         graph.add_node("B", x=380, y=60, charger=False)
         graph.add_node("C", x=150, y=360, charger=True)
@@ -87,5 +88,6 @@ class BatGraph(networkx.classes.graph.Graph):
         graph.add_edge("D", "E")
         graph.add_edge("D", "F")
         graph.add_edge("E", "F")
+        graph = BatGraph(graph)
         graph.storeEdgeAirlineDistances()
         return graph

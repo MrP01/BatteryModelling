@@ -19,8 +19,8 @@ class MainWindow(Simulation, QtWidgets.QWidget):
 
     STEPS_PER_FRAME = 15
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom"):
+        super().__init__(locality)
         self.batmap = BatMap(self.batgraph, self.batmobile, self)
         self.setWindowTitle("Battery Modelling in the BatMobile")
         self.threadPool = QThreadPool()

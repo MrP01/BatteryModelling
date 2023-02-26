@@ -101,7 +101,7 @@ class BatMap(QLabel):
             painter.drawText(self.X(data["x"]) - 5, self.Y(data["y"]) + 5, str(node)[:2])
 
     def X(self, x):
-        return (x - self.graph.center[0]) * self.canvas.width() / self.graph.maxDx + 960 // 2
+        return (x - self.graph.center[0]) * 0.9 * self.canvas.width() / self.graph.maxDx + 960 // 2
 
     def Y(self, y):
-        return (y - self.graph.center[1]) * self.canvas.height() / self.graph.maxDy + 520 // 2
+        return (y - self.graph.center[1]) * 0.9 * self.canvas.height() / self.graph.maxDy + 520 // 2
