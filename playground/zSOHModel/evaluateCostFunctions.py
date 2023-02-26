@@ -25,7 +25,7 @@ def getTotalDegradationTime(current, threshold):
     numCyclesNeededToDegrade = getCyclesTilDegradedCapacity(current, threshold)
     totalTimeNeeded = 0
     for i in range(1, int(numCyclesNeededToDegrade + 1)):
-        totalTimeNeeded += dm.totalDegradation(i, current) / current
+        totalTimeNeeded += dm.totalDegradation(i, current, 0.65, 0) / current
     return totalTimeNeeded
 
 
