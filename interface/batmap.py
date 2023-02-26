@@ -70,9 +70,10 @@ class BatMap(QLabel):
         edge = self.graph.edges[self.batmobile.sourceNode, self.batmobile.destinationNode]
         x = self.X(src["x"] + self.batmobile.position / edge["length"] * (dest["x"] - src["x"]))
         y = self.Y(src["y"] + self.batmobile.position / edge["length"] * (dest["y"] - src["y"]))
+        dy, dx = self.Y(dest["y"]) - self.Y(src["y"]), self.X(dest["x"]) - self.X(src["x"])
         transform = QTransform()
         transform.translate(x, y)
-        transform.rotate(math.degrees(math.atan2(dest["y"] - src["y"], dest["x"] - src["x"])) - 90)
+        transform.rotate(math.degrees(math.atan2(dy, dx)) - 90)
         transform.translate(-38, -40)
         transform.scale(0.6, 0.6)
         painter.setTransform(transform)
@@ -110,4 +111,4 @@ class BatMap(QLabel):
         return (x - self.graph.center[0]) * 0.9 * self.canvas.width() / self.graph.maxDx + 960 // 2
 
     def Y(self, y):
-        return (y - self.graph.center[1]) * 0.9 * self.canvas.height() / self.graph.maxDy + 520 // 2
+        return -(y - self.graph.center[1]) * 0.9 * self.canvas.height() / self.graph.maxDy + 520 // 2
