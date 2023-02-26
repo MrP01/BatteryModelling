@@ -1,12 +1,12 @@
 """The graphical interface / visualisation layer of our simulation!"""
 import random
+
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QThreadPool
 
 from interface.batmap import BatMap
 from interface.graphs import BatTimeseriesCanvas
 from simulator.simulation import Simulation
-
 
 NUMERICAL_KEYS = (Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4, Qt.Key.Key_5)
 
@@ -38,7 +38,6 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         ):
             print("Turning time")
             self.turnLabel.setText("Where would you like to turn? Press 1, 2, 3, etc.")
-            self.turnLabel.setHidden(False)
             self.startOrStop()
             return
         super().iterate()  # calls the Simulation class's numerical integration step
@@ -87,8 +86,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             "Press 'S' as a shortcut to start/stop."
         )
         self.statsLabel = QtWidgets.QLabel()
-        self.turnLabel = QtWidgets.QLabel()
-        self.turnLabel.setHidden(True)
+        self.turnLabel = QtWidgets.QLabel("Welcome to the Electric Vehicle Simulator.")
         self.turnLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
 
@@ -135,5 +133,5 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     def chooseTurnIndex(self):
         index = self.userSelectedTurnIndex
         self.userSelectedTurnIndex = None
-        self.turnLabel.setHidden(True)
+        self.turnLabel.setText("Continue driving")
         return index

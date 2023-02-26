@@ -1,5 +1,6 @@
-import numpy as np
 import dataclasses
+
+import numpy as np
 
 
 @dataclasses.dataclass()

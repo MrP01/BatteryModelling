@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy as sp
 
 plt.rcParams["text.usetex"] = True

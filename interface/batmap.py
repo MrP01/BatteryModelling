@@ -33,8 +33,9 @@ class BatMap(QLabel):
         plt.rcParams["axes.facecolor"] = self.backgroundColor.name()
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
-        self.effect = QtMultimedia.QSoundEffect()
-        self.effect.setSource(QtCore.QUrl.fromLocalFile(INTERFACE_DIRECTORY / "assets" / "vroom-vroom.wav"))
+        if self.PLAY_SOUND:
+            self.effect = QtMultimedia.QSoundEffect()
+            self.effect.setSource(QtCore.QUrl.fromLocalFile(INTERFACE_DIRECTORY / "assets" / "vroom-vroom.wav"))
 
     def render(self):
         self.canvas.fill(self.backgroundColor)

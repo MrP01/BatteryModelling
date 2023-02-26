@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plt
 import matplotlib.axes
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 df = pd.read_csv("cleanData/25c/cleanData25C/run5_25C.csv")
 normalisedVoltage = df.voltage - df.voltage.min() + 0.01

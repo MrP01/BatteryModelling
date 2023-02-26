@@ -1,7 +1,8 @@
-import numpy as np
 import csv
-from mat4py import loadmat
+
 import matplotlib.pyplot as plt
+import numpy as np
+from mat4py import loadmat
 
 ##
 data = loadmat("pulses.mat")

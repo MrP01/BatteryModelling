@@ -4,8 +4,8 @@ import sys
 import invoke
 import matplotlib.pyplot as plt
 import numpy as np
-from simulator.optimiser import Optimiser
 
+from simulator.optimiser import Optimiser
 from simulator.simulation import Simulation
 
 

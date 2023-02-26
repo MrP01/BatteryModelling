@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 plt.rcParams["text.usetex"] = True
 # This file outlines the degradation model we use. There are

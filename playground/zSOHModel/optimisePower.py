@@ -1,6 +1,6 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import evaluateCostFunctions as ttf
+import matplotlib.pyplot as plt
+import numpy as np
 import scipy.integrate as integrate
 
 
