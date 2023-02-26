@@ -1,10 +1,7 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import evaluateCostFunctions as ttf
 import scipy.integrate as integrate
-
-##
 
 
 def getModelParams():  # Should read from file but I am just copying from other program--parameterCurveFinding.py
@@ -40,23 +37,25 @@ def getModelParams():  # Should read from file but I am just copying from other 
             -101216.29866021,
         ]
     )
-    OCV = np.array(
-        [10.59735953, -33.51599917, 40.16840115, -22.18084932, 6.28065451, 2.80646924]
-    )
+    OCV = np.array([10.59735953, -33.51599917, 40.16840115, -22.18084932, 6.28065451, 2.80646924])
     return R0, R1, C1, OCV
 
 
 def computePowerAtGivenCycle(current, cycle, R0, R1, C1, OCV, operationBand=[1, 0.2]):
     Qn = ttf.cycleAgeBattery(cycle, current)
-    V = (
-        lambda SOC: np.polyval(OCV, SOC)
-        - current * np.polyval(R0, SOC)
-        - current * np.polyval(R1, SOC)
-    )
-    SOCTransform = lambda t: 1 - current / Qn * t
+
+    def V(SOC):
+        return np.polyval(OCV, SOC) - current * np.polyval(R0, SOC) - current * np.polyval(R1, SOC)
+
+    def SOCTransform(t):
+        return 1 - current / Qn * t
+
     startTime = -Qn / current * (operationBand[0] - 1)
     endTime = -Qn / current * (operationBand[1] - 1)
-    VTransformed = lambda t: V(SOCTransform(t))
+
+    def VTransformed(t):
+        return V(SOCTransform(t))
+
     return current * integrate.quad(VTransformed, startTime, endTime)[0]
 
 
@@ -69,9 +68,7 @@ def computePower(current, threshold=0.8):
     P = 0
     for i in range(int(np.floor(finalCycle))):  # i = k means integrate over the (k+1)th
         P += computePowerAtGivenCycle(current, i, R0, R1, C1, OCV)
-    P += computePowerAtGivenCycle(current, np.floor(finalCycle), R0, R1, C1, OCV) * (
-        finalCycle - np.floor(finalCycle)
-    )
+    P += computePowerAtGivenCycle(current, np.floor(finalCycle), R0, R1, C1, OCV) * (finalCycle - np.floor(finalCycle))
     # print("Total power: "+str(P))
     return P
 

@@ -1,6 +1,7 @@
 __pycache__/
 .ruff_cache/
 .cache/
+cache/
 .DS_Store
 .venv
 *.tmp

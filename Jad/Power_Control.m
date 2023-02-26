@@ -11,7 +11,7 @@ function [ze,Ie,Te,h0,c0,tf,tvals,SOCvals,CycleVals,SOHVals] = Power_Control (Po
 %Note: for calendar aging only, specify current = 0 with current control!
 
 % A constant, singular mass matrix
-M = @(t,y)[1 0 0 0 0 0 0 0%SOC 
+M = @(t,y)[1 0 0 0 0 0 0 0%SOC
    0 1 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
@@ -56,43 +56,43 @@ c0 = y1(end,8);
 % ylabel('z');
 % title('state of charge');
 % xlabel('t');
-% % 
+% %
 % figure(2);
 % plot(t1,y1(:,2),'g.-');
 % ylabel('Vc1(t)');
 % title('capacitor voltage');
 % xlabel('t');
-% 
+%
 % figure(3);
 % plot(t1,y1(:,3),'b.-');
 % ylabel('v(t)');
 % title('voltage');
 % xlabel('t');
-% 
+%
 % figure(4);
 % plot(t1,y1(:,4),'k.-');
 % ylabel('IR1(t)');
 % title('current');
 % xlabel('t');
-% 
+%
 % figure(5);
 % plot(t1,y1(:,5),'y.-');
 % ylabel('T(t)');
 % title('temperature');
 % xlabel('t');
-% % 
+% %
 % figure(6);
 % plot(t1,y1(:,6),'y.-');
 % ylabel('I(t)');
 % title('Current');
 % xlabel('t');
-% 
+%
 % figure(7);
 % plot(t1,y1(:,7),'y.-');
 % ylabel('Q(t)');
 % title('Capacity');
 % xlabel('t');
-% 
+%
 % figure(8);
 % plot(t1,y1(:,8)/3600,'y.-');
 % ylabel('C');
@@ -111,7 +111,7 @@ c0 = y1(end,8);
 function out = f(~,y)
 out = [  -y(6)./y(7)/3600
     y(6)./C1(y(5),y(1))-y(4)./C1(y(5),y(1))
-   y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1)) 
+   y(3) - ocv(y(1))+ y(2)+y(6).*R0(y(5),y(1))
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10
    equ(Pow,y(6),y(3),check)
@@ -120,7 +120,7 @@ out = [  -y(6)./y(7)/3600
 end
 
 function [m] = equ (Pow,x1,x2,check)
-    if check == 1 
+    if check == 1
     m = x1-Pow/x2;
     else
     m = x1-Pow;

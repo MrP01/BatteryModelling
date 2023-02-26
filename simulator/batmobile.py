@@ -55,4 +55,4 @@ class BatMobile:
 
     def chargeUp(self):
         self.battery.soc = 1
-        print("Charged up!")
+        # print("Charged up!")
