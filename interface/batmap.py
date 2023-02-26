@@ -12,6 +12,7 @@ from simulator.batgraph import BatGraph
 from simulator.batmobile import BatMobile
 
 INTERFACE_DIRECTORY = pathlib.Path(__file__).parent
+NODE_SIZE = 12
 
 
 class BatMap(QLabel):
@@ -96,9 +97,14 @@ class BatMap(QLabel):
             brush.setColor(QtGui.QColor("#e2dd00") if data["charger"] else Qt.GlobalColor.white)
             painter.setPen(pen)
             painter.setBrush(brush)
-            painter.drawEllipse(self.X(data["x"]) - 15, self.Y(data["y"]) - 15, 30, 30)
+            painter.drawEllipse(
+                self.X(data["x"]) - NODE_SIZE // 2,
+                self.Y(data["y"]) - NODE_SIZE // 2,
+                NODE_SIZE,
+                NODE_SIZE,
+            )
             painter.setPen(originalPen)
-            painter.drawText(self.X(data["x"]) - 5, self.Y(data["y"]) + 5, str(node)[:2])
+            painter.drawText(self.X(data["x"]) - NODE_SIZE / 6, self.Y(data["y"]) + NODE_SIZE / 6, str(node)[:1])
 
     def X(self, x):
         return (x - self.graph.center[0]) * 0.9 * self.canvas.width() / self.graph.maxDx + 960 // 2

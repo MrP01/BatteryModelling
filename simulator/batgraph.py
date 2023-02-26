@@ -53,9 +53,9 @@ class BatGraph(networkx.classes.graph.Graph):
 
     def perturbRoute(self, route: tuple) -> tuple:
         """Return a type-1, type-2 or type-3 perturbation of a given path.
-        type-1: turn one edge into two edges -> route length increases by one
-        type-2: replace one node along the route with another adjacent one -> route length stays the same
-        type-3: the destination becomes part of the perturbation so the route is shortened
+        type-1: turn one edge into two edges -> route length increases by one.
+        type-2: replace one node along the route with another adjacent one -> route length stays the same.
+        type-3: the destination becomes part of the perturbation so the route is shortened.
         """
         i = random.randrange(0, len(route))
         j = random.choice([x for x in (i + 1, i + 2, i - 1, i - 2) if 0 <= x < len(route)])
@@ -65,6 +65,7 @@ class BatGraph(networkx.classes.graph.Graph):
         if indexB - indexA == 2:  # type-2 perturbation
             inbetween = route[indexA + 1]
             sharedNeighbours.remove(inbetween)  # ignore the element that is already part of the route
+        # print(list(self.neighbors(nodeA)), list(self.neighbors(nodeB)), sharedNeighbours)
         middle = sharedNeighbours.pop()
         if middle == route[-1]:  # type-3 perturbation, destination is perturbed in
             return route[: indexA + 1] + (middle,)  # so ignore the remaining route (which will be a loop)

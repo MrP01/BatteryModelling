@@ -68,7 +68,7 @@ class Simulation:
 
     def getOnwardDestinations(self):
         connectedEdges = [edge[1] for edge in self.batgraph.edges(self.batmobile.destinationNode)]
-        connectedEdges.remove(self.batmobile.sourceNode)
+        # connectedEdges.remove(self.batmobile.sourceNode)
         return connectedEdges
 
     def chooseNextDestination(self):

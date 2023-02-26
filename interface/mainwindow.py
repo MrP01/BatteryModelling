@@ -1,4 +1,5 @@
 """The graphical interface / visualisation layer of our simulation!"""
+import random
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QThreadPool
 
@@ -17,7 +18,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     I am a subclass of the Simulation class.
     """
 
-    STEPS_PER_FRAME = 15
+    STEPS_PER_FRAME = 25
 
     def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom"):
         super().__init__(locality)
@@ -116,6 +117,12 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             self.close()
         if event.key() == Qt.Key.Key_S:
             self.startOrStop()
+        elif event.key() == Qt.Key.Key_R:
+            nodes = list(self.batgraph.nodes)
+            self.batmobile.sourceNode = random.choice(nodes)
+            self.batmobile.destinationNode = next(self.batgraph.neighbors(self.batmobile.sourceNode))
+            self.batmobile.position = 0
+            self.batmap.render()
         elif event.key() in NUMERICAL_KEYS:
             self.userSelectedTurnIndex = NUMERICAL_KEYS.index(event.key())
             connections = self.getOnwardDestinations()

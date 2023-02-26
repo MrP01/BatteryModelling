@@ -1,3 +1,4 @@
+import random
 import sys
 
 import invoke
@@ -55,9 +56,11 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
 
 
 @invoke.task()
-def optimise(ctx):
-    """Optimise"""
-    optimiser = Optimiser()
+def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom", N=20):
+    """Optimise the route."""
+    optimiser = Optimiser(locality)
+    nodes = list(optimiser.simulator.batgraph.nodes())
+    optimiser.initialise(random.choice(nodes), random.choice(nodes))
     print("Shortest path:", optimiser.route, optimiser.testedRoutes[optimiser.route])
-    for i in range(20):
+    for i in range(N):
         optimiser.mcmcStep()

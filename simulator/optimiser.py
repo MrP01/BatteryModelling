@@ -4,11 +4,14 @@ from simulator.simulation import Simulation
 
 
 class Optimiser:
-    def __init__(self) -> None:
-        self.simulator = Simulation()
+    def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom") -> None:
+        self.simulator = Simulation(locality)
         self.testedRoutes = {}
         self.temperature = 1.0
-        self.route = self.simulator.batgraph.findShortestPath("A", "F")
+
+    def initialise(self, source, destination):
+        """Simulates (measures) the shortest possible route, ignoring charging stations, etc."""
+        self.route = self.simulator.batgraph.findShortestPath(source, destination)
         self.measureRoute(self.route)
 
     def metric(self):
@@ -29,11 +32,11 @@ class Optimiser:
             try:
                 # print("Perturbing...")
                 newRoute = self.simulator.batgraph.perturbRoute(self.route)
-                perturbationAttempt += 1
                 if newRoute not in self.testedRoutes:
                     break
             except KeyError:  # perturbRoute() was unsuccessful
                 pass
+            perturbationAttempt += 1
             if perturbationAttempt > 20:
                 print("Giving up perturbation.")
                 return
