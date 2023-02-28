@@ -5,8 +5,8 @@ from simulator.simulation import Simulation
 
 
 class Optimiser:
-    def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom") -> None:
-        self.simulator = Simulation(locality)
+    def __init__(self, graph) -> None:
+        self.simulator = Simulation(graph)
         self.testedRoutes = {}
         self.temperature = 1.0
 

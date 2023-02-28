@@ -5,6 +5,7 @@ import invoke
 import matplotlib.pyplot as plt
 import numpy as np
 
+from simulator.batgraph import BatGraph
 from simulator.optimiser import Optimiser
 from simulator.simulation import Simulation
 
@@ -58,7 +59,8 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
 @invoke.task()
 def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom", N=20):
     """Optimise the route."""
-    optimiser = Optimiser(locality)
+    graph = BatGraph.exampleGraph() if locality == "example" else BatGraph.fetch(locality)
+    optimiser = Optimiser(graph)
     nodes = list(optimiser.simulator.batgraph.nodes())
     optimiser.initialise(random.choice(nodes), random.choice(nodes))
     print("Shortest path:", optimiser.route, optimiser.testedRoutes[optimiser.route])

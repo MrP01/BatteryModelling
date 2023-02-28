@@ -12,7 +12,6 @@ from simulator.batgraph import BatGraph
 from simulator.batmobile import BatMobile
 
 INTERFACE_DIRECTORY = pathlib.Path(__file__).parent
-NODE_SIZE = 12
 
 
 class BatMap(QLabel):
@@ -32,6 +31,7 @@ class BatMap(QLabel):
         plt.rcParams["figure.facecolor"] = self.backgroundColor.name()
         plt.rcParams["axes.facecolor"] = self.backgroundColor.name()
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.nodeSize = 12 if len(self.graph.nodes) > 30 else 30
 
         if self.PLAY_SOUND:
             self.effect = QtMultimedia.QSoundEffect()
@@ -100,13 +100,17 @@ class BatMap(QLabel):
             painter.setPen(pen)
             painter.setBrush(brush)
             painter.drawEllipse(
-                self.X(data["x"]) - NODE_SIZE // 2,
-                self.Y(data["y"]) - NODE_SIZE // 2,
-                NODE_SIZE,
-                NODE_SIZE,
+                self.X(data["x"]) - self.nodeSize // 2,
+                self.Y(data["y"]) - self.nodeSize // 2,
+                self.nodeSize,
+                self.nodeSize,
             )
             painter.setPen(originalPen)
-            painter.drawText(self.X(data["x"]) - NODE_SIZE / 6, self.Y(data["y"]) + NODE_SIZE / 6, str(node)[:1])
+            painter.drawText(
+                self.X(data["x"]) - self.nodeSize / 6,
+                self.Y(data["y"]) + self.nodeSize / 6,
+                str(node)[:1],
+            )
 
     def X(self, x):
         return (x - self.graph.center[0]) * 0.9 * self.canvas.width() / self.graph.maxDx + 960 // 2

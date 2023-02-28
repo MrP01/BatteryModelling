@@ -16,9 +16,11 @@ class Simulation:
 
     dt = 0.01
 
-    def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom"):
+    def __init__(self, graph=None):
         super().__init__()
-        self.batgraph = BatGraph.exampleGraph() if locality == "example" else BatGraph.fetch(locality)
+        if graph is None:
+            graph = BatGraph.exampleGraph()
+        self.batgraph = graph
         self.reset()
 
     def reset(self):

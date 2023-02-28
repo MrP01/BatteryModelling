@@ -92,3 +92,26 @@ class BatGraph(networkx.classes.graph.Graph):
         graph = BatGraph(graph)
         graph.storeEdgeAirlineDistances()
         return graph
+
+    @staticmethod
+    def grannysHouse():
+        graph = networkx.Graph()
+        graph.add_node("H", x=0, y=100, charger=False)
+        graph.add_node("C", x=300, y=180, charger=True)
+        graph.add_node("D", x=600, y=320, charger=True)
+        graph.add_node("G", x=900, y=400, charger=False)
+        graph.add_edge("H", "C")
+        graph.add_edge("H", "D")
+        graph.add_edge("C", "G")
+        graph.add_edge("D", "G")
+        graph = BatGraph(graph)
+        graph.storeEdgeAirlineDistances()
+        return graph
+
+    @staticmethod
+    def fromName(locality):
+        if locality == "example":
+            return BatGraph.exampleGraph()
+        elif locality == "grannys":
+            return BatGraph.grannysHouse()
+        return BatGraph.fetch(locality)

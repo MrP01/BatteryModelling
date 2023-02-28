@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt, QThreadPool
 
 from interface.batmap import BatMap
 from interface.graphs import BatTimeseriesCanvas
+from simulator.batgraph import BatGraph
 from simulator.simulation import Simulation
 
 NUMERICAL_KEYS = (Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4, Qt.Key.Key_5)
@@ -21,7 +22,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
     STEPS_PER_FRAME = 25
 
     def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom"):
-        super().__init__(locality)
+        super().__init__(graph=BatGraph.fromName(locality))
         self.batmap = BatMap(self.batgraph, self.batmobile, self)
         self.setWindowTitle("Battery Modelling in the BatMobile")
         self.threadPool = QThreadPool()
