@@ -57,12 +57,11 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
 
 
 @invoke.task()
-def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom", N=20):
+def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom", start=None, end=None, N=20):
     """Optimise the route."""
-    graph = BatGraph.exampleGraph() if locality == "example" else BatGraph.fetch(locality)
-    optimiser = Optimiser(graph)
+    optimiser = Optimiser(graph=BatGraph.fromName(locality))
     nodes = list(optimiser.simulator.batgraph.nodes())
-    optimiser.initialise(random.choice(nodes), random.choice(nodes))
+    optimiser.initialise(start or random.choice(nodes), end or random.choice(nodes))
     print("Shortest path:", optimiser.route, optimiser.testedRoutes[optimiser.route])
     for i in range(N):
         optimiser.mcmcStep()

@@ -117,3 +117,21 @@ class BatMap(QLabel):
 
     def Y(self, y):
         return -(y - self.graph.center[1]) * 0.9 * self.canvas.height() / self.graph.maxDy + 520 // 2
+
+    def highlightNode(self, name):
+        data = self.graph.nodes.get(name)
+        if data is None:
+            data = self.graph.nodes.get(int(name))
+        print("Selected", name, data)
+        painter = QPainter(self.canvas)
+        pen = QtGui.QPen()
+        pen.setWidth(5)
+        pen.setColor(QtGui.QColor(self.themeColors[2]))
+        painter.setPen(pen)
+        painter.drawEllipse(
+            QtCore.QPoint(self.X(data["x"]), self.Y(data["y"])),
+            self.nodeSize * 1.2,
+            self.nodeSize * 1.2,
+        )
+        painter.end()
+        self.setPixmap(self.canvas)

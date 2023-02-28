@@ -7,6 +7,7 @@ from PySide6.QtCore import Qt, QThreadPool
 from interface.batmap import BatMap
 from interface.graphs import BatTimeseriesCanvas
 from simulator.batgraph import BatGraph
+from simulator.optimiser import Optimiser
 from simulator.simulation import Simulation
 
 NUMERICAL_KEYS = (Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4, Qt.Key.Key_5)
@@ -27,6 +28,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.setWindowTitle("Battery Modelling in the BatMobile")
         self.threadPool = QThreadPool()
         self.userSelectedTurnIndex = None
+        self.optimiser = Optimiser(self.batgraph)
 
     def iterate(self):
         """The iteration method of the simulation, representing a single numerical integration step in time by dt.
@@ -71,14 +73,28 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             self.killTimer(self.iterationTimerId)
             self.controlBtn.setText("Start")
 
+    def startOptimiser(self):
+        if self.optimiseBtn.text() == "Monte-Carlo away":
+            self.optimisingTimerId = self.startTimer(50)
+            self.optimiseBtn.setText("Bring me back")
+        else:
+            self.killTimer(self.optimisingTimerId)
+            self.optimiseBtn.setText("Monte-Carlo away")
+
     def timerEvent(self, event: QtCore.QTimerEvent):
-        self.iterate()
+        if self.controlBtn.text() == "Stop":
+            self.iterate()
+        else:
+            if len(self.optimiser.testedRoutes) == 0:
+                self.optimiser.initialise(self.sourceDrowdown.currentText(), self.destinationDropdown.currentText())
+            self.optimiser.mcmcStep()
         return super().timerEvent(event)
 
     def buildUI(self):
         self.controlBtn = QtWidgets.QPushButton("Start", self)
         self.resetBtn = QtWidgets.QPushButton("Reset", self)
         self.exportBtn = QtWidgets.QPushButton("Export", self)
+        self.optimiseBtn = QtWidgets.QPushButton("Monte-Carlo away", self)
         usageLabel = QtWidgets.QLabel(
             "Controls:\n"
             "Click 'Start' to begin the simulation.\n"
@@ -89,7 +105,16 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.statsLabel = QtWidgets.QLabel()
         self.turnLabel = QtWidgets.QLabel("Welcome to the Electric Vehicle Simulator.")
         self.turnLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.sourceDrowdown = QtWidgets.QComboBox(self)
+        self.destinationDropdown = QtWidgets.QComboBox(self)
+        self.sourceDrowdown.addItems(list(map(str, self.batgraph.nodes)))
+        self.destinationDropdown.addItems(list(map(str, self.batgraph.nodes)))
+        self.sourceDrowdown.setCurrentText(str(self.batmobile.sourceNode))
+        self.destinationDropdown.setCurrentText(str(self.batmobile.destinationNode))
         self.controlBtn.clicked.connect(self.startOrStop)  # type: ignore
+        self.optimiseBtn.clicked.connect(self.startOptimiser)  # type: ignore
+        self.sourceDrowdown.currentTextChanged.connect(self.batmap.highlightNode)  # type: ignore
+        self.destinationDropdown.currentTextChanged.connect(self.batmap.highlightNode)  # type: ignore
 
         self.batteryPlots = BatTimeseriesCanvas()
         self.batteryPlots.draw()
@@ -104,6 +129,11 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         buttonLayout.addWidget(self.exportBtn)
         buttonLayout.addWidget(usageLabel)
         buttonLayout.addWidget(self.statsLabel)
+        buttonLayout.addWidget(QtWidgets.QLabel("Source:"))
+        buttonLayout.addWidget(self.sourceDrowdown)
+        buttonLayout.addWidget(QtWidgets.QLabel("Destination:"))
+        buttonLayout.addWidget(self.destinationDropdown)
+        buttonLayout.addWidget(self.optimiseBtn)
         buttonLayout.addStretch()
         layout.addLayout(buttonLayout, 1, 1)
         graphLayout = QtWidgets.QHBoxLayout()
