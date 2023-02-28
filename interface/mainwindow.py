@@ -85,9 +85,11 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         if self.controlBtn.text() == "Stop":
             self.iterate()
         else:
-            if len(self.optimiser.testedRoutes) == 0:
-                self.optimiser.initialise(self.sourceDrowdown.currentText(), self.destinationDropdown.currentText())
+            self.optimiser = Optimiser(self.batgraph)
+            self.optimiser.initialise(self.sourceDrowdown.currentText(), self.destinationDropdown.currentText())
             self.optimiser.mcmcStep()
+            self.batmap.render()
+            self.batmap.drawRoute(self.optimiser.route)
         return super().timerEvent(event)
 
     def buildUI(self):

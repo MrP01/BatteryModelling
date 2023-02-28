@@ -12,6 +12,10 @@ class Optimiser:
 
     def initialise(self, source, destination):
         """Simulates (measures) the shortest possible route, ignoring charging stations, etc."""
+        if not self.simulator.batgraph.has_node(source):
+            source = int(source)
+        if not self.simulator.batgraph.has_node(destination):
+            destination = int(destination)
         self.route = self.simulator.batgraph.findShortestPath(source, destination)
         self.measureRoute(self.route)
 

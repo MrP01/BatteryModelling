@@ -135,3 +135,17 @@ class BatMap(QLabel):
         )
         painter.end()
         self.setPixmap(self.canvas)
+
+    def drawRoute(self, route):
+        painter = QPainter(self.canvas)
+        pen = QtGui.QPen()
+        pen.setWidth(5)
+        pen.setColor(QtGui.QColor(self.themeColors[3]))
+        painter.setPen(pen)
+        last = QtCore.QPoint(self.X(self.graph.nodes[route[0]]["x"]), self.Y(self.graph.nodes[route[0]]["y"]))
+        for node in route[1:]:
+            data = self.graph.nodes.get(node)
+            painter.drawLine(last, QtCore.QPoint(self.X(data["x"]), self.Y(data["y"])))
+            last = QtCore.QPoint(self.X(data["x"]), self.Y(data["y"]))
+        painter.end()
+        self.setPixmap(self.canvas)
