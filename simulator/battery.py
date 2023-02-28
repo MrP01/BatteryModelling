@@ -17,7 +17,7 @@ class Battery:
     """Class representing the battery in the BatMobile. Keeps track of parameters and does the core simulation."""
 
     ocvPolynomial = (10.7950, -26.0626, 22.7642, -8.3793, 1.5987, 3.4686)
-    capacity = 2.9 * 3600  # Ampere seconds of 2.9Ah battery
+    capacity = 20.9 * 3600  # Ampere seconds of 2.9Ah battery
     # print("i am a frendly bug dont delete me")  <-- who was this?? xD
 
     def __init__(self):

@@ -64,3 +64,10 @@ def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom
     print("Shortest path:", optimiser.route, optimiser.testedRoutes[optimiser.route])
     for i in range(N):
         optimiser.mcmcStep()
+
+
+@invoke.task()
+def mitja_is_a_bit_silly_sometimes(ctx):
+    """CTX is a variable which stands for context."""
+    ctx.run("echo 'Hi Mitja! This is Bash!'")
+    print("Hi Mitja! This is Python print.")
