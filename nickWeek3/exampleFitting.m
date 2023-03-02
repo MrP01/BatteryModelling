@@ -9,7 +9,7 @@ capacity = 2.9; % 2.9Ahr cell
 
 %% Load specific current and voltage profile.
 dataDir = "/Users/nickwest/Documents/Oxford/MMSC/Hilary/Battery Modeling/BatteryModelling/cleanData/10c/cleanData10C/";
-filename = "run30_10C.csv";
+filename = "run26_10C.csv";
 runData = readtable(dataDir + filename);
 measuredVoltage = runData.voltage;
 % OCV = mean(measuredVoltage([1:3 length(measuredVoltage)-3:length(measuredVoltage)]))
@@ -58,13 +58,51 @@ predictedVoltage = getVoltageCurveConstOCV(samplingRate, ...
     [R0 R1 C1], ...
     iR10, ...
     OCV);
-figure(1)
-plot(predictedVoltage, "b--");
-hold on
-plot(measuredVoltage, "r");
-hold off
-shg
+% figure(1)
+% plot(predictedVoltage, "b--");
+% hold on
+% plot(measuredVoltage, "r");
+% hold off
+% shg
+% 
+% figure(2)
+% plot(current)
+% shg
+x = 0.01.*[1:length(measuredVoltage)];
+ECMMotivation = figure(1);
+p1 = subplot(2, 1, 1);
+plot(x, measuredVoltage)
+title("Battery Voltage vs Time")
+ylabel("Voltage (V)")
+xlabel("Time (s)")
+p2 = subplot(2,1,2);
+plot(x, current);
+title("Current vs Time")
+ylabel("Current (A)")
+xlabel("Time (s)")
+saveas(ECMMotivation, "ECMMotivation.png")
+fontsize(ECMMotivation, "increase")
+fontsize(ECMMotivation, "increase")
+fontsize(ECMMotivation, "increase")
 
-figure(2)
-plot(current)
-shg
+
+ECMModellingExample = figure(2);
+p3 = subplot(2, 1, 1);
+hold on
+plot(x, measuredVoltage, "b")
+plot(x, predictedVoltage, "r--")
+title("Battery Voltage vs Time")
+ylabel("Voltage (V)")
+xlabel("Time (s)")
+legend("Measured Voltage", "ECM Model")
+hold off
+p4 = subplot(2, 1, 2);
+plot(x, current);
+title("Current vs Time")
+ylabel("Current (A)")
+xlabel("Time (s)")
+fontsize(ECMModellingExample, "increase")
+fontsize(ECMModellingExample, "increase")
+fontsize(ECMModellingExample, "increase")
+
+saveas(ECMModellingExample, "ECMModellingExample.png")
