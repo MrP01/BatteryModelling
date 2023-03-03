@@ -8,14 +8,17 @@ def load_data():
 
 
 def plot_curves_no_temperature_data(df):
+	# Function to help append run number as an integer as a column. Helps to filter out
+	# large current pulses
     def tempfunc(x):
         return int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
 
+	# Adding columns/cleaning up data
     df["RunNum"] = df["Run"].apply(tempfunc)
     try:
-        df.drop(df.index[df["T"] != 10], axis=0, inplace=True)  # Only working with 10C
+        df.drop(df.index[df["T"] != 10], axis=0, inplace=True)  # Only working with 10deg Celsius
     except Exception:
-        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved like this
+        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved as #T sometimes
     df.drop(df.index[df["R1"] < 0], axis=0, inplace=True)  # No negative resistances
     df.drop(df.index[df["C1"] < 100], axis=0, inplace=True)  # Bad data
     df.drop(df.index[df["RunNum"] % 5 == 0], axis=0, inplace=True)  # Get rid of high current runs because messes up R1
