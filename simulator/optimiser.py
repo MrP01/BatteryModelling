@@ -39,7 +39,7 @@ class Optimiser:
                 newRoute = self.simulator.batgraph.perturbRoute(self.route)
                 if newRoute not in self.testedRoutes:
                     break
-            except KeyError:  # perturbRoute() was unsuccessful
+            except (KeyError, StopIteration):  # perturbRoute() was unsuccessful
                 pass
             perturbationAttempt += 1
             if perturbationAttempt > 20:
