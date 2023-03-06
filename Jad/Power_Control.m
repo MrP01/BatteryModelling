@@ -188,9 +188,9 @@ function [m] = Temp_C (T)
         Calendari = Calendar;
     end
     if T>20
-        m = 3.805*10^-7*0.045*Calendari;
+        m = 3.805*10^-7*0.05*Calendari;
     else
-        m = 3.171*10^-8*0.045*Calendari;
+        m = 3.171*10^-8*0.05*Calendari;
     end
 end
 
