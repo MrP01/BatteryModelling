@@ -8,67 +8,87 @@ def load_data():
 
 
 def plot_curves_no_temperature_data(df):
+	# Function to help append run number as an integer as a column. Helps to filter out
+	# large current pulses
     def tempfunc(x):
         return int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
 
+	# Adding columns/cleaning up data
     df["RunNum"] = df["Run"].apply(tempfunc)
     try:
-        df.drop(df.index[df["T"] != 10], axis=0, inplace=True)  # Only working with 10C
+        df.drop(df.index[df["T"] != 10], axis=0, inplace=True)  # Only working with 10deg Celsius
     except Exception:
-        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved like this
+        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved as #T sometimes
     df.drop(df.index[df["R1"] < 0], axis=0, inplace=True)  # No negative resistances
     df.drop(df.index[df["C1"] < 100], axis=0, inplace=True)  # Bad data
     df.drop(df.index[df["RunNum"] % 5 == 0], axis=0, inplace=True)  # Get rid of high current runs because messes up R1
     df.drop(df.index[df["SOC"] <= 0.1], axis=0, inplace=True)  # one bad data point in R1
 
     # Start plotting
-    plt.figure(1, figsize=(16, 7))
+    plt.figure(1, figsize=(16, 16))
 
     # Plot of R0 with fit
-    plt.subplot(2, 4, 1)
+    plt.subplot(2, 2, 1)
     plt.scatter(df["SOC"], df["R0"])
     myTemp = np.polyfit(df["SOC"], df["R0"], 6)
     x = np.linspace(0.1, 1, 101)
     plt.plot(x, np.polyval(myTemp, x))
+    plt.xlabel("State of Charge (Unitless)")
+    plt.ylabel("$R_0$ ($\Omega$)")
+    plt.title("$R_0$")
     print("R0 Fit: " + str(myTemp))
-    # Plot of residuals
-    plt.subplot(2, 4, 1 + 4)
-    plt.scatter(df["SOC"], df["R0"] - np.polyval(myTemp, df["SOC"]))
+    
+#     # Plot of residuals
+#     plt.subplot(2, 4, 1 + 4)
+#     plt.scatter(df["SOC"], df["R0"] - np.polyval(myTemp, df["SOC"]))
 
     # Plot of R1 with fit
-    plt.subplot(2, 4, 2)
+    plt.subplot(2, 2, 2)
     plt.scatter(df["SOC"], df["R1"])
     myTemp = np.polyfit(df["SOC"], df["R1"], 6)
     x = np.linspace(0.1, 1, 101)
     plt.plot(x, np.polyval(myTemp, x))
+    plt.xlabel("State of Charge (Unitless)")
+    plt.ylabel("$R_1$ ($\Omega$)")
+    plt.title("$R_1$")
     print("R1 Fit:" + str(myTemp))
 
-    # Plot of residuals
-    plt.subplot(2, 4, 2 + 4)
-    plt.scatter(df["SOC"], df["R1"] - np.polyval(myTemp, df["SOC"]))
+#     # Plot of residuals
+#     plt.subplot(2, 4, 2 + 4)
+#     plt.scatter(df["SOC"], df["R1"] - np.polyval(myTemp, df["SOC"]))
 
     # Plot of C1 with fit
-    plt.subplot(2, 4, 3)
-    plt.scatter(df["SOC"], df["C1"])
+    plt.subplot(2, 2, 3)
+    plt.scatter(df["SOC"], df["C1"]/1000)
     myTemp = np.polyfit(df["SOC"], df["C1"], 4)
     x = np.linspace(0.1, 1, 101)
     y = np.array([max(i, df["C1"].min()) for i in np.polyval(myTemp, x)])
-    plt.plot(x, y)
+    plt.plot(x, y/1000)
+    plt.xlabel("State of Charge (Unitless)")
+    plt.ylabel("$C_1$ (kF)")
+    plt.title("$C_1$")
+    
+    #plt.rcParams.update({'font.size': 28})
     print("C1 Fit: " + str(myTemp))
-    # Plot of residuals
-    plt.subplot(2, 4, 3 + 4)
-    plt.scatter(df["SOC"], df["C1"] - np.polyval(myTemp, df["SOC"]))
+    
+#     # Plot of residuals
+#     plt.subplot(2, 4, 3 + 4)
+#     plt.scatter(df["SOC"], df["C1"] - np.polyval(myTemp, df["SOC"]))
 
     # Plot of OCV with fit
-    plt.subplot(2, 4, 4)
+    plt.subplot(2, 2, 4)
     plt.scatter(df["OCV_SOC"], df["OCV"])
     myTemp = np.polyfit(df["OCV_SOC"], df["OCV"], 5)
     x = np.linspace(0.1, 1, 101)
     plt.plot(x, np.polyval(myTemp, x))
+    plt.xlabel("State of Charge (Unitless)")
+    plt.ylabel("$V_{OC}$ (V)")
+    plt.title("$V_{OC}$")
     print("OCV Fit: " + str(myTemp))
-    # Plot of residuals
-    plt.subplot(2, 4, 4 + 4)
-    plt.scatter(df["SOC"], df["OCV"] - np.polyval(myTemp, df["OCV_SOC"]))
+    
+#     # Plot of residuals
+#     plt.subplot(2, 4, 4 + 4)
+#     plt.scatter(df["SOC"], df["OCV"] - np.polyval(myTemp, df["OCV_SOC"]))
     plt.savefig("paramsNoTemp.png")
 
 
