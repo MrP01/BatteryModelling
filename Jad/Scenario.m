@@ -1,8 +1,8 @@
 clc
 clearvars
 close all
-dt = 220; %Total distance (to granny*2)
-vec1 = [40 80 140]; %Distances of charging stations 
+dt = 220;%220; %Total distance (to granny*2)
+vec1 = [20 85 135 200]; %Distances of charging stations 
 C1 = ones(1,length(vec1)); %Charging rate of stations
 Co1 = [15 10 15 10]; %Cost of charging in stations
 Cbattery = 3000; %Cost of a battery
@@ -17,7 +17,7 @@ vec = vec2;
 name = "V";
 end
 counter4 = 0;
-for stays = 3:3
+for stays = 6:6
     counter4 = counter4+1;
     counter3 = 0;
 for calendar = 0:2
@@ -40,7 +40,7 @@ P = @(v) p1(1,1)*v^2+p1(1,2)*v+p1(1,3);
 Po = P(N)/60;
 
 %% Model
-zi = 0.8; zc = 0.9; I0 = 1; T0 = 10; h0 = 1; c0 = 0;
+zi = 0.8; zc = 0.8; I0 = 1; T0 = 10; h0 = 1; c0 = 0;
 tc = dc/v*3600; tgi = dt/2/v*3600; stay = 24*3600*(7-stays); home = 24*3600*stays; ti = 0; tg = tgi;
 tvec = []; Savec = []; Sbvec = []; Scvec = []; Sdvec = [];
 if dc > dt/2
@@ -48,7 +48,7 @@ if dc > dt/2
 else
     check = 1;
 end
-[tvec,Savec,Sbvec,Scvec,Sdvec]= First_Scenario(check,ncycles,C1(1,counter),Po,zi,zc,I0,T0,h0,c0,tc,tgi,stay,home,ti,tg,tvec,Savec,Sbvec,Scvec,Sdvec,calendar,0.6);   
+[tvec,Savec,Sbvec,Scvec,Sdvec]= First_Scenario(check,ncycles,C1(1,counter),Po,zi,zc,I0,T0,h0,c0,tc,tgi,stay,home,ti,tg,tvec,Savec,Sbvec,Scvec,Sdvec,calendar,0.4);   
 
 tplot(counter,1:length(tvec),counter3)=tvec;
 Saplot(counter,1:length(tvec),counter3)= Savec;
@@ -59,7 +59,7 @@ Sdplot(counter,1:length(tvec),counter3)=Sdvec;
 end
 end
 end
-Percentage(counter4,1)= mean((ones-nonzeros(Scplot(1,:,1)))./(ones-nonzeros(Scplot(1,:,2))))*100;
+Percentage(counter4,1)= mean((ones-nonzeros(Scplot(end,:,1)))./(ones-nonzeros(Scplot(end,:,2))))*100;
 end
 
 %% Plotting
@@ -69,7 +69,7 @@ figure
 if num == 1 || num == 2
 subplot(1,2,1)
 elseif num == 3
-subplot(1,3,1)
+subplot(1,5,1)
 end
     
 for i = 1:counter
@@ -109,19 +109,35 @@ end
 xlabel('Time')
 ylabel('Cycles')
 elseif num == 3
-subplot(1,3,2)
+subplot(1,5,2)
 plot(tplot(1,Saplot(1,:,3)~=0,3),nonzeros(Saplot(1,:,3)))
 hold on
-[y1val,y2val,Error] = Compute_Mean(tplot(1,Saplot(1,:,3)~=0,3),tplot(end,Saplot(end,:,3)~=0,3),nonzeros(Saplot(1,:,3)),nonzeros(Saplot(end,:,3)));
+[y1val,y2val,y3val,y4val,Error] = Compute_Mean(tplot(1,Saplot(1,:,3)~=0,3),tplot(2,Saplot(2,:,3)~=0,3),tplot(3,Saplot(3,:,3)~=0,3),tplot(4,Saplot(4,:,3)~=0,3),nonzeros(Saplot(1,:,3)),nonzeros(Saplot(2,:,3)),nonzeros(Saplot(3,:,3)),nonzeros(Saplot(4,:,3)));
 plot(tplot(1,Saplot(1,:,3)~=0,3),ones(1,length(tplot(1,Saplot(1,:,3)~=0,3)))*y1val)
 ylim([0 1])
 xlabel('Time')
 ylabel('SOC')
 title("dc = "+num2str(vec1(1,1))+" Calendar Aging")
-subplot(1,3,3)
+subplot(1,5,3)
+plot(tplot(2,Saplot(2,:,3)~=0,3),nonzeros(Saplot(2,:,3)))
+hold on
+ylim([0 1])
+plot(tplot(2,Saplot(2,:,3)~=0,3),ones(1,length(tplot(2,Saplot(2,:,3)~=0,3)))*y2val)
+xlabel('Time')
+ylabel('SOC')
+title("dc = "+num2str(vec1(1,2))+" Calendar Aging")
+subplot(1,5,4)
+plot(tplot(3,Saplot(3,:,3)~=0,3),nonzeros(Saplot(3,:,3)))
+hold on
+ylim([0 1])
+plot(tplot(3,Saplot(3,:,3)~=0,3),ones(1,length(tplot(3,Saplot(3,:,3)~=0,3)))*y3val)
+xlabel('Time')
+ylabel('SOC')
+title("dc = "+num2str(vec1(1,3))+" Calendar Aging")
+subplot(1,5,5)
 plot(tplot(end,Saplot(end,:,3)~=0,3),nonzeros(Saplot(end,:,3)))
 hold on
-plot(tplot(end,Saplot(end,:,3)~=0,3),ones(1,length(tplot(end,Saplot(end,:,3)~=0,3)))*y2val)
+plot(tplot(end,Saplot(end,:,3)~=0,3),ones(1,length(tplot(end,Saplot(end,:,3)~=0,3)))*y4val)
 xlabel('Time')
 ylabel('SOC')
 title("dc = "+num2str(vec1(1,end))+" Calendar Aging")

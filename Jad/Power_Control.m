@@ -17,7 +17,7 @@ M = @(t,y)[1 0 0 0 0 0 0 0%SOC
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
-   2.9*0.2*Temp_C(y(5))*t*(sinh(y(1)))*-sign(Pow) 0 0 0 0 varyM1(y(6),y(8)/3600,check,Pow)*((Calendar-2)~=0)  1 varyM2(y(6),check,Pow)*((Calendar-2)~=0)
+   2.9*0.2*Temp_C(y(5))*t*0.4*abs(sinh(0.4*y(1)-0.15))*-sign(Pow) 0 0 0 0 varyM1(y(6),y(8)/3600,check,Pow)*((Calendar-2)~=0)  1 varyM2(y(6),check,Pow)*((Calendar-2)~=0)
    0 0 0 0 0 0 0 1];
 
 % Use the LSODI example tolerances.  The 'MassSingular' property is
@@ -119,7 +119,7 @@ out = [  -y(6)./y(7)/3600
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10
    equ(Pow,y(6),y(3),check)
-   -2.9*0.2*Temp_C(y(5))*(cosh(y(1)));
+   -2.9*0.2*Temp_C(y(5))*(cosh(2*y(1)-0.8));
    0.5*abs(y(6))./y(7)];
 end
 
@@ -188,9 +188,9 @@ function [m] = Temp_C (T)
         Calendari = Calendar;
     end
     if T>20
-        m = 3.805*10^-7*0.05*Calendari;
+        m = 3.805*10^-7*0.045*Calendari;
     else
-        m = 3.171*10^-8*0.05*Calendari;
+        m = 3.171*10^-8*0.045*Calendari;
     end
 end
 
