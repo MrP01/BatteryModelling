@@ -56,6 +56,13 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         if self.step % self.STEPS_PER_FRAME == 1:
             self.updatePlots()
 
+    def iterateOptimiser(self):
+        self.optimiser.mcmcStep()
+        self.batmap.render()
+        self.batmap.drawRoute(self.optimiser.route)
+        if self.optimiseBtn.text() != "Monte-Carlo away":
+            QtCore.QTimer.singleShot(0, self.iterateOptimiser)
+
     def updatePlots(self):
         """Updates the plots and redraws them. This is an expensive operation, so we run it outside the main thread."""
         measurement = self.batmobile.battery.measurement()
@@ -75,21 +82,22 @@ class MainWindow(Simulation, QtWidgets.QWidget):
 
     def startOptimiser(self):
         if self.optimiseBtn.text() == "Monte-Carlo away":
-            self.optimisingTimerId = self.startTimer(50)
-            self.optimiseBtn.setText("Bring me back")
+            # self.optimisingTimerId = self.startTimer(250)
+            self.optimiseBtn.setText("Stop it!")
+            self.optimiser = Optimiser(self.batgraph)
+            self.optimiser.initialise(self.sourceDrowdown.currentText(), self.destinationDropdown.currentText())
+            QtCore.QTimer.singleShot(0, self.iterateOptimiser)
         else:
-            self.killTimer(self.optimisingTimerId)
+            # self.killTimer(self.optimisingTimerId)
             self.optimiseBtn.setText("Monte-Carlo away")
 
     def timerEvent(self, event: QtCore.QTimerEvent):
-        if self.controlBtn.text() == "Stop":
-            self.iterate()
-        else:
-            self.optimiser = Optimiser(self.batgraph)
-            self.optimiser.initialise(self.sourceDrowdown.currentText(), self.destinationDropdown.currentText())
-            self.optimiser.mcmcStep()
-            self.batmap.render()
-            self.batmap.drawRoute(self.optimiser.route)
+        self.iterate()
+        # if self.controlBtn.text() == "Stop":
+        #     self.iterate()
+        # else:
+        #     self.iterateOptimiser()
+        #     # self.threadPool.start(self.iterateOptimiser)
         return super().timerEvent(event)
 
     def buildUI(self):

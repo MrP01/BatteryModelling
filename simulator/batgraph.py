@@ -58,18 +58,25 @@ class BatGraph(networkx.classes.graph.Graph):
         type-3: the destination becomes part of the perturbation so the route is shortened.
         """
         i = random.randrange(0, len(route))
-        j = random.choice([x for x in (i + 1, i + 2, i - 1, i - 2) if 0 <= x < len(route)])
+        j = random.choice([x for x in (i + 1, i + 2, i + 3, i + 4, i - 1, i - 2, i - 3, i - 4) if 0 <= x < len(route)])
         indexA, indexB = min(i, j), max(i, j)
         nodeA, nodeB = route[indexA], route[indexB]
-        sharedNeighbours = set(self.neighbors(nodeA)).intersection(self.neighbors(nodeB))
-        if indexB - indexA == 2:  # type-2 perturbation
-            inbetween = route[indexA + 1]
-            sharedNeighbours.remove(inbetween)  # ignore the element that is already part of the route
-        # print(list(self.neighbors(nodeA)), list(self.neighbors(nodeB)), sharedNeighbours)
-        middle = sharedNeighbours.pop()
-        if middle == route[-1]:  # type-3 perturbation, destination is perturbed in
-            return route[: indexA + 1] + (middle,)  # so ignore the remaining route (which will be a loop)
-        return route[: indexA + 1] + (middle,) + route[indexB:]  # choose any shared neighbour
+        if indexB - indexA <= 2:
+            # print("type-1-2-3 perturbation")
+            sharedNeighbours = set(self.neighbors(nodeA)).intersection(self.neighbors(nodeB))
+            if indexB - indexA == 2:  # type-2 perturbation
+                inbetween = route[indexA + 1]
+                sharedNeighbours.remove(inbetween)  # ignore the element that is already part of the route
+            # print(list(self.neighbors(nodeA)), list(self.neighbors(nodeB)), sharedNeighbours)
+            middle = sharedNeighbours.pop()
+            if middle == route[-1]:  # type-3 perturbation, destination is perturbed in
+                return route[: indexA + 1] + (middle,)  # so ignore the remaining route (which will be a loop)
+            return route[: indexA + 1] + (middle,) + route[indexB:]  # choose any shared neighboudan
+        else:
+            # print("type-4 perturbation")
+            generator = networkx.all_simple_paths(self, nodeA, nodeB)
+            # next(generator)  # discard this one as it might already be on the route
+            return route[:indexA] + tuple(next(generator)) + route[indexB + 1 :]
 
     @staticmethod
     def exampleGraph():
