@@ -1,4 +1,4 @@
-function [ze,Ie,Te,h0,c0,tf,tvals,SOCvals,CycleVals,SOHVals] = Power_Control (Pow,check,ti,fval,z0,I0,T0,h0,c0,s)
+function [ze,Ie,Te,h0,c0,tf,tvals,SOCvals,CycleVals,SOHVals,CurrentVals] = Power_Control (Pow,check,ti,fval,z0,I0,T0,h0,c0,s,plotting,Calendar)
 
 %Pow specifies either current or power
 %Check is 1 for power control and 0 for current control
@@ -17,9 +17,9 @@ M = @(t,y)[1 0 0 0 0 0 0 0%SOC
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
    0 0 0 0 0 0 0 0
-   0 0 0 0 0 varyM1(y(6),y(8)/3600,check,Pow)  1 varyM2(y(6),check,Pow)
+   2.9*0.2*Temp_C(y(5))*t*(sinh(y(1)))*-sign(Pow) 0 0 0 0 varyM1(y(6),y(8)/3600,check,Pow)*((Calendar-2)~=0)  1 varyM2(y(6),check,Pow)*((Calendar-2)~=0)
    0 0 0 0 0 0 0 1];
-%2.9*0.2*Temp_C(y(5))*t*(8*y(1)-4*1.3)
+
 % Use the LSODI example tolerances.  The 'MassSingular' property is
 % left at its default 'maybe' to test the automatic detection of a DAE.
 if s == "Time"
@@ -48,56 +48,60 @@ tf = t1(end,1);
 tvals = t1(:,1);
 SOCvals = y1(:,1);
 CycleVals = y1(:,8)/3600;
+CurrentVals = y1(:,6);
 SOHVals = y1(:,7);
 h0 = y1(end,7);
 c0 = y1(end,8);
-% figure(1);
-% plot(t1,y1(:,1), 'r.-');
-% ylabel('z');
-% title('state of charge');
-% xlabel('t');
-% %
-% figure(2);
-% plot(t1,y1(:,2),'g.-');
-% ylabel('Vc1(t)');
-% title('capacitor voltage');
-% xlabel('t');
+
+if plotting == 1
+figure(1);
+plot(t1,y1(:,1), 'r.-');
+ylabel('z');
+title('state of charge');
+xlabel('t');
 %
-% figure(3);
-% plot(t1,y1(:,3),'b.-');
-% ylabel('v(t)');
-% title('voltage');
-% xlabel('t');
+figure(2);
+plot(t1,y1(:,2),'g.-');
+ylabel('Vc1(t)');
+title('capacitor voltage');
+xlabel('t');
+
+figure(3);
+plot(t1,y1(:,3),'b.-');
+ylabel('v(t)');
+title('voltage');
+xlabel('t');
+
+figure(4);
+plot(t1,y1(:,4),'k.-');
+ylabel('IR1(t)');
+title('current');
+xlabel('t');
+
+figure(5);
+plot(t1,y1(:,5),'y.-');
+ylabel('T(t)');
+title('temperature');
+xlabel('t');
 %
-% figure(4);
-% plot(t1,y1(:,4),'k.-');
-% ylabel('IR1(t)');
-% title('current');
-% xlabel('t');
-%
-% figure(5);
-% plot(t1,y1(:,5),'y.-');
-% ylabel('T(t)');
-% title('temperature');
-% xlabel('t');
-% %
-% figure(6);
-% plot(t1,y1(:,6),'y.-');
-% ylabel('I(t)');
-% title('Current');
-% xlabel('t');
-%
-% figure(7);
-% plot(t1,y1(:,7),'y.-');
-% ylabel('Q(t)');
-% title('Capacity');
-% xlabel('t');
-%
-% figure(8);
-% plot(t1,y1(:,8)/3600,'y.-');
-% ylabel('C');
-% title('Cycle');
-% xlabel('t');
+figure(6);
+plot(t1,y1(:,6),'y.-');
+ylabel('I(t)');
+title('Current');
+xlabel('t');
+
+figure(7);
+plot(t1,y1(:,7),'y.-');
+ylabel('Q(t)');
+title('Capacity');
+xlabel('t');
+
+figure(8);
+plot(t1,y1(:,8)/3600,'y.-');
+ylabel('C');
+title('Cycle');
+xlabel('t');
+end
 %--------------------------------------------------------------------------
 
 
@@ -115,7 +119,7 @@ out = [  -y(6)./y(7)/3600
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10
    equ(Pow,y(6),y(3),check)
-   -2.9*0.2*Temp_C(y(5))*(4*y(1).^2-4*1.3*y(1)+1.3^2+1)
+   -2.9*0.2*Temp_C(y(5))*(cosh(y(1)));
    0.5*abs(y(6))./y(7)];
 end
 
@@ -178,10 +182,15 @@ end
 end
 
 function [m] = Temp_C (T)
-    if T>20
-        m = 3.805*10^-7;
+    if Calendar == 2
+        Calendari = 1;
     else
-        m = 3.171*10^-8;
+        Calendari = Calendar;
+    end
+    if T>20
+        m = 3.805*10^-7*0.05*Calendari;
+    else
+        m = 3.171*10^-8*0.05*Calendari;
     end
 end
 
