@@ -48,14 +48,15 @@ if dc > dt/2
 else
     check = 1;
 end
-[tvec,Savec,Sbvec,Scvec,Sdvec]= First_Scenario(check,ncycles,C1(1,counter),Po,zi,zc,I0,T0,h0,c0,tc,tgi,stay,home,ti,tg,tvec,Savec,Sbvec,Scvec,Sdvec,calendar,0.4);   
+[tvec,Savec,Sbvec,Scvec,Sdvec,SOH_PER_TRIP]= First_Scenario(check,ncycles,C1(1,counter),Po,zi,zc,I0,T0,h0,c0,tc,tgi,stay,home,ti,tg,tvec,Savec,Sbvec,Scvec,Sdvec,calendar,0.4);   
 
 tplot(counter,1:length(tvec),counter3)=tvec;
 Saplot(counter,1:length(tvec),counter3)= Savec;
 Sbplot(counter,1:length(tvec),counter3)= Sbvec;
 Scplot(counter,1:length(tvec),counter3)= Scvec;
-Sdplot(counter,1:length(tvec),counter3)=Sdvec;    
-
+Sdplot(counter,1:length(tvec),counter3)=Sdvec;
+NickPlot1(counter, 1:length(SOH_PER_TRIP), counter3) = SOH_PER_TRIP(1, :);
+NickPlot2(counter, 1:length(SOH_PER_TRIP), counter3) = SOH_PER_TRIP(2, :);
 end
 end
 end
@@ -73,7 +74,8 @@ for twice = 1:2
 figure
 subplot(1,2,1)
 for i = 1:counter
-    plot(tplot(i,Scplot(i,:,1)~=0,1),nonzeros(Scplot(i,:,1)),'linewidth',1.2)
+%     plot(tplot(i,Scplot(i,:,1)~=0,1),nonzeros(Scplot(i,:,1)),'linewidth',1.2)
+    plot(NickPlot1(i, :, 1), NickPlot2(i, :, 1), 'linewidth', 1.2);
     hold on
 end
 legend(s(1:length(vec)))
@@ -88,7 +90,8 @@ ylim([0.99135 0.99225])
 end
 subplot(1,2,2)
 for i = 1:counter
-    plot(tplot(i,Sbplot(i,:,1)~=0,1),nonzeros(Sbplot(i,:,1)),'linewidth',1.2)
+%     plot(tplot(i,Sbplot(i,:,1)~=0,1),nonzeros(Sbplot(i,:,1)),'linewidth',1.2)
+    plot(NickPlot1(i, :, 1), NickPlot2(i, :, 1), 'linewidth', 1.2);
     hold on
 end
 legend(s(1:length(vec)),'location','northwest')
@@ -108,7 +111,8 @@ figure
 for twice = 1:2
 subplot(1,2,twice)
 for i = 1:counter
-    plot(tplot(i,Scplot(i,:,3)~=0,1),nonzeros(Scplot(i,:,3)),'linewidth',1.2)
+%     plot(tplot(i,Scplot(i,:,3)~=0,1),nonzeros(Scplot(i,:,3)),'linewidth',1.2)
+    plot(NickPlot1(i, :, 3), NickPlot2(i, :, 3), 'linewidth', 1.2);
     hold on
 end
 legend(s(1:length(vec)))
@@ -131,7 +135,8 @@ for twice = [4 2]
 figure
 subplot(1,3,1)
 for i = 1:counter
-    plot(tplot(i,Scplot(i,:,3)~=0,1),nonzeros(Scplot(i,:,3)),'linewidth',1.2)
+%     plot(tplot(i,Scplot(i,:,3)~=0,1),nonzeros(Scplot(i,:,3)),'linewidth',1.2)
+    plot(NickPlot1(i, :, 3), NickPlot2(i, :, 3), 'linewidth', 1.2);
     hold on
 end
 legend(s(1:length(vec)),'location','southwest')
@@ -171,7 +176,8 @@ figure
 for twice = 1:2
 subplot(1,2,twice)
 for i = 1:counter
-    plot(tplot(i,Scplot(i,:,2)~=0,1),nonzeros(Scplot(i,:,2)),'linewidth',1.2)
+%     plot(tplot(i,Scplot(i,:,2)~=0,1),nonzeros(Scplot(i,:,2)),'linewidth',1.2)
+    plot(NickPlot1(i, :, 2), NickPlot2(i, :, 2), 'linewidth', 1.2);
     hold on
 end
 legend(s(1:length(vec)))
@@ -189,7 +195,6 @@ xlim([5.5*10^6 8*10^6])
 ylim([0.9825 0.986])
 end
 end
-
 
 %% Plotting cost
 %This part will only show up if different charging stations are compared! 

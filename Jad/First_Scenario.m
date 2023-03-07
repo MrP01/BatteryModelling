@@ -1,4 +1,5 @@
-function [tvec,Savec,Sbvec,Scvec,Sdvec]= First_Scenario(check,cycles,C1,Po,zi,zc,I0,T0,h0,c0,tc,tgi,stay,home,ti,tg,tvec,Savec,Sbvec,Scvec,Sdvec,c,zopt)  
+function [tvec,Savec,Sbvec,Scvec,Sdvec,SOH_OF_EACH_TRIP]= First_Scenario(check,cycles,C1,Po,zi,zc,I0,T0,h0,c0,tc,tgi,stay,home,ti,tg,tvec,Savec,Sbvec,Scvec,Sdvec,c,zopt)  
+SOH_OF_EACH_TRIP = zeros([2 cycles]);
 if check ==1
 for cycle = 1:cycles
     if cycle == 1
@@ -21,6 +22,8 @@ ti = t8(end,1); tg = tgi+t8(end,1);
 tvec = [tvec;t1;t2;t3;t4;t5;t6;t7;t8]; Savec = [Savec;S1a;S2a;S3a;S4a;S5a;S6a;S7a;S8a];
 Sbvec = [Sbvec;S1b;S2b;S3b;S4b;S5b;S6b;S7b;S8b]; Scvec = [Scvec;S1c;S2c;S3c;S4c;S5c;S6c;S7c;S8c];
 Sdvec = [Sdvec;S1d;S2d;S3d;S4d;S5d;S6d;S7d;S8d];
+SOH_OF_EACH_TRIP(1, cycle) = ti;
+SOH_OF_EACH_TRIP(2, cycle) = S8c(end, 1);
 end
 else
 for cycle = 1:cycles  
@@ -43,6 +46,8 @@ ti = t8(end,1);
 tvec = [tvec;t1;t2;t3;t4;t5;t6;t7;t8]; Savec = [Savec;S1a;S2a;S3a;S4a;S5a;S6a;S7a;S8a];
 Sbvec = [Sbvec;S1b;S2b;S3b;S4b;S5b;S6b;S7b;S8b]; Scvec = [Scvec;S1c;S2c;S3c;S4c;S5c;S6c;S7c;S8c]; 
 Sdvec = [Sdvec;S1d;S2d;S3d;S4d;S5d;S6d;S7d;S8d];
+SOH_OF_EACH_TRIP(1, cycle) = ti;
+SOH_OF_EACH_TRIP(2, cycle) = S8c(end, 1);
 end
 end
 end
