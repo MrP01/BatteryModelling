@@ -4,6 +4,7 @@ from scipy.optimize import fsolve
 
 import playground.zSOHModel.degradationModel as dm
 
+plt.rcParams.update({"font.size": 16})
 plt.rcParams["text.usetex"] = True
 # This file lets us evaluate some basic cost functions and
 # also lets us generate any optimal currents for some specific cost functions.
@@ -44,12 +45,18 @@ plt.show()
 ##
 def getBestCurrent(a, b, powerLaw, threshold, plotArg="n"):
     currents = np.linspace(1e-2, 15)
-    times = np.array([getTotalDegradationTime(current, threshold) for current in currents])
+    times = np.array(
+        [getTotalDegradationTime(current, threshold) for current in currents]
+    )
 
     with np.errstate(divide="ignore"):
         inverseTimes = np.divide(1, times) ** powerLaw
     costFun = (
-        a * np.multiply(np.square(currents[0 : len(inverseTimes)]), times[0 : len(inverseTimes)]) - b * inverseTimes
+        a
+        * np.multiply(
+            np.square(currents[0 : len(inverseTimes)]), times[0 : len(inverseTimes)]
+        )
+        - b * inverseTimes
     )
     if plotArg == "y":
         print(f"Best current is {currents[costFun.argmax()]:.1f}A")
@@ -59,6 +66,9 @@ def getBestCurrent(a, b, powerLaw, threshold, plotArg="n"):
             print("You are NEUTRAL")
         else:
             print("You are at a net POSIITVE")
+
+        plt.figure(figsize=(9, 6))
+        plt.tight_layout()
         plt.plot(currents, costFun, "red")
         plt.title(
             f"Evaluation of Cost Function C with Death at {threshold}$Q_{{00}}$\n$p$ ={powerLaw}, "

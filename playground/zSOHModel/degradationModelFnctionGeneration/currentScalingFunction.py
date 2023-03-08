@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
+plt.rcParams.update({"font.size": 16})
 plt.rcParams["text.usetex"] = True
-
+##
 # This file generates a 'current scaling factor' CSF, NOT to be confused with
 # the SOC, s. The variable CSF is a measure of how much further a battery's capacity Q(t)
 # should degrade when ran at higher temperatures, compared to being run at 1C
@@ -158,10 +159,12 @@ optimalDegradingFactorParameters, pcov = sp.optimize.curve_fit(
 rangeOfCurrentValues = np.linspace(0, 6)
 yy = degradingFactor(rangeOfCurrentValues, *optimalDegradingFactorParameters)
 
-plt.plot(rangeOfCurrentValues * 2.9, yy, "orange")
-plt.title("Degradation Ratios against Current")
+plt.figure(figsize=(8, 6))
+plt.tight_layout()
+plt.plot(rangeOfCurrentValues[yy > 0] * 2.9, yy[yy > 0], "orange")
+plt.title("Current Scaling Factor against Current")
 plt.xlabel("Current (A)")
-plt.ylabel("Degradation Ratio")
+plt.ylabel("Current Scaling Factor")
 # plt.legend(["actual data", "fit data"])
 plt.show()
 
@@ -174,7 +177,10 @@ def scaleDegrading(current):
     currentInC = current / 2.9
     return np.clip(
         optimalDegradingFactorParameters[0]
-        - np.exp(optimalDegradingFactorParameters[1] * currentInC + optimalDegradingFactorParameters[2]),
+        - np.exp(
+            optimalDegradingFactorParameters[1] * currentInC
+            + optimalDegradingFactorParameters[2]
+        ),
         0,
         1,
     )

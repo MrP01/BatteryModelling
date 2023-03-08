@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+plt.rcParams.update({"font.size": 16})
 plt.rcParams["text.usetex"] = True
 # This file outlines the degradation model we use. There are
 # several components to the model. The overall function looks something like:
@@ -24,7 +25,7 @@ def calendarDegradationFactor(soc, timeInSeconds, temp=10):
     Given an SOC that the battery is kept at, as well as the duration of storage,
     calculates the calendar aging that occurs
     """
-    socFactor = (2 * soc - 1.3) ** 2 + 1
+    socFactor = np.cosh(0.4 * soc - 0.15)  # (1.5 * soc - 0.5) ** 4 + 1
     if temp > 20:
         timeInMonths = 3.805e-7 * timeInSeconds
         return np.max(2.9 * (1 - 0.2 * timeInMonths * socFactor / 3), 0)
@@ -57,14 +58,20 @@ def totalDegradation(cycles, current, soc=0.65, timeInSecs=1e7):
 
     # Q(cycles,current,SOC,time) = Q_0 - (CACDF(cycles)/CSF(current)) - CDF(SOC,time)
     """
-    # To view background for CACDF view:
-    # 'generateCurrentAgnosticDegradation.py'
-    CACDF = 2.9 * 4.58e-04 * cycles * (1 + (1 / 4.58e-04) * np.exp(5.07e-02 * (cycles - 700)))
     CSF = currentScalingFactor(current)
     CDF = 2.9 - calendarDegradationFactor(soc, timeInSecs)
-    if currentScalingFactor == -1:
+    if CSF == -1:
         return 2.9 - CDF
     else:
+        # To view background for CACDF view:
+        # 'generateCurrentAgnosticDegradation.py'
+        CACDF = (
+            2.9
+            * 4.58e-04
+            * cycles
+            * (1 + (1 / 4.58e-04) * np.exp(5.07e-02 * (cycles - 700)))
+        )
+        print(CACDF)
         capacityAfterDegradation = np.maximum(
             2.9 - (CACDF / CSF) - CDF,
             0,
@@ -73,28 +80,60 @@ def totalDegradation(cycles, current, soc=0.65, timeInSecs=1e7):
 
 
 # The code above is all that is needed for our degradation model.
-#######
+
 # This next code just generating capacity profiles for different current profiles
 def generatePlots():
     timeOfSit = 0.2e8
     cycles = np.linspace(0, 600)
     profile1C = [totalDegradation(cycle, 2.9, 0.65, timeOfSit) for cycle in cycles]
-    profile1CShort = [totalDegradation(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles]
-    profile0C = [totalDegradation(cycle, 0 * 2.9, 0.65, timeOfSit) for cycle in cycles]
+    profile1CShort = [
+        totalDegradation(cycle, 2.9, 0.65, 0.2 * timeOfSit) for cycle in cycles
+    ]
     profile3C = [totalDegradation(cycle, 3 * 2.9, 0.65, timeOfSit) for cycle in cycles]
     profile4C = [totalDegradation(cycle, 4 * 2.9, 0.65, timeOfSit) for cycle in cycles]
-    profile3CHighSOC = [totalDegradation(cycle, 3 * 2.9, 0.9, timeOfSit) for cycle in cycles]
-    plt.plot(cycles, profile1C, "r", label=f"1C Time={timeOfSit:.2e}s")
-    plt.plot(cycles, profile1CShort, "g", label=f"1C Time={0.5*timeOfSit:.2e}s")
-    plt.plot(cycles, profile0C, "b", label=f"0C Time={timeOfSit:.2e}")
-    plt.plot(cycles, profile3C, "magenta", label=f"3C Time={timeOfSit:.2e}")
-    plt.plot(cycles, profile4C, "cyan", label=f"4C Time={timeOfSit:.2e}")
-    plt.plot(cycles, profile3CHighSOC, "orange", label=f"3C, High SOC Time={timeOfSit:.2e}")
+    profile3CHighSOC = [
+        totalDegradation(cycle, 3 * 2.9, 0.95, timeOfSit) for cycle in cycles
+    ]
+
+    plt.figure(figsize=(8, 6))
+    plt.tight_layout()
+    plt.plot(cycles, profile1C, "r", label=f"1C, Time = {timeOfSit:.2e}s")
+    plt.plot(cycles, profile1CShort, "g", label=f"1C, Time = {0.5*timeOfSit:.2e}s")
+    plt.plot(cycles, profile3C, "m", label=f"3C, Time = {timeOfSit:.2e}s")
+    plt.plot(cycles, profile4C, "cyan", label=f"4C, Time = {timeOfSit:.2e}s")
+    # plt.plot(
+    #     cycles,
+    #     profile3CHighSOC,
+    #     "m--",
+    #     label=f"3C, High SOC, Time={timeOfSit:.2e}s",
+    # )
+    profile0C = [totalDegradation(cycle, 0, 0.65, timeOfSit) for cycle in cycles]
+    plt.plot(cycles, profile0C, "b", label=f"0C, Time = {timeOfSit:.2e}s")
     plt.legend(loc="best")
     plt.title("Comparison of Current and Aging Profiles with Cycles on Capacity")
     plt.xlabel("Cycles")
+    plt.grid(visible=True, which="major", c="#dddddd", lw=2, ls="-")
     plt.ylabel("Capacity (Ah)")
     plt.show()
+    return profile0C
 
 
-generatePlots()
+x = generatePlots()
+
+##
+def generateDQPlot():
+    socs = np.linspace(0, 1, 200)
+    dvals = -0.4 * abs(np.sinh(0.4 * socs - 0.15))
+    plt.figure(figsize=(8, 6))
+    plt.tight_layout()
+    plt.plot(socs, dvals, "r")
+    plt.legend(loc="best")
+    plt.title("$(Q_s)_{t,T,I}$ against $s$")
+    plt.xlabel("$s$")
+    plt.grid(visible=True, which="major", c="#dddddd", lw=2, ls="-")
+    plt.ylabel("$(Q_s)_{t,T,I}$ (Ah)")
+    plt.show()
+    return
+
+
+generateDQPlot()
