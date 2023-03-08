@@ -8,7 +8,7 @@ capacity = 2.9; % 2.9Ahr cell
 %OCV = generateOCV(chargeData,dischargeData,capacity,5);
 
 %% Load specific current and voltage profile.
-dataDir = "/Users/nickwest/Documents/Oxford/MMSC/Hilary/Battery Modeling/BatteryModelling/cleanData/10c/cleanData10C/";
+dataDir ="/home/sulch/BatteryModelling/cleanData/10c/cleanData10C/";
 filename = "run26_10C.csv";
 runData = readtable(dataDir + filename);
 measuredVoltage = runData.voltage;
@@ -106,3 +106,8 @@ fontsize(ECMModellingExample, "increase")
 fontsize(ECMModellingExample, "increase")
 
 saveas(ECMModellingExample, "ECMModellingExample.png")
+%%
+csvwrite('measuredVoltage.csv', measuredVoltage);
+csvwrite('predictedVoltage.csv', predictedVoltage);
+csvwrite('times.csv', x);
+csvwrite('measuredCurrent.csv', current);

@@ -2,27 +2,42 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+plt.rcParams["text.usetex"] = True
+plt.rcParams.update({"font.size": 16})
+
 
 def load_data():
     return pd.read_csv("finalOutputWithOCV.txt")
 
 
 def plot_curves_no_temperature_data(df):
-	# Function to help append run number as an integer as a column. Helps to filter out
-	# large current pulses
+    # Function to help append run number as an integer as a column. Helps to filter out
+    # large current pulses
     def tempfunc(x):
-        return int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
+        return (
+            int(x.split("_")[0][3:])
+            if x.split("_")[0][-1] != "_"
+            else int(x.split("_")[0][3:-1])
+        )
 
-	# Adding columns/cleaning up data
+    # Adding columns/cleaning up data
     df["RunNum"] = df["Run"].apply(tempfunc)
     try:
-        df.drop(df.index[df["T"] != 10], axis=0, inplace=True)  # Only working with 10deg Celsius
+        df.drop(
+            df.index[df["T"] != 10], axis=0, inplace=True
+        )  # Only working with 10deg Celsius
     except Exception:
-        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved as #T sometimes
+        df.drop(
+            df.index[df["#T"] != 10], axis=0, inplace=True
+        )  # I don't know why it is saved as #T sometimes
     df.drop(df.index[df["R1"] < 0], axis=0, inplace=True)  # No negative resistances
     df.drop(df.index[df["C1"] < 100], axis=0, inplace=True)  # Bad data
-    df.drop(df.index[df["RunNum"] % 5 == 0], axis=0, inplace=True)  # Get rid of high current runs because messes up R1
-    df.drop(df.index[df["SOC"] <= 0.1], axis=0, inplace=True)  # one bad data point in R1
+    df.drop(
+        df.index[df["RunNum"] % 5 == 0], axis=0, inplace=True
+    )  # Get rid of high current runs because messes up R1
+    df.drop(
+        df.index[df["SOC"] <= 0.1], axis=0, inplace=True
+    )  # one bad data point in R1
 
     # Start plotting
     plt.figure(1, figsize=(16, 16))
@@ -37,10 +52,10 @@ def plot_curves_no_temperature_data(df):
     plt.ylabel("$R_0$ ($\Omega$)")
     plt.title("$R_0$")
     print("R0 Fit: " + str(myTemp))
-    
-#     # Plot of residuals
-#     plt.subplot(2, 4, 1 + 4)
-#     plt.scatter(df["SOC"], df["R0"] - np.polyval(myTemp, df["SOC"]))
+
+    #     # Plot of residuals
+    #     plt.subplot(2, 4, 1 + 4)
+    #     plt.scatter(df["SOC"], df["R0"] - np.polyval(myTemp, df["SOC"]))
 
     # Plot of R1 with fit
     plt.subplot(2, 2, 2)
@@ -53,27 +68,26 @@ def plot_curves_no_temperature_data(df):
     plt.title("$R_1$")
     print("R1 Fit:" + str(myTemp))
 
-#     # Plot of residuals
-#     plt.subplot(2, 4, 2 + 4)
-#     plt.scatter(df["SOC"], df["R1"] - np.polyval(myTemp, df["SOC"]))
+    #     # Plot of residuals
+    #     plt.subplot(2, 4, 2 + 4)
+    #     plt.scatter(df["SOC"], df["R1"] - np.polyval(myTemp, df["SOC"]))
 
     # Plot of C1 with fit
     plt.subplot(2, 2, 3)
-    plt.scatter(df["SOC"], df["C1"]/1000)
+    plt.scatter(df["SOC"], df["C1"] / 1000)
     myTemp = np.polyfit(df["SOC"], df["C1"], 4)
     x = np.linspace(0.1, 1, 101)
     y = np.array([max(i, df["C1"].min()) for i in np.polyval(myTemp, x)])
-    plt.plot(x, y/1000)
+    plt.plot(x, y / 1000)
     plt.xlabel("State of Charge (Unitless)")
     plt.ylabel("$C_1$ (kF)")
     plt.title("$C_1$")
-    
-    #plt.rcParams.update({'font.size': 28})
+    # plt.rcParams.update({'font.size': 28})
     print("C1 Fit: " + str(myTemp))
-    
-#     # Plot of residuals
-#     plt.subplot(2, 4, 3 + 4)
-#     plt.scatter(df["SOC"], df["C1"] - np.polyval(myTemp, df["SOC"]))
+
+    #     # Plot of residuals
+    #     plt.subplot(2, 4, 3 + 4)
+    #     plt.scatter(df["SOC"], df["C1"] - np.polyval(myTemp, df["SOC"]))
 
     # Plot of OCV with fit
     plt.subplot(2, 2, 4)
@@ -85,16 +99,21 @@ def plot_curves_no_temperature_data(df):
     plt.ylabel("$V_{OC}$ (V)")
     plt.title("$V_{OC}$")
     print("OCV Fit: " + str(myTemp))
-    
-#     # Plot of residuals
-#     plt.subplot(2, 4, 4 + 4)
-#     plt.scatter(df["SOC"], df["OCV"] - np.polyval(myTemp, df["OCV_SOC"]))
+
+    #     # Plot of residuals
+    #     plt.subplot(2, 4, 4 + 4)
+    #     plt.scatter(df["SOC"], df["OCV"] - np.polyval(myTemp, df["OCV_SOC"]))
+    plt.show()
     plt.savefig("paramsNoTemp.png")
 
 
 def plot_curves(df):
     def tempfunc(x):
-        return int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
+        return (
+            int(x.split("_")[0][3:])
+            if x.split("_")[0][-1] != "_"
+            else int(x.split("_")[0][3:-1])
+        )
 
     df["RunNum"] = df["Run"].apply(tempfunc)
     clean_df = df[df["R1"] >= 0]
@@ -161,3 +180,54 @@ if __name__ == "__main__":
     df = load_data()
     # plot_curves(df)
     plot_curves_no_temperature_data(df)
+
+##
+def getPresentationPlots(df):
+    plt.figure(figsize=(8, 6))
+    plt.tight_layout()
+    plt.scatter(
+        df["SOC"], df["R0"], color="green", label="Optimal Data Points to HPPC Curves"
+    )
+    myTemp = np.polyfit(df["SOC"], df["R0"], 6)
+    x = np.linspace(0.1, 1, 101)
+    plt.plot(x, np.polyval(myTemp, x), "r", label="Fitted Curve")
+    plt.xlabel("State of Charge (Unitless)")
+    plt.ylabel("$R_0$ ($\Omega$)")
+    plt.title("Fitting of $R_0$ as a Function of State of Charge\n at 10C")
+    plt.legend(loc="best")
+    print("R0 Fit: " + str(myTemp))
+    plt.show()
+    plt.figure(figsize=(8, 6))
+    plt.tight_layout()
+    plt.scatter(
+        df["SOC"], df["R1"], color="green", label="Optimal Data Points to HPPC Curves"
+    )
+    myTemp = np.polyfit(df["SOC"], df["R1"], 6)
+    x = np.linspace(0.1, 1, 101)
+    plt.plot(x, np.polyval(myTemp, x), "r", label="Fitted Curve")
+    plt.xlabel("State of Charge (Unitless)")
+    plt.ylabel("$R_1$ ($\Omega$)")
+    plt.title("Fitting of $R_1$ as a Function of State of Charge\n at 10C")
+    plt.legend(loc="best")
+    print("R0 Fit: " + str(myTemp))
+    plt.show()
+
+
+getPresentationPlots(df)
+##
+measuredCurrent = pd.read_csv("measuredCurrent.csv")
+measuredVoltage = pd.read_csv("measuredVoltage.csv")
+predictedVoltage = pd.read_csv("predictedVoltage.csv")
+times = 0.01 * np.arange(len(measuredVoltage))
+##
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), constrained_layout=True)
+ax1.plot(times, measuredVoltage, "r", label="Measured Voltage")
+# ax1.plot(times, predictedVoltage, "g", label="Predicted Voltage via ECM Model")
+ax1.set(xlabel="Time (s)", ylabel="Voltage (V)")
+ax1.set_title("Voltage on a Single HPPC Pulse")
+ax1.legend(loc="best")
+ax2.plot(times, measuredCurrent, "r", label="Current Profile")
+ax2.set(xlabel="Time (s)", ylabel="Current (A)")
+ax2.set_title("Current Profile")
+ax2.legend(loc="best")
+plt.show()
