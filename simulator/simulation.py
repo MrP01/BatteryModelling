@@ -25,7 +25,8 @@ class Simulation:
 
     def reset(self):
         self.batmobile = BatMobile()
-        self.batmobile.sourceNode = next(iter(self.batgraph.nodes))
+        # self.batmobile.sourceNode = next(iter(self.batgraph.nodes))
+        self.batmobile.sourceNode = 346139666
         self.batmobile.destinationNode = next(self.batgraph.neighbors(self.batmobile.sourceNode))
         self.totalTimeElapsed = 0
         self.step = 0

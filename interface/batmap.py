@@ -83,7 +83,7 @@ class BatMap(QLabel):
     def paintBatGraph(self, painter: QPainter):
         originalPen = painter.pen()
         linePen = QtGui.QPen()
-        linePen.setWidth(2)
+        linePen.setWidth(8)
         linePen.setColor(Qt.GlobalColor.white)
         painter.setPen(linePen)
         for A, B in self.graph.edges():
@@ -91,7 +91,7 @@ class BatMap(QLabel):
             painter.drawLine(self.X(nodeA["x"]), self.Y(nodeA["y"]), self.X(nodeB["x"]), self.Y(nodeB["y"]))
 
         pen = QtGui.QPen()
-        pen.setWidth(4)
+        pen.setWidth(10)
         pen.setColor(QtGui.QColor(self.themeColors[0]))
         brush = QtGui.QBrush()
         brush.setStyle(Qt.BrushStyle.SolidPattern)
@@ -139,8 +139,8 @@ class BatMap(QLabel):
     def drawRoute(self, route):
         painter = QPainter(self.canvas)
         pen = QtGui.QPen()
-        pen.setWidth(5)
-        pen.setColor(QtGui.QColor(self.themeColors[3]))
+        pen.setWidth(12)
+        pen.setColor(Qt.GlobalColor.darkBlue)
         painter.setPen(pen)
         last = QtCore.QPoint(self.X(self.graph.nodes[route[0]]["x"]), self.Y(self.graph.nodes[route[0]]["y"]))
         for node in route[1:]:
