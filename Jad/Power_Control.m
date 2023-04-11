@@ -1,4 +1,4 @@
-function [ze,Ie,Te,h0,c0,tf,tvals,SOCvals,CycleVals,SOHVals,CurrentVals] = Power_Control (Pow,check,ti,fval,z0,I0,T0,h0,c0,s,plotting,Calendar)
+function [ze,Ie,Te,h0,c0,tf,tvals,SOCvals,CycleVals,SOHVals,CurrentVals,Voltage] = Power_Control (Pow,check,ti,fval,z0,I0,T0,h0,c0,s,plotting,Calendar)
 
 %Pow specifies either current or power
 %Check is 1 for power control and 0 for current control
@@ -50,6 +50,7 @@ SOCvals = y1(:,1);
 CycleVals = y1(:,8)/3600;
 CurrentVals = y1(:,6);
 SOHVals = y1(:,7);
+Voltage = y1(:,3);
 h0 = y1(end,7);
 c0 = y1(end,8);
 
@@ -119,7 +120,7 @@ out = [  -y(6)./y(7)/3600
    y(4)-y(2)./R1(y(5),y(1))
    y(5)-10
    equ(Pow,y(6),y(3),check)
-   -2.9*0.2*Temp_C(y(5))*(cosh(2*y(1)-0.8));
+   -2.9*0.2*Temp_C(y(5))*(cosh(2*y(1)-0.9));
    0.5*abs(y(6))./y(7)];
 end
 
@@ -188,14 +189,14 @@ function [m] = Temp_C (T)
         Calendari = Calendar;
     end
     if T>20
-        m = 3.805*10^-7*0.045*Calendari;
+        m = 3.805*10^-7*0.05*Calendari;
     else
-        m = 3.171*10^-8*0.045*Calendari;
+        m = 3.171*10^-8*0.05*Calendari;
     end
 end
 
 function [value, isterminal, direction] = myEvent(~, Y)
-value      = abs((Y(1) - fval))<=0.04;
+value      = Y(1)>fval;
 isterminal = 1;   % Stop the integration
 direction  = 0;
 end
