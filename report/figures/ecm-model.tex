@@ -1,0 +1,22 @@
+\begin{circuitikz}[european,american voltages]
+  \ctikzset{voltage=straight}
+  \ctikzset{!vi/.style={no v symbols, no i symbols}}
+  \ctikzset{bipole voltage style/.style={color=blue}, bipole current style/.style={color=red}}
+  \draw (7,-1.7) to [short, *-]
+  (0,-1.7) to [V, name=VOC, v<=]
+  (0,1) to [R, l_=$R_0$, i<=$I$, v^<=, name=V0, !vi]
+  (3.2,1) to [short]
+  (3.2,0) to [R, l_=$R_1$, i<=$I_{R1}$, name=R1, !vi]
+  (6,0) to [short]
+  (6,2) to [C, l^=$C_1$, v_=, i=$I_{C1}$, name=V1, !vi]
+  (3.2,2) to [short]
+  (3.2,1);
+  \draw (6,1) to [short, -*] (7,1) to [open, name=VAB, v^=] (7,-1.7);
+  \iarronly{V0}
+  \iarronly{V1}
+  \iarronly{R1}
+  \fixedvlen{V0}{$V_0$}[blue]
+  \fixedvlen{V1}{$V_1$}[blue]
+  \fixedvlen{VOC}{$V_{\rm OC}$}[blue]
+  \fixedvlen{VAB}{$V$}[blue]
+\end{circuitikz}

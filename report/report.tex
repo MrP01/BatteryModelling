@@ -11,45 +11,13 @@
 \usepackage{prettytex/math}
 \usepackage[nameinlink]{cleveref}
 \usepackage[cleveref]{prettytex/math-theorems}
-\usepackage{prettytex/mathematicians}
 \usepackage{prettytex/gfx}
 \usepackage{prettytex/code}
 \usepackage{prettytex/pseudo}
 \usepackage{prettytex/thesis}
 \usepackage[european]{circuitikz}
 
-\setlength{\headheight}{19.53pt}
-\setlength{\headsep}{1.8em}
-\setlength{\belowcaptionskip}{-12pt}
-\addbibresource{sources.bib}
-\setminted{fontsize=\footnotesize}
-\AfterEndEnvironment{minted}{\vspace*{-0.8cm}}
-\tikzexternalize[prefix=tikz/]
-\renewcommand{\operatorcolor}{black}
-% \tikzset{>={Latex[width=3mm,length=3mm]}}
-\usetikzlibrary{arrows.meta,calc,decorations.pathreplacing,graphs,quotes}
-
-\newcommand{\chebyshev}{Chebyshev\xspace}
-\newcommand{\tschebfun}{\textcolor{themecolor3}{TschebFun}\xspace}
-\newcommand{\heatfun}{\textcolor{themecolor3}{HeatFun}\xspace}
-\newcommand{\iarronly}[1]{
-  \node [currarrow, color=red, anchor=center,
-  rotate=\ctikzgetdirection{#1-Iarrow}] at (#1-Ipos) {};
-}
-\newcommand{\varronly}[1]{
-  \draw [color=blue] (#1-Vfrom) .. controls (#1-Vcont1)
-  and (#1-Vcont2).. (#1-Vto) node [currarrow,
-  sloped, anchor=tip, allow upside down,pos=1]{};
-}
-\NewDocumentCommand{\fixedvlen}{O{0.7cm} m m O{}}{
-  % [semilength]{node}{label}[extra options]
-  % get the center of the standard arrow
-  \coordinate (#2-Vcenter) at ($(#2-Vfrom)!0.5!(#2-Vto)$);
-  % draw an arrow of a fixed size around that center and on the same line
-  \draw[-Triangle, #4] ($(#2-Vcenter)!#1!(#2-Vfrom)$) -- ($(#2-Vcenter)!#1!(#2-Vto)$);
-  % position the label as in the normal voltages
-  \node[anchor=\ctikzgetanchor{#2}{Vlab}, #4] at (#2-Vlab) {#3};
-}
+\input{customisations.tex}
 
 \newcommand{\topictitle}{Battery Modelling}
 \newcommand{\candidatenumber}{1072462}
@@ -58,22 +26,6 @@
 \title{\topictitle}
 \author{Candidate \candidatenumber}
 \date{\today}
-
-\tikzset{growing arrow/.style={decorate,
-decoration={show path construction,
-moveto code={},
-lineto code={
-\draw[line width=1pt,-{Stealth[width=12pt,length=12pt]}]
-(\tikzinputsegmentfirst) --  (\tikzinputsegmentlast);
-\fill ($ (\tikzinputsegmentlast)!6pt!0:(\tikzinputsegmentfirst) $) coordinate (aux)
- ($ (\tikzinputsegmentfirst)!0.5pt!90:(\tikzinputsegmentlast) $)
- -- ($ (aux)!2pt!-90:(\tikzinputsegmentfirst) $)
- --($ (aux)!2pt!90:(\tikzinputsegmentfirst) $)
- -- ($ (\tikzinputsegmentfirst)!0.5pt!-90:(\tikzinputsegmentlast) $) ;
-},
-curveto code={},
-closepath code={},
-}}}
 
 \begin{document}
   \pagestyle{plain}
@@ -127,30 +79,10 @@ closepath code={},
   $$s = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \dd\tau \,,$$
   under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
 
+  \subsection{The Equivalent Circuit Model}
   \begin{figure}[H]
     \centering
-    \begin{circuitikz}[european,american voltages]
-      \ctikzset{voltage=straight}
-      \ctikzset{!vi/.style={no v symbols, no i symbols}}
-      \ctikzset{bipole voltage style/.style={color=blue}, bipole current style/.style={color=red}}
-      \draw (7,-1.7) to [short, *-]
-      (0,-1.7) to [V, name=VOC, v<=]
-      (0,1) to [R, l_=$R_0$, i<=$I$, v^<=, name=V0, !vi]
-      (3.2,1) to [short]
-      (3.2,0) to [R, l_=$R_1$, i<=$I_{R1}$, name=R1, !vi]
-      (6,0) to [short]
-      (6,2) to [C, l^=$C_1$, v_=, i=$I_{C1}$, name=V1, !vi]
-      (3.2,2) to [short]
-      (3.2,1);
-      \draw (6,1) to [short, -*] (7,1) to [open, name=VAB, v^=] (7,-1.7);
-      \iarronly{V0}
-      \iarronly{V1}
-      \iarronly{R1}
-      \fixedvlen{V0}{$V_0$}[blue]
-      \fixedvlen{V1}{$V_1$}[blue]
-      \fixedvlen{VOC}{$V_{\rm OC}$}[blue]
-      \fixedvlen{VAB}{$V$}[blue]
-    \end{circuitikz}
+    \inputtikz{ecm-model}
     \caption{
       The Thevenin equivalent circuit model (ECM) with parameters $R_0 \in \R^+$, $R_1 \in \R^+$ and $C_1 \in \R^+$ and $V_{\rm OC} \in \R^+$ the \textit{open circuit voltage} which behaves according to a function $V_{\rm OC}(s, h, T)$ dependent on $s$, $h$ and $T$.
     }
@@ -161,9 +93,9 @@ closepath code={},
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/ec2.png}
+    \includegraphics[width=0.6\linewidth]{figures/hppc-pulse.png}
     \caption{HPPC Pulse}
-    \label{fig:ec2}
+    \label{fig:hppc-pulse}
   \end{figure}
 
   \subsection{Battery in an Electric Vehicle (EV)}
@@ -175,25 +107,10 @@ closepath code={},
   Then let
   $T_{\rm env}(x) \in [-273.15, \infty)$ denote the temperature of the environment (\textcolor{gray}{in degrees Celsius}) at location $x$.
 
-  \section{The Equivalent Circuit Model}
   \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[x=2cm,y=pi*0.5cm,font=\sffamily]
-      \graph[nodes={circle,fill=themecolor,text=white,minimum size=2em}]{
-      {
-      Graz [yshift=-1cm] -- {
-      A [xshift=2mm] -- [growing arrow, "5"] C [yshift=3mm] ,
-      B [> "2"] -- D [> "10",xshift=3mm]
-      } -- Munich
-      };
-      B -- A [> "1"];
-      B -- ["8"] C;
-      D -- ["2"] C;
-      D -- ["5"] Munich;
-      C -- [growing arrow, "6"] Munich;
-      };
-      \draw[growing arrow] (Graz) to ["4"] (A);
-    \end{tikzpicture}
+    \inputtikz{graz-to-munich}
+    \caption{Path}
   \end{figure}
 
   Let $P \in \R$, $P := I \cdot V$ denote the (electrical) power the car draws from the battery (\textcolor{gray}{in Watts}) so $P > 0$ corresponds to discharging the battery.
@@ -246,6 +163,13 @@ closepath code={},
     \label{fig:aging}
   \end{figure}
 
+  \begin{figure}[H]
+    \centering
+    \inputtikz{battery-model-overview}
+    \caption{Overview}
+    \label{fig:model-overview}
+  \end{figure}
+
   \section{Numerical Simulation of a Car}
   \subsection{Finding ECM Parameters}
   \begin{figure}[H]
@@ -275,17 +199,7 @@ closepath code={},
   \subsection{Special Case: Granny's House}
   \begin{figure}[H]
     \centering
-    \begin{tikzpicture}
-      \node[fill=themecolor,circle,draw] at (-5,-0.5) (nodeA) {Home};
-      \node[fill=themecolor,circle,draw] at (-2,0.5) (nodeB) {\tiny{Charger 1}};
-      \node[fill=themecolor,circle,draw] at (5,0.5) (nodeC) {Granny};
-      \node[fill=themecolor,circle,draw] at (2,-0.5) (nodeD) {\tiny{Charger 2}};
-
-      \draw (nodeA) -- (nodeB);
-      \draw (nodeB) -- (nodeC);
-      \draw (nodeC) -- (nodeD);
-      \draw (nodeD) -- (nodeA);
-    \end{tikzpicture}
+    \inputtikz{grannys-house}
     \caption{The exemplary problem ``Granny's House'', a special case of Problem (TODO).}
   \end{figure}
 

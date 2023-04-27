@@ -1,0 +1,44 @@
+\setlength{\headheight}{19.53pt}
+\setlength{\headsep}{1.8em}
+\setlength{\belowcaptionskip}{-12pt}
+\addbibresource{sources.bib}
+\setminted{fontsize=\footnotesize}
+\AfterEndEnvironment{minted}{\vspace*{-0.8cm}}
+\tikzexternalize[prefix=tikz/]
+\renewcommand{\operatorcolor}{black}
+% \tikzset{>={Latex[width=3mm,length=3mm]}}
+\usetikzlibrary{arrows.meta,calc,decorations.pathreplacing,graphs,quotes}
+
+\newcommand{\iarronly}[1]{
+  \node [currarrow, color=red, anchor=center,
+    rotate=\ctikzgetdirection{#1-Iarrow}] at (#1-Ipos) {};
+}
+\newcommand{\varronly}[1]{
+  \draw [color=blue] (#1-Vfrom) .. controls (#1-Vcont1)
+  and (#1-Vcont2).. (#1-Vto) node [currarrow,
+      sloped, anchor=tip, allow upside down,pos=1]{};
+}
+\NewDocumentCommand{\fixedvlen}{O{0.7cm} m m O{}}{
+  % [semilength]{node}{label}[extra options]
+  % get the center of the standard arrow
+  \coordinate (#2-Vcenter) at ($(#2-Vfrom)!0.5!(#2-Vto)$);
+  % draw an arrow of a fixed size around that center and on the same line
+  \draw[-Triangle, #4] ($(#2-Vcenter)!#1!(#2-Vfrom)$) -- ($(#2-Vcenter)!#1!(#2-Vto)$);
+  % position the label as in the normal voltages
+  \node[anchor=\ctikzgetanchor{#2}{Vlab}, #4] at (#2-Vlab) {#3};
+}
+\tikzset{growing arrow/.style={decorate,
+decoration={show path construction,
+moveto code={},
+lineto code={
+\draw[line width=1pt,-{Stealth[width=12pt,length=12pt]}]
+(\tikzinputsegmentfirst) --  (\tikzinputsegmentlast);
+\fill ($ (\tikzinputsegmentlast)!6pt!0:(\tikzinputsegmentfirst) $) coordinate (aux)
+($ (\tikzinputsegmentfirst)!0.5pt!90:(\tikzinputsegmentlast) $)
+-- ($ (aux)!2pt!-90:(\tikzinputsegmentfirst) $)
+--($ (aux)!2pt!90:(\tikzinputsegmentfirst) $)
+-- ($ (\tikzinputsegmentfirst)!0.5pt!-90:(\tikzinputsegmentlast) $) ;
+},
+curveto code={},
+closepath code={},
+}}}
