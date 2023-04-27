@@ -1,23 +1,8 @@
-\documentclass[12pt, a4paper]{article}
-\PassOptionsToPackage{sharp}{prettytex/boxes}
-\usepackage{prettytex/base}
-
-\setlength{\topmargin}{0.0in}
-\setlength{\oddsidemargin}{0.33in}
-\setlength{\textheight}{9.0in}
-\setlength{\textwidth}{6.0in}
-\renewcommand{\baselinestretch}{1.25}
-
-\usepackage{prettytex/math}
-\usepackage[nameinlink]{cleveref}
-\usepackage[cleveref]{prettytex/math-theorems}
-\usepackage{prettytex/gfx}
-\usepackage{prettytex/code}
-\usepackage{prettytex/pseudo}
-\usepackage{prettytex/thesis}
+\documentclass{prettytex/ox/mmsc-special-topic}
 \usepackage[european]{circuitikz}
-
 \input{customisations.tex}
+\addbibresource{sources.bib}
+\tikzexternalize[prefix=tikz/]
 
 \newcommand{\topictitle}{Battery Modelling}
 \newcommand{\candidatenumber}{1072462}
@@ -29,15 +14,7 @@
 
 \begin{document}
   \pagestyle{plain}
-  \begin{center}
-    \vspace*{-2.5cm}
-    \Large \topictitle \\
-    \vspace{.3cm}
-
-    \normalsize A Case Study on \textcolor{themecolor3}{\textsc{\course}}\\
-    \normalsize Candidate Number: \textcolor{themecolor3}{\candidatenumber}
-    \vspace{.3cm}
-  \end{center}
+  \mmscSpecialHeader[casestudy]
 
   \begin{abstract}
     \label{abstract}
@@ -155,7 +132,7 @@
   % \end{itemize}
   % and many more simplifications are possible, which ones do we choose?
 
-  \subsection{Aging}
+  \subsection{Battery Aging}
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/aging.png}
