@@ -101,6 +101,14 @@ closepath code={},
   \pagebreak
   \pagestyle{normal}
 
+  \section{Introduction}
+  Clearly, electric batteries are largely important for various industries and demand for them is ever-growing.
+  This includes, especially, the renewable energy sector due to the unpredictability of energy supplies such as wind and solar power where short-term storage is a necessary evil.
+  Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
+  In many countries and/or regions, Electric Vehicles (EVs) still lack a well-enlarged network of charging stations, for various reasons including incompatibilties between charging station suppliers.
+
+  In this report, we will consider how to model a battery
+
   \section{Problem Formulation}
   \subsection{The Isolated Battery}
   Let
@@ -151,6 +159,13 @@ closepath code={},
   Kirchhoff's law further tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
   The capacitor behaves according to $I_{C1} = C_1 \frac{\dd V_1}{\ddt}$, while the resistors follow Ohm's law $V_0 = R_0 I$ and $V_1 = R_1 I_{R1}$.
 
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/ec2.png}
+    \caption{HPPC Pulse}
+    \label{fig:ec2}
+  \end{figure}
+
   \subsection{Battery in an Electric Vehicle (EV)}
   On a graph $(V_G, E)$ with edges $E = \{AB, AC, ...\} \subseteq V_G \times V_G$ and vertices $V_G = \{A, B, ...\}$, let
   $d_{AB} \in \R^+$ denote the distance between two vertices $A \in V_G$ and $B \in V_G$ (\textcolor{gray}{in meters}),
@@ -160,6 +175,7 @@ closepath code={},
   Then let
   $T_{\rm env}(x) \in [-273.15, \infty)$ denote the temperature of the environment (\textcolor{gray}{in degrees Celsius}) at location $x$.
 
+  \section{The Equivalent Circuit Model}
   \begin{figure}[H]
     \centering
     \begin{tikzpicture}[x=2cm,y=pi*0.5cm,font=\sffamily]
@@ -188,7 +204,9 @@ closepath code={},
   On the graph $(V_G, E)$ there exists a set of EV charging stations $V_{\rm charge} \subseteq V_G$ where $P_{C,\rm charge}$ denotes the possible charging power (\textcolor{gray}{in Watts}) at the charging station vertex $C \in V_{\rm charge}$ with $K_C \in \R^+$ the occuring costs per energy unit (\textcolor{gray}{in Euros per Watt second}) and $t_C \in \R^+$ the charging time per charging station $B$ (\textcolor{gray}{in seconds}).
 
   \subsection{A Variational Optimisation Problem}
-  Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, which connected set of edges $E_R \subseteq E$ connecting $A$ to $Z$, battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$, set of visited charging stations $V_C \subseteq V_{\rm charge}$ and charging times $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and driving behaviour $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space \footnote{to be defined} minimises
+  Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, which connected set of edges $E_R \subseteq E$ connecting $A$ to $Z$,
+  % battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$,
+  set of visited charging stations $V_C \subseteq V_{\rm charge}$ and charging times $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and driving behaviour $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space \footnote{to be defined.. TODO} minimises
   \begin{enumerate}
     \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \ddx + \sum_{C \in V_C} t_C$,
     \item the total cost of travel $K := \sum_{C \in V_C} P_{C, \rm charge} t_{C} K_C$,
@@ -221,9 +239,22 @@ closepath code={},
   % and many more simplifications are possible, which ones do we choose?
 
   \subsection{Aging}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/aging.png}
+    \caption{Aging}
+    \label{fig:aging}
+  \end{figure}
 
-  \section{Numerical Simulation of the Equivalent Circuit Model}
-  \subsection{Finding Parameters}
+  \section{Numerical Simulation of a Car}
+  \subsection{Finding ECM Parameters}
+  \begin{figure}[H]
+    \captionsetup[subfigure]{justification=centering}
+    \centering
+    \subfloat[Fit of $R_0$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
+    \subfloat[Fit of $R_1$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
+  \end{figure}
+
   \subsection{Forward Euler Simulation}
 
   \section{Metropolis-Hastings and A-Star}
@@ -231,5 +262,32 @@ closepath code={},
     A graph $G = (V, E)$ with vertices $V$ and edges $E \subseteq V \times V$ is undirected if and only if $(v_i, v_j) \in E \Rightarrow (v_j, v_i) \in E \quad \forall\; v_i, v_j \in V$.
   \end{definition}
 
+  \subsection{Special Case: Granny's House}
+  \begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+      \node[fill=themecolor,circle,draw] at (-5,-0.5) (nodeA) {Home};
+      \node[fill=themecolor,circle,draw] at (-2,0.5) (nodeB) {\tiny{Charger 1}};
+      \node[fill=themecolor,circle,draw] at (5,0.5) (nodeC) {Granny};
+      \node[fill=themecolor,circle,draw] at (2,-0.5) (nodeD) {\tiny{Charger 2}};
+
+      \draw (nodeA) -- (nodeB);
+      \draw (nodeB) -- (nodeC);
+      \draw (nodeC) -- (nodeD);
+      \draw (nodeD) -- (nodeA);
+    \end{tikzpicture}
+    \caption{The exemplary problem ``Granny's House'', a special case of Problem (TODO).}
+  \end{figure}
+
+  \subsection{Routing in Jericho}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/jericho.png}
+    \caption{Overlay of the routing graph on a map of Jericho \parencite{OpenStreetMap}, without adjusting for the Merkator projection, which leads to a slightly skewed appearance. The underlying data is exactly the same.}
+  \end{figure}
+
   \section{Conclusion}
+
+  \pagebreak
+  \printbibliography
 \end{document}
