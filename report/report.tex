@@ -262,6 +262,16 @@ closepath code={},
     A graph $G = (V, E)$ with vertices $V$ and edges $E \subseteq V \times V$ is undirected if and only if $(v_i, v_j) \in E \Rightarrow (v_j, v_i) \in E \quad \forall\; v_i, v_j \in V$.
   \end{definition}
 
+  \subsection{Shortest Path Finding}
+  \subsection{Monte-Carlo Optimisation}
+  Optimise a large problem (huge state-space). Metric: Time! Could be anything.
+  $\Rightarrow$ Use Monte-Carlo Markov Chain Methods!
+  Slightly perturb the route using a specific alteration technique.
+  Metropolis-Hastings updates the state (route) based on $$p_{\rm accept} = \min\left(1, \e^{-\beta (T_{\rm next} - T_{\rm current})}\right)\,, \quad \text{ with } \beta \in \R^+ \text{ a transition factor} \,.$$
+  Does a full numerical simulation of the drive. Stop to charge?
+  Explore the state-space to some extent, and return the best route!
+  Larger scales / maps (e.g. England) are not a problem!
+
   \subsection{Special Case: Granny's House}
   \begin{figure}[H]
     \centering
