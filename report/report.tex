@@ -1,0 +1,235 @@
+\documentclass[12pt, a4paper]{article}
+\PassOptionsToPackage{sharp}{prettytex/boxes}
+\usepackage{prettytex/base}
+
+\setlength{\topmargin}{0.0in}
+\setlength{\oddsidemargin}{0.33in}
+\setlength{\textheight}{9.0in}
+\setlength{\textwidth}{6.0in}
+\renewcommand{\baselinestretch}{1.25}
+
+\usepackage{prettytex/math}
+\usepackage[nameinlink]{cleveref}
+\usepackage[cleveref]{prettytex/math-theorems}
+\usepackage{prettytex/mathematicians}
+\usepackage{prettytex/gfx}
+\usepackage{prettytex/code}
+\usepackage{prettytex/pseudo}
+\usepackage{prettytex/thesis}
+\usepackage[european]{circuitikz}
+
+\setlength{\headheight}{19.53pt}
+\setlength{\headsep}{1.8em}
+\setlength{\belowcaptionskip}{-12pt}
+\addbibresource{sources.bib}
+\setminted{fontsize=\footnotesize}
+\AfterEndEnvironment{minted}{\vspace*{-0.8cm}}
+\tikzexternalize[prefix=tikz/]
+\renewcommand{\operatorcolor}{black}
+% \tikzset{>={Latex[width=3mm,length=3mm]}}
+\usetikzlibrary{arrows.meta,calc,decorations.pathreplacing,graphs,quotes}
+
+\newcommand{\chebyshev}{Chebyshev\xspace}
+\newcommand{\tschebfun}{\textcolor{themecolor3}{TschebFun}\xspace}
+\newcommand{\heatfun}{\textcolor{themecolor3}{HeatFun}\xspace}
+\newcommand{\iarronly}[1]{
+  \node [currarrow, color=red, anchor=center,
+  rotate=\ctikzgetdirection{#1-Iarrow}] at (#1-Ipos) {};
+}
+\newcommand{\varronly}[1]{
+  \draw [color=blue] (#1-Vfrom) .. controls (#1-Vcont1)
+  and (#1-Vcont2).. (#1-Vto) node [currarrow,
+  sloped, anchor=tip, allow upside down,pos=1]{};
+}
+\NewDocumentCommand{\fixedvlen}{O{0.7cm} m m O{}}{
+  % [semilength]{node}{label}[extra options]
+  % get the center of the standard arrow
+  \coordinate (#2-Vcenter) at ($(#2-Vfrom)!0.5!(#2-Vto)$);
+  % draw an arrow of a fixed size around that center and on the same line
+  \draw[-Triangle, #4] ($(#2-Vcenter)!#1!(#2-Vfrom)$) -- ($(#2-Vcenter)!#1!(#2-Vto)$);
+  % position the label as in the normal voltages
+  \node[anchor=\ctikzgetanchor{#2}{Vlab}, #4] at (#2-Vlab) {#3};
+}
+
+\newcommand{\topictitle}{Battery Modelling}
+\newcommand{\candidatenumber}{1072462}
+\newcommand{\course}{Mathematical Modelling}
+
+\title{\topictitle}
+\author{Candidate \candidatenumber}
+\date{\today}
+
+\tikzset{growing arrow/.style={decorate,
+decoration={show path construction,
+moveto code={},
+lineto code={
+\draw[line width=1pt,-{Stealth[width=12pt,length=12pt]}]
+(\tikzinputsegmentfirst) --  (\tikzinputsegmentlast);
+\fill ($ (\tikzinputsegmentlast)!6pt!0:(\tikzinputsegmentfirst) $) coordinate (aux)
+ ($ (\tikzinputsegmentfirst)!0.5pt!90:(\tikzinputsegmentlast) $)
+ -- ($ (aux)!2pt!-90:(\tikzinputsegmentfirst) $)
+ --($ (aux)!2pt!90:(\tikzinputsegmentfirst) $)
+ -- ($ (\tikzinputsegmentfirst)!0.5pt!-90:(\tikzinputsegmentlast) $) ;
+},
+curveto code={},
+closepath code={},
+}}}
+
+\begin{document}
+  \pagestyle{plain}
+  \begin{center}
+    \vspace*{-2.5cm}
+    \Large \topictitle \\
+    \vspace{.3cm}
+
+    \normalsize A Case Study on \textcolor{themecolor3}{\textsc{\course}}\\
+    \normalsize Candidate Number: \textcolor{themecolor3}{\candidatenumber}
+    \vspace{.3cm}
+  \end{center}
+
+  \begin{abstract}
+    \label{abstract}
+    This work will attempt to
+
+    % Monte Carlo with Simulated Annealing on the graph
+    % A-Star on the graph
+    % Chebyshev Ansatz (Finite Element) for I(t), solve model and minimize for coefficients
+  \end{abstract}
+
+  \tableofcontents
+
+  \pagebreak
+  \pagestyle{normal}
+
+  \section{Problem Formulation}
+  \subsection{The Isolated Battery}
+  Let
+  $s \in [0, 1]$ denote the \textit{state of charge} (SOC) of the battery,
+  $h \in [0, 1]$ the \textit{state of health} (SOH),
+  $Q \in \R^+$ the charge,
+  $Q_{00} \in \R^+$ the maximum possible charge at the time of production (\textcolor{gray}{in Coulombs}),
+  $V \in \R$ the voltage across the battery (\textcolor{gray}{in Volts}) with
+  $I \in \R$ the corresponding current (\textcolor{gray}{in Amperes}) where $I > 0$ corresponds to discharging the battery.
+  Then, per common definition, $s := \frac{Q}{Q_0}$ is the amount of charge currently present in the battery as compared to $Q_0 \in \R^+$ the current maximum capacity, which itself is dependent on the state of health, as given by $Q_0 := h Q_{00}$.
+  Further let
+  $T \in [-273.15, \infty)$ denote the temperature of the battery (\textcolor{gray}{in degrees Celsius}) and
+  let $t \in \R$ represent time (\textcolor{gray}{in seconds}).
+
+  From the definition of current $I := \frac{\dd Q}{\ddt}$, we further have that for a single cycle,
+  $$s = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \dd\tau \,,$$
+  under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
+
+  \begin{figure}[H]
+    \centering
+    \begin{circuitikz}[european,american voltages]
+      \ctikzset{voltage=straight}
+      \ctikzset{!vi/.style={no v symbols, no i symbols}}
+      \ctikzset{bipole voltage style/.style={color=blue}, bipole current style/.style={color=red}}
+      \draw (7,-1.7) to [short, *-]
+      (0,-1.7) to [V, name=VOC, v<=]
+      (0,1) to [R, l_=$R_0$, i<=$I$, v^<=, name=V0, !vi]
+      (3.2,1) to [short]
+      (3.2,0) to [R, l_=$R_1$, i<=$I_{R1}$, name=R1, !vi]
+      (6,0) to [short]
+      (6,2) to [C, l^=$C_1$, v_=, i=$I_{C1}$, name=V1, !vi]
+      (3.2,2) to [short]
+      (3.2,1);
+      \draw (6,1) to [short, -*] (7,1) to [open, name=VAB, v^=] (7,-1.7);
+      \iarronly{V0}
+      \iarronly{V1}
+      \iarronly{R1}
+      \fixedvlen{V0}{$V_0$}[blue]
+      \fixedvlen{V1}{$V_1$}[blue]
+      \fixedvlen{VOC}{$V_{\rm OC}$}[blue]
+      \fixedvlen{VAB}{$V$}[blue]
+    \end{circuitikz}
+    \caption{
+      The Thevenin equivalent circuit model (ECM) with parameters $R_0 \in \R^+$, $R_1 \in \R^+$ and $C_1 \in \R^+$ and $V_{\rm OC} \in \R^+$ the \textit{open circuit voltage} which behaves according to a function $V_{\rm OC}(s, h, T)$ dependent on $s$, $h$ and $T$.
+    }
+  \end{figure}
+
+  Kirchhoff's law further tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
+  The capacitor behaves according to $I_{C1} = C_1 \frac{\dd V_1}{\ddt}$, while the resistors follow Ohm's law $V_0 = R_0 I$ and $V_1 = R_1 I_{R1}$.
+
+  \subsection{Battery in an Electric Vehicle (EV)}
+  On a graph $(V_G, E)$ with edges $E = \{AB, AC, ...\} \subseteq V_G \times V_G$ and vertices $V_G = \{A, B, ...\}$, let
+  $d_{AB} \in \R^+$ denote the distance between two vertices $A \in V_G$ and $B \in V_G$ (\textcolor{gray}{in meters}),
+  $x = x_{AB} \in [0, d_{AB}]$ the progress (current location) on the route from vertex $A$ to $B$ (\textcolor{gray}{in meters}),
+  $v := \frac{\ddx}{\ddt}$ denote the current velocity with
+  $v_{\rm max, AB} \in \R^+$ the maximum allowed velocity on $AB$ (\textcolor{gray}{in meters per second}).
+  Then let
+  $T_{\rm env}(x) \in [-273.15, \infty)$ denote the temperature of the environment (\textcolor{gray}{in degrees Celsius}) at location $x$.
+
+  \begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[x=2cm,y=pi*0.5cm,font=\sffamily]
+      \graph[nodes={circle,fill=themecolor,text=white,minimum size=2em}]{
+      {
+      Graz [yshift=-1cm] -- {
+      A [xshift=2mm] -- [growing arrow, "5"] C [yshift=3mm] ,
+      B [> "2"] -- D [> "10",xshift=3mm]
+      } -- Munich
+      };
+      B -- A [> "1"];
+      B -- ["8"] C;
+      D -- ["2"] C;
+      D -- ["5"] Munich;
+      C -- [growing arrow, "6"] Munich;
+      };
+      \draw[growing arrow] (Graz) to ["4"] (A);
+    \end{tikzpicture}
+  \end{figure}
+
+  Let $P \in \R$, $P := I \cdot V$ denote the (electrical) power the car draws from the battery (\textcolor{gray}{in Watts}) so $P > 0$ corresponds to discharging the battery.
+  This power is to be realised into a mechanical component $P_{\rm motor} \in \R^+$ driving the car forwards, heating for the battery $P_{\rm heat} \in \R^+$, $P_{\rm heat} = c (T - T_{\rm env})$, with $c \in \R^+$ the heat conduction constant describing the relation between the heater and battery, and power dissipation $P_{\rm diss} \in \R^+$.
+  While driving, $P = P_{\rm motor} + P_{\rm heat} + P_{\rm diss}$.
+  The acceleration of the car $a \in \R$ (\textcolor{gray}{in meters per second squared}), where $a := \frac{\dd v}{\ddt} = \frac{\dd^2 x}{\ddt}$ is decomposed into $a_m \in \R$, which directly impacts $P_{\rm motor}(a_m)$, and the deceleration due to friction (air, etc.) $a_f(v) \in \R^-$, so that in total $a = a_m + a_f$.
+
+  On the graph $(V_G, E)$ there exists a set of EV charging stations $V_{\rm charge} \subseteq V_G$ where $P_{C,\rm charge}$ denotes the possible charging power (\textcolor{gray}{in Watts}) at the charging station vertex $C \in V_{\rm charge}$ with $K_C \in \R^+$ the occuring costs per energy unit (\textcolor{gray}{in Euros per Watt second}) and $t_C \in \R^+$ the charging time per charging station $B$ (\textcolor{gray}{in seconds}).
+
+  \subsection{A Variational Optimisation Problem}
+  Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, which connected set of edges $E_R \subseteq E$ connecting $A$ to $Z$, battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$, set of visited charging stations $V_C \subseteq V_{\rm charge}$ and charging times $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and driving behaviour $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space \footnote{to be defined} minimises
+  \begin{enumerate}
+    \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \ddx + \sum_{C \in V_C} t_C$,
+    \item the total cost of travel $K := \sum_{C \in V_C} P_{C, \rm charge} t_{C} K_C$,
+    \item $-N$ where $N$ is the highest possible number of repetitions (commutes from $A$ to $Z$) with the same battery (requiring $h > 0$).
+  \end{enumerate}
+  Formulated differently, we aim to minimise the functional
+  $F \in \cC(\P)^*, F: \cC(\P) \mapsto \R$ where either $F[\chi] = t_{\rm total}$ or $F[\chi] = K$.
+
+  Charging station + street data could be obtained from \href{https://osm.org/}{OpenStreetMap} by calling \\
+  \texttt{osmfilter england-latest.o5m \-\-keep="amenity=charging\_station"} \footnote{OSM's public map data may be obtained from \url{https://download.geofabrik.de/}}.
+
+  % \subsection{Notes}
+  % \begin{itemize}
+  %   % \item
+  %   \item Thanks to Nicholas and Zella, we have $R_0$, $R_1$, $C_1$ as functions of $s$, $T$ (and possibly $h$ in the future).
+  % \end{itemize}
+
+  % \subsection{Simplifications}
+  % Endless possibilities, such as
+  % \begin{itemize}
+  %   \item $V_G = \{A, B\}$ and $E = \{AB\}$ with some $d_{AB}$ and $v_{\rm max, AB} = \infty$ and $V_C = \{\}$, so only looking at the minimisation of $t_{\rm total}$.
+  %   \item $P_{\rm heat} = 0$.
+  %   \item $T = T_{\rm env} = \rm const.$ and therefore $P_{\rm heat} = 0$.
+  %   \item $P_{\rm diss} = 0$.
+  %   \item $a_f = 0$.
+  %   \item $h = 1$.
+  %   \item $s = \rm const$.
+  %   \item etc.
+  % \end{itemize}
+  % and many more simplifications are possible, which ones do we choose?
+
+  \subsection{Aging}
+
+  \section{Numerical Simulation of the Equivalent Circuit Model}
+  \subsection{Finding Parameters}
+  \subsection{Forward Euler Simulation}
+
+  \section{Metropolis-Hastings and A-Star}
+  \begin{definition}{Undirected Graph}{undirected-graph}
+    A graph $G = (V, E)$ with vertices $V$ and edges $E \subseteq V \times V$ is undirected if and only if $(v_i, v_j) \in E \Rightarrow (v_j, v_i) \in E \quad \forall\; v_i, v_j \in V$.
+  \end{definition}
+
+  \section{Conclusion}
+\end{document}

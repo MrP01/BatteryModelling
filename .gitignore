@@ -7,6 +7,5 @@ cache/
 *.tmp
 
 literature/
-report/
 stuff/
 .idea/
