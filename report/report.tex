@@ -36,7 +36,10 @@
   Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
   In many countries and/or regions, Electric Vehicles (EVs) still lack a well-enlarged network of charging stations, for various reasons including incompatibilties between charging station suppliers.
 
-  In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some data available in the public domain \parencite{panasonicnums}.
+  In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some characteristic data available in the public domain \parencite{panasonicnums}.
+  To do this, we will consider an Equivalent Circuit Model (ECM), namely the Thevenin ECM, which may be found in \Cref{fig:ecm}.
+  The key idea here is to model the voltage output $V(t)$ given a current profile $I(t)$.
+  Further
 
   \section{Problem Formulation}
   \subsection{The Isolated Battery}
@@ -57,16 +60,8 @@
   under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
 
   \subsection{The Equivalent Circuit Model}
-  \begin{figure}[H]
-    \centering
-    \inputtikz{ecm-model}
-    \caption{
-      The Thevenin equivalent circuit model (ECM) with parameters $R_0 \in \R^+$, $R_1 \in \R^+$ and $C_1 \in \R^+$ and $V_{\rm OC} \in \R^+$ the \textit{open circuit voltage} which behaves according to a function $V_{\rm OC}(s, h, T)$ dependent on $s$, $h$ and $T$.
-    }
-  \end{figure}
-
-  Kirchhoff's law further tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
-  The capacitor behaves according to $I_{C1} = C_1 \frac{\dd V_1}{\ddt}$, while the resistors follow Ohm's law $V_0 = R_0 I$ and $V_1 = R_1 I_{R1}$.
+  As mentioned earlier, we want to model the battery as an electrical component which exerts specific behaviour in an electrical circuit.
+  In electrical engineering, such models of more complicated components are frequently represented by equivalent circuits which only consist of basic components, mostly resistors, diodes, transistors, capacitors and inductors.
 
   \begin{figure}[H]
     \centering
@@ -74,6 +69,20 @@
     \caption{HPPC Pulse}
     \label{fig:hppc-pulse}
   \end{figure}
+
+  Empirically, we know that a battery's voltage output looks roughly
+
+  \begin{figure}[H]
+    \centering
+    \inputtikz{ecm-model}
+    \caption{
+      The Thevenin equivalent circuit model (ECM) with parameters $R_0 \in \R^+$, $R_1 \in \R^+$ and $C_1 \in \R^+$ and $V_{\rm OC} \in \R^+$ the \textit{open circuit voltage} which behaves according to a function $V_{\rm OC}(s, h, T)$ dependent on $s$, $h$ and $T$.
+    }
+    \label{fig:ecm}
+  \end{figure}
+
+  Kirchhoff's law further tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
+  The capacitor behaves according to $I_{C1} = C_1 \frac{\dd V_1}{\ddt}$, while the resistors follow Ohm's law $V_0 = R_0 I$ and $V_1 = R_1 I_{R1}$.
 
   \subsection{Battery in an Electric Vehicle (EV)}
   On a graph $(V_G, E)$ with edges $E = \{AB, AC, ...\} \subseteq V_G \times V_G$ and vertices $V_G = \{A, B, ...\}$, let
@@ -133,6 +142,14 @@
   % and many more simplifications are possible, which ones do we choose?
 
   \subsection{Battery Aging}
+  \begin{equation*}
+    \label{eq:cap}
+    Q (t,c,s,I) = Q_{0} - \frac{F_{acycle}(c)}{F_{current}(I)} - F_{cal}
+  \end{equation*}
+  By $F_{acycle}(c)$ we denote the \textit{Current Agnostic Cycle Degradation Factor} models cycle aging at a single current.
+  Also $F_{current}(I)$ represents the \textit{Current Scaling Factor}, a value $0 < F_{current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging.
+  Finally, $F_{cal}(s,t)$, the \textit{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of state of charge.
+
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/aging.png}
@@ -175,6 +192,17 @@
   Explore the state-space to some extent, and return the best route!
   Larger scales / maps (e.g. England) are not a problem!
 
+  \begin{minted}{python}
+newRoute = self.simulator.batgraph.perturbRoute(self.route)
+delta = self.measureRoute(newRoute) - self.testedRoutes[self.route]
+acceptanceProbability = min(1, math.exp(-delta / self.temperature))
+if random.random() < acceptanceProbability:
+    self.route = newRoute
+    print(f"Accepted new route {newRoute} with delta: {delta:.2f}. Total: {self.testedRoutes[newRoute]:.2f}.")
+else:
+    print(f"Rejected route {newRoute} with delta: {delta:.2f}.")
+  \end{minted}
+
   \subsection{Special Case: Granny's House}
   \begin{figure}[H]
     \centering
@@ -193,4 +221,9 @@
 
   \pagebreak
   \printbibliography
+
+  \pagebreak
+  \appendix
+  \section{Simulation Code}
+  \inputminted{python}{../simulator/batmobile.py}
 \end{document}

@@ -6,7 +6,6 @@ from simulator.battery import Battery
 class BatMobile:
     """Represents the battery car ("Bat-Mobile") driving on an edge of the BatGraph. Models everything."""
 
-    # accelerationPerWatt = 350
     accelerationPerWatt = 100
     friction = -120.0
     currentJump = 0.1
@@ -28,7 +27,6 @@ class BatMobile:
     def iterate(self, dt):
         self.battery.iterate(dt)
 
-        # dP_motor = self.battery.voltage * self.battery.current - self.P_motor
         self.motorAcceleration = self.accelerationPerWatt * self.battery.voltage * self.battery.current
         self.simulateDrag()
 
@@ -55,4 +53,4 @@ class BatMobile:
 
     def chargeUp(self):
         self.battery.soc = 1
-        # print("Charged up!")
+        print("Charged up!")
