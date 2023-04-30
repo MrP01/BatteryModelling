@@ -106,6 +106,12 @@
   Let us consider an application of this model in an electric vehicle next.
 
   \subsection{Battery in an Electric Vehicle (EV)}
+  In order to model a road network, let us first consider the definition of an undirected graph $G = (V_G, E)$. We take an undirected graph for simplicity, assuming that cars may go in arbitrary direction along each edge.
+  \begin{definition}{Undirected Graph}{undirected-graph}
+    A graph $G = (V_G, E)$ with vertices $V_G$ and edges $E \subseteq V_G \times V_G$ is undirected if and only if $(v_i, v_j) \in E \Rightarrow (v_j, v_i) \in E \quad \forall\; v_i, v_j \in V_G$.
+  \end{definition}
+
+  Modelling a vehicle on a road network requires a few more definitions.
   On a graph $(V_G, E)$ with edges $E = \{AB, AC, ...\} \subseteq V_G \times V_G$ and vertices $V_G = \{A, B, ...\}$, let
   $d_{AB} \in \R^+$ denote the distance between two vertices $A \in V_G$ and $B \in V_G$ (\textcolor{gray}{in meters}),
   $x = x_{AB} \in [0, d_{AB}]$ the progress (current location) on the route from vertex $A$ to $B$ (\textcolor{gray}{in meters}),
@@ -113,13 +119,17 @@
   $v_{\rm max, AB} \in \R^+$ the maximum allowed velocity on $AB$ (\textcolor{gray}{in meters per second}).
   Then let
   $T_{\rm env}(x) \in [-273.15, \infty)$ denote the temperature of the environment (\textcolor{gray}{in degrees Celsius}) at location $x$.
+  Note that this graph-based approach to the problem does not require any more geometric information about the network than edge lengths $\{d_{ij}\}_{i,j}$, while it may of course be motivated by spherical coordinates on the earth.
+  Consider for example \autoref{fig:graz-to-munich}.
 
   \begin{figure}[H]
     \centering
     \inputtikz{graz-to-munich}
-    \caption{Path}
+    \caption{Exemplary route from Graz to Munich on a road network $(V_G, E)$, where edge weights correspond to distances in between the physical places represented by nodes.}
+    \label{fig:graz-to-munich}
   \end{figure}
 
+  The model of our car still lacks a component realising electrical into mechanical power (a motor), which we model very simplistically.
   Let $P \in \R$, $P := I \cdot V$ denote the (electrical) power the car draws from the battery (\textcolor{gray}{in Watts}) so $P > 0$ corresponds to discharging the battery.
   This power is to be realised into a mechanical component $P_{\rm motor} \in \R^+$ driving the car forwards, heating for the battery $P_{\rm heat} \in \R^+$, $P_{\rm heat} = c (T - T_{\rm env})$, with $c \in \R^+$ the heat conduction constant describing the relation between the heater and battery, and power dissipation $P_{\rm diss} \in \R^+$.
   While driving, $P = P_{\rm motor} + P_{\rm heat} + P_{\rm diss}$.
@@ -129,7 +139,6 @@
 
   \subsection{A Variational Optimisation Problem}
   Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, which connected set of edges $E_R \subseteq E$ connecting $A$ to $Z$,
-  % battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$,
   set of visited charging stations $V_C \subseteq V_{\rm charge}$ and charging times $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and driving behaviour $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space \footnote{to be defined.. TODO} minimises
   \begin{enumerate}
     \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \ddx + \sum_{C \in V_C} t_C$,
@@ -188,6 +197,8 @@
   \cite{csfpaper}.
 
   \section{Numerical Simulation of a Car}
+  For simplification, we neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
+
   \subsection{Finding ECM Parameters}
   \begin{figure}[H]
     \captionsetup[subfigure]{justification=centering}
@@ -198,11 +209,13 @@
 
   \subsection{Forward Euler Simulation}
 
-  \section{Metropolis-Hastings and A-Star}
-  \begin{definition}{Undirected Graph}{undirected-graph}
-    A graph $G = (V, E)$ with vertices $V$ and edges $E \subseteq V \times V$ is undirected if and only if $(v_i, v_j) \in E \Rightarrow (v_j, v_i) \in E \quad \forall\; v_i, v_j \in V$.
-  \end{definition}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/screenshot.png}
+    \caption{User Interface}
+  \end{figure}
 
+  \section{Metropolis-Hastings and A-Star}
   \subsection{Shortest Path Finding}
   The graph data was retrieved using OSMNX \parencite{osmnx} which itself is built on NetworkX \parencite{networkx}.
 
@@ -248,5 +261,5 @@ else:
   \pagebreak
   \appendix
   \section{Simulation Code}
-  \inputminted{python}{../simulator/batmobile.py}
+  \inputminted{python}{../simulator/optimiser.py}
 \end{document}
