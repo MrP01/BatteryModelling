@@ -50,10 +50,11 @@
   A good initial condition is all that the remaining algorithm requires, which is a Monte-Carlo iterative method that repeatedly applies small, well-defined, perturbations to the graph route and then obtains a time or cost estimate of the modified trip using the battery (and car) model we introduced.
   If the modified route yields an improvement in the metric of choice, it is accepted as the new state and the process repeats until a satisfactory route was found.
 
-  Further
+  This report will focus on explicit formulation of the problem and model, numerical simulation of an electric car on a given real-world route and path optimisation through the Metropolis-Hastings method.
 
-  \section{Problem Formulation}
+  \section{Problem and Model Formulation}
   \subsection{The Isolated Battery}
+  In order to model a Lithium-Ion battery in and of itself, we consider the following (physical) quantities:
   Let
   $s \in [0, 1]$ denote the \textit{state of charge} (SOC) of the battery,
   $h \in [0, 1]$ the \textit{state of health} (SOH),
@@ -77,11 +78,18 @@
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{figures/hppc-pulse.png}
-    \caption{HPPC Pulse}
+    \caption{One of the sample HPPC (Hybrid Pulse Power Characterization) pulses we used for parameter finding. We want to model the output voltage $V(t)$ given a current input profile $I(t)$. Each sample is characterised at a specific state of charge $s$, state of health $h$ and temperature $T$, this one was taken at $s \approx 1$, $h \approx 1$ and $T = \SI{10}{\degreeCelsius}$.}
     \label{fig:hppc-pulse}
   \end{figure}
 
-  Empirically, we know that a battery's voltage output looks roughly
+  Empirically, we know that a battery's voltage output looks roughly as given in \autoref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
+  As one can see from the voltage curve, the battery exerts a ``time-relaxation'' behaviour on high-frequency changes in the current.
+  One way of modelling this is through an RC circuit, confer \autoref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
+  Normally, RC circuits also
+  Additional ohmic impedance is modelled through $R_0$.
+  The ``heart'' of the equivalent circuit model is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
+  We modelled it accordingly, using a polynomial ansatz including cross-terms $$V_{OC}(s, h, T) = c_1 s + c_2 h + c_3 T + c_4 sh + c_5 sT + c_6 hT + c_7 shT + \mathcal{O}(s^2, h^2, T^2, ...)\,,$$
+  and similar polynomials are chosen for $R_0$, $R_1$ and $C_1$, completing the model.
 
   \begin{figure}[H]
     \centering
@@ -92,8 +100,10 @@
     \label{fig:ecm}
   \end{figure}
 
-  Kirchhoff's law further tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
+  Kirchhoff's law then tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
   The capacitor behaves according to $I_{C1} = C_1 \frac{\dd V_1}{\ddt}$, while the resistors follow Ohm's law $V_0 = R_0 I$ and $V_1 = R_1 I_{R1}$.
+  The resulting circuit then behaves approximately as a real Lithium-Ion battery would in many relevant situations.
+  Let us consider an application of this model in an electric vehicle next.
 
   \subsection{Battery in an Electric Vehicle (EV)}
   On a graph $(V_G, E)$ with edges $E = \{AB, AC, ...\} \subseteq V_G \times V_G$ and vertices $V_G = \{A, B, ...\}$, let
@@ -174,6 +184,8 @@
     \caption{Overview}
     \label{fig:model-overview}
   \end{figure}
+
+  \cite{csfpaper}.
 
   \section{Numerical Simulation of a Car}
   \subsection{Finding ECM Parameters}

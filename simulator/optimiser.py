@@ -37,7 +37,7 @@ class Optimiser:
             try:
                 # print("Perturbing...")
                 newRoute = self.simulator.batgraph.perturbRoute(self.route)
-                if newRoute not in self.testedRoutes:
+                if newRoute != self.route:
                     break
             except (KeyError, StopIteration):  # perturbRoute() was unsuccessful
                 pass
@@ -46,8 +46,9 @@ class Optimiser:
                 print("Giving up perturbation.")
                 return
 
-        # negative delta is good!!
-        delta = self.measureRoute(newRoute) - self.testedRoutes[self.route]
+        # a negative delta is good!!
+        newEnergy = self.measureRoute(newRoute) if newRoute not in self.testedRoutes else self.testedRoutes[newRoute]
+        delta = newEnergy - self.testedRoutes[self.route]
         acceptanceProbability = min(1, math.exp(-delta / self.temperature))
         if random.random() < acceptanceProbability:
             self.route = newRoute
