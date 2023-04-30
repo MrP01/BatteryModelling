@@ -35,10 +35,21 @@
   This includes, especially, the renewable energy sector due to the unpredictability of energy supplies such as wind and solar power where short-term storage is a necessary evil.
   Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
   In many countries and/or regions, Electric Vehicles (EVs) still lack a well-enlarged network of charging stations, for various reasons including incompatibilties between charging station suppliers.
+  Using methods introduced in the present report, we aim to optimise the customer experience of an electric vehicle owner through a routing application that takes electric battery peculiarities and battery life-time into account.
 
   In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some characteristic data available in the public domain \parencite{panasonicnums}.
   To do this, we will consider an Equivalent Circuit Model (ECM), namely the Thevenin ECM, which may be found in \Cref{fig:ecm}.
   The key idea here is to model the voltage output $V(t)$ given a current profile $I(t)$.
+  This model not only depends on current and time, but also keeps track of internal quantities like the state of charge (SOC, $s \in [0, 1]$) and state of health (SOH, $h \in [0, 1]$).
+  It can be reduced to a system of ordinary differential equations, for which, using given profiles, we find parameters $R_0$, $R_1$, $C_1$ and more by a fitting procedure.
+  Later on, we also considered aging effects of the battery through usage over time, which resulted in an additional differential equation in the ODE system.
+
+  Based on the model we obtained, verified and validated on new pulse test data, the next step was to apply the model to a real-world application, namely that of electric vehicle routing.
+  For this purpose, we obtain graph data of the road network of choice (users may enter new localitys as a text input) from OpenStreetMap \parencite{osm}.
+  In order to find the best route from A to B, the algorithm then performs a classical routing algorithm called \emph{A-Star} to find the (geometrically) shortest path between A and B, which may not yet be a feasible or optimal path to the destination but a good start.
+  A good initial condition is all that the remaining algorithm requires, which is a Monte-Carlo iterative method that repeatedly applies small, well-defined, perturbations to the graph route and then obtains a time or cost estimate of the modified trip using the battery (and car) model we introduced.
+  If the modified route yields an improvement in the metric of choice, it is accepted as the new state and the process repeats until a satisfactory route was found.
+
   Further
 
   \section{Problem Formulation}
