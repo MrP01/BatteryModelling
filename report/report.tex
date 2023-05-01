@@ -1,5 +1,6 @@
 \documentclass{prettytex/ox/mmsc-special-topic}
 \usepackage[european]{circuitikz}
+\usepackage{menukeys}
 \input{customisations.tex}
 \addbibresource{sources.bib}
 \tikzexternalize[prefix=tikz/]
@@ -30,7 +31,14 @@
     The model was implemented in Python and there is a graphical user interface available with live insight into the model (cf. \autoref{fig:user-interface}).
   \end{abstract}
 
-  \tableofcontents
+  \begin{figure}[H]
+    \centering
+    \inputtikz{battery-model-overview}
+    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding state of health $h(t)$ due to battery degradation (aging). The core part of the model is an equivalent circuit model (ECM), while aging is modelled by the capacity model.}
+    \label{fig:model-overview}
+  \end{figure}
+
+  % \tableofcontents
 
   \pagebreak
   \pagestyle{normal}
@@ -96,6 +104,7 @@
   The ``heart'' of the equivalent circuit model is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
   We modelled it accordingly, using a polynomial ansatz including cross-terms $$V_{OC}(s, h, T) = c_1 s + c_2 h + c_3 T + c_4 sh + c_5 sT + c_6 hT + c_7 shT + \mathcal{O}(s^2, h^2, T^2, ...)\,,$$
   and similar polynomials are chosen for $R_0$, $R_1$ and $C_1$, completing the model.
+  Using the abovementioned dataset \parencite{panasonicnums}, these fits were obtained numerically using a least-squares fitting procedure. An example of the dependency on the state of charge $s$ can be found in \autoref{fig:parameters}.
 
   \begin{figure}[H]
     \centering
@@ -109,6 +118,16 @@
   Kirchhoff's law then tells us that the currents $I_{R1} \in \R$ and $I_{C1} \in \R$ add up to the total current $I = I_{R1} + I_{C1}$, and that the voltages $V_0 \in \R$, $V_1 \in \R$ and $V_{\rm OC}$ sum up to $V = V_0 + V_1 + V_{\rm OC}$.
   The capacitor behaves according to $I_{C1} = C_1 \frac{\dd V_1}{\ddt}$, while the resistors follow Ohm's law $V_0 = R_0 I$ and $V_1 = R_1 I_{R1}$.
   The resulting circuit then behaves approximately as a real Lithium-Ion battery would in many relevant situations.
+
+  \begin{figure}[H]
+    \captionsetup[subfigure]{justification=centering}
+    \centering
+    \subfloat[Fit of $R_0$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
+    \subfloat[Fit of $R_1$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
+    \caption{Dependencies of the Thevenin equivalent circuit (\autoref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the state of charge with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
+    \label{fig:parameters}
+  \end{figure}
+
   Let us consider an application of this model in an electric vehicle next.
 
   \subsection{Battery in an Electric Vehicle (EV)}
@@ -151,27 +170,39 @@
 
   \subsection{Battery Aging}
   A central aspect considered in our project was to study the effects of battery degredation, or aging. One possible model for this would be to express $Q_0$ in terms of the original capacity at the time of production $Q_{00}$ along with multiple degradation effects that we consider:
-  \begin{equation*}
+  \begin{equation}
     \label{eq:cap}
     Q_0(t,c,s,I) = Q_{00} - \frac{F_{\rm acycle}(c)}{F_{\rm current}(I)} - F_{\rm cal} \quad \in [0, Q_{00}]\,.
-  \end{equation*}
-  By $F_{\rm acycle}(c)$ we denote the \textit{Current Agnostic Cycle Degradation Factor} models cycle aging at a single current.
-  Also $F_{\rm current}(I)$ represents the \textit{Current Scaling Factor}, a value $0 < F_{\rm current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging \parencite{csfpaper}.
-  Finally, $F_{\rm cal}(s,t)$, the \textit{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of state of charge.
+  \end{equation}
+  By $F_{\rm acycle}(c) \in \R$ we denote the \textbf{Current Agnostic Cycle Degradation Factor} which models cycle aging at a single current. It models the aging effects resulting only from discharge usage of the battery, at an idealised single current.
+  $F_{\rm current}(I) \in \R$ represents the \textbf{Current Scaling Factor}, a value $0 < F_{\rm current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging \parencite{csfpaper}. This term is highly relevant for scenarios where one can choose the amount of current drawn from the battery and then optimise accordingly if this behaviour is well-known.
+  Finally, $F_{\rm cal}(s,t) \in \R$, the \textbf{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of the state of charge.
+  Storage at the right state of charge and environment is one of the most crucial aspects for battery lifetime.
 
-  The state of health is then given by
-  $$h = \frac{Q_0}{Q_{00}} = 1 - \frac{F_{\rm acycle}(c) + F_{\rm cal} F_{\rm current}(I)}{F_{\rm current}(I) Q_{00}} \quad \in [0, 1]\,.$$
+  The state of health $h$, the ratio between $Q_0$ and $Q_{00}$ is then given by
+  $$h = \frac{Q_0}{Q_{00}} = 1 - \frac{F_{\rm acycle}(c) + F_{\rm cal} F_{\rm current}(I)}{F_{\rm current}(I) Q_{00}} \quad \in [0, 1]\,,$$
+  directly following from \autoref{eq:cap} and yielding a simple, yet effective approximation for aging of the battery.
+  In our model, we used
+  \begin{align*}
+    F_{\rm acycle}  & = c \left( \alpha_1 + \alpha_2 \exp{\alpha_3c-\alpha_4} \right)\,,                                                                                                                     \\
+    F_{\rm current} & = \alpha_5 - \alpha_6 \exp{ \alpha_7 I - \alpha_8}\,,                                                                                                                                  \\
+    F_{\rm cal}     & = \int \left( \alpha_9(T) \left\{\cosh({\alpha_{10}s - \alpha_{11}}) + \alpha_{10} t \, \abs{\sinh({\alpha_{10} s- \alpha_{11}})} \, \abs{ \frac{\dds}{\ddt}}\right\}\right) \,\ddt\,,
+  \end{align*}
+  largely following \cite{csfpaper}
+  with $\alpha_{1, ..., 11} \in \R$ various parameters obtained through fitting procedures.
+  A plot of the degredation function is given in \autoref{fig:aging}, using the given expressions for $F_{\rm acycle}$, $F_{\rm current}$ and $F_{\rm cal}$.
 
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/aging.pdf}
-    \caption{Aging}
+    \caption{Capacity over discharging cycles behaviour according to the degradation model of the battery, according to \autoref{eq:cap} with $Q_{00} = \SI{2.9}{\ampere\hour}$. Each line corresponds to different discharge currents $I$, as multiples of the capacity, and a different battery aging time.}
     \label{fig:aging}
   \end{figure}
 
   Using the car and road network models introduced above, in general terms the problem may be stated as follows:
 
   \subsection{A Variational Optimisation Problem}
+  \label{sec:problem}
   Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, \textbf{which connected set of edges} $E_R \subseteq E$ connecting $A$ to $Z$, set of visited \textbf{charging stations} $V_C \subseteq V_{\rm charge}$ along $E_R$ and \textbf{charging times} $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and \textbf{driving behaviour} $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space, \textbf{minimises}
   \begin{enumerate}
     \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \,\ddx + \sum_{C \in V_C} t_C$,
@@ -200,30 +231,15 @@
   % \end{itemize}
   % and many more simplifications are possible, which ones do we choose?
 
-  \begin{figure}[H]
-    \centering
-    \inputtikz{battery-model-overview}
-    \caption{Overview}
-    \label{fig:model-overview}
-  \end{figure}
-
   \section{Numerical Simulation of a Car}
   For simplification, we neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
-
-  \subsection{Finding ECM Parameters}
-  \begin{figure}[H]
-    \captionsetup[subfigure]{justification=centering}
-    \centering
-    \subfloat[Fit of $R_0$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
-    \subfloat[Fit of $R_1$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
-  \end{figure}
 
   \subsection{Forward Euler Simulation}
 
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{figures/screenshot.png}
-    \caption{User Interface}
+    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \autoref{sec:code}). Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network. Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates.}
     \label{fig:user-interface}
   \end{figure}
 
@@ -257,33 +273,49 @@ else:
   \begin{figure}[H]
     \centering
     \inputtikz{grannys-house}
-    \caption{The exemplary problem ``Granny's House'', a special case of Problem (TODO).}
+    \caption{The graph of our exemplary problem ``Granny's House'', a simplified case of the problem described in \autoref{sec:problem}. The situation is that we want to visit our grandmother, who lives \SI{115}{\kilo\meter} away from our home, in regular intervals. Along the route, there are two chargers. Our car only has a range of \SI{200}{\kilo\meter}. Is it better to charge at the first or second charger, on the way there or on the way back?}
     \label{fig:grannys-idealised-problem-setting}
   \end{figure}
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\linewidth]{figures/grannys-stations.png}
-    \caption{Route in Ireland}
+    \includegraphics[width=0.5\linewidth]{figures/grannys-stations.png}
+    \caption{The unperturbed route for the ``Granny's House'' problem in Ireland, with charging stations depicted using red pins. Screenshot due to \cite{googlemaps}.}
     \label{fig:grannys-stations}
   \end{figure}
 
   \subsection{Routing in Jericho}
+  \begin{algorithm}[language=pseudo,basicstyle=\footnotesize,caption={\centering The $A^*$-search algorithm \parencite{astar}}]
+open_list, closed_list = empty list of possible positions
+adjacent_val = 0
+next_position = null
+push start_position to open_list
+while open_list is not empty, do
+  current_node = pop(open_list)
+  for each adjacent position of current_node (ap_current)
+        with value (av_current), do
+    if (adjacent_val < av_current) or (ap_current $\in$ closed_list), do
+      adjacent_val = av_current
+      next_position = ap_current
+    push ap_current to closed_list
+  push next_position to open_list
+  \end{algorithm}
+
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/jericho.png}
-    \caption{Overlay of the routing graph on a map of Jericho \parencite{osm}, without adjusting for the Merkator projection, which leads to a slightly skewed appearance. The underlying data is exactly the same.}
+    \includegraphics[width=0.5\linewidth]{figures/jericho.png}
+    \caption{Overlay of the routing graph on a map of Jericho, Oxford, Oxfordshire \parencite{osm}, without adjusting for the Merkator projection or non-linear roads, which leads to a slightly skewed appearance. The Oxford Mathematical Institute is adjacent to one of the shown edges.}
   \end{figure}
 
   \begin{figure}[H]
     \captionsetup[subfigure]{justification=centering}
     \centering
-    \subfloat[Route 1.]{\includegraphics[width=.5\linewidth]{figures/route1.png}}\hfill
-    \subfloat[Route 2.]{\includegraphics[width=.5\linewidth]{figures/route2.png}}\par
+    \subfloat[Original route as returned by $A^*$.]{\includegraphics[width=.5\linewidth]{figures/route1.png}}\hfill
+    \subfloat[Perturbed route.]{\includegraphics[width=.5\linewidth]{figures/route2.png}}\par
     \vspace{0.5cm}
-    \subfloat[Route 3.]{\includegraphics[width=.5\linewidth]{figures/route3.png}}\hfill
-    \subfloat[Route 4.]{\includegraphics[width=.5\linewidth]{figures/route4.png}}\par
-    \caption{Routes}
+    \subfloat[Perturbed route.]{\includegraphics[width=.5\linewidth]{figures/route3.png}}\hfill
+    \subfloat[Perturbed route.]{\includegraphics[width=.5\linewidth]{figures/route4.png}}\par
+    \caption{Routes on the extended user interface including $A^*$ route finding along with the Monte-Carlo route perturbation-based optimisation functionality. The user can select a source and target vertex on the road graph $G = (V_G, E)$ loaded from OpenStreetMap and start the optimisation procedure. The displayed road network is that of Jericho, Oxford, Oxfordshire.}
   \end{figure}
 
   \section{Conclusion}
@@ -297,6 +329,7 @@ else:
   % \inputminted{python}{../simulator/optimiser.py}
 
   \section{Code Structure and Setup}
+  \label{sec:code}
   The code of this group project can be found on GitHub, namely in \href{https://github.com/MrP01/BatteryModelling}{this repository}.
   To use and sustain a Python virtual environment, install
   \href{https://python-poetry.org/}{poetry}, which works with the

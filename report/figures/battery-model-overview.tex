@@ -9,8 +9,8 @@
       ticks=none,
       xmin=-3,
       xmax=7,
-      ymin=-3,
-      ymax=3]
+      ymin=-1.6,
+      ymax=2.5]
     %\clip(-4,-2) rectangle (4,4);
 
     \draw (0,0.5) node[anchor=south] (endbox1) {};
@@ -67,14 +67,14 @@
     %\draw[line width = 2pt] (4,1.75) -- (7,1.75) node [midway,above] (outputs) {Outputs};
 
     % box descriptions
-    \draw (-1.5,0.5) node (inputs) {\Large \begin{tabular}{c} Current profile \\ and/or power profile \end{tabular}};
+    \draw (-1.5,0.5) node (inputs) {\Large \begin{tabular}{c} Current profile $I(t)$ \\ and/or power profile \end{tabular}};
 
     \node at (5.5,1.125) (voltout) {\Large $V(t)$};
     \node at (2,1.50) (ecmtext1) {\Large $V = V_{OC} -...$};
-    \node at (2,1.15) (ecmtext2) {\Large $R_1,R_0,C_1$};
+    \node at (2,1.15) (ecmtext2) {\Large $R_0,R_1,C_1$};
     \node at (5.5,-0.125) (sohout) {\Large $h(t)$};
 
-    \node at (2,-0.50) (captext1) {\Large $Q = Q_0 - ...$};
+    \node at (2,-0.50) (captext1) {\Large $Q_0 = Q_{00} - ...$};
     %\draw[color=black] (-1.5,1.2) node {Input Profiles};
   \end{axis}
 \end{tikzpicture}
