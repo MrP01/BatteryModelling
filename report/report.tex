@@ -12,6 +12,9 @@
 \author{Candidate \candidatenumber}
 \date{\today}
 
+% TODO: check all figures - good captions?
+% TODO: check all figures - are they referenced?
+
 \begin{document}
   \pagestyle{plain}
   \mmscSpecialHeader[casestudy]
@@ -68,6 +71,7 @@
   Further let
   $T \in [-273.15, \infty)$ denote the temperature of the battery (\textcolor{gray}{in degrees Celsius}) and
   let $t \in \R$ represent time (\textcolor{gray}{in seconds}).
+  Let $c \in \R^+$ denote the cycle, so the number of full discharges of the battery.
 
   From the definition of current $I := \frac{\dd Q}{\ddt}$, we further have that for a single cycle,
   $$s = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \dd\tau \,,$$
@@ -160,7 +164,7 @@
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{figures/aging.png}
+    \includegraphics[width=0.7\linewidth]{figures/aging.pdf}
     \caption{Aging}
     \label{fig:aging}
   \end{figure}
@@ -225,9 +229,11 @@
 
   \section{Metropolis-Hastings and A-Star}
   \subsection{Shortest Path Finding}
-  The graph data was retrieved using OSMNX \parencite{osmnx} which itself is built on NetworkX \parencite{networkx}.
+  The graph data was retrieved using OSMnx \parencite{osmnx} which itself is built on NetworkX \parencite{networkx}.
 
   \subsection{Monte-Carlo Optimisation}
+  \cite{metropolis, hastings}.
+
   Optimise a large problem (huge state-space). Metric: Time! Could be anything.
   $\Rightarrow$ Use Monte-Carlo Markov Chain Methods!
   Slightly perturb the route using a specific alteration technique.
@@ -291,7 +297,7 @@ else:
   % \inputminted{python}{../simulator/optimiser.py}
 
   \section{Code Structure and Setup}
-  The code can be found on GitHub, namely in \href{https://github.com/MrP01/BatteryModelling}{this repository}.
+  The code of this group project can be found on GitHub, namely in \href{https://github.com/MrP01/BatteryModelling}{this repository}.
   To use and sustain a Python virtual environment, install
   \href{https://python-poetry.org/}{poetry}, which works with the
   \texttt{pyproject.toml} file. After installing poetry (and subsequently
