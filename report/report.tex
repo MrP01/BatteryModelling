@@ -222,7 +222,7 @@
   In the remaining sections of the report, we will assume the following:
   \begin{itemize}
     \tightlist
-    \item $T = T_{\rm env} = \rm const.$ and therefore $P_{\rm heat} = 0$ to ignore the motor heating component. We neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
+    \item $T = T_{\rm env} = \rm const. = \SI{10}{\degreeCelsius}$ and therefore $P_{\rm heat} = 0$ to ignore the motor heating component. We neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
     \item $P_{\rm diss} = 0$ as this is an easily implementable extension to the existing model.
           % \item $a_f = 0$ to ignore friction terms in the acceleration. Then $a = a_m$ is the first argument of the functional $F[a, E_R, V_C, t_C]$ we are trying to minimise.
     \item $v_{{\rm max}, ij} = \infty \,\forall\, i, j$ so there is no speed limit.
@@ -328,7 +328,7 @@ until convergence, repeat
   We define four types of perturbations: Type-1 which turns one edge into two (taking a small detour with a connected vertex). So the route length increases.
   Type-2 which replaces a node by an adjacent node that still connects the two neighbouring vertices. The route length stays the same.
   Type-3 is a special case where the destination becomes a part of the perturbation which shortens the route to this node.
-  Finally, Type-4 was added to allow for much larger changes using a NetworkX subroutine yielding a simple path between two vertices which were neighbours in the previous route.
+  Finally, Type-4 was added to allow for much larger changes using a NetworkX subroutine yielding a simple path between two vertices which were neighbours in the previous route. Consider for example \Cref{fig:perturbations}.
 
   The key idea here is to perturb charging stations in- and out of the route and compare results after performing the numerical simulation described in \Cref{sec:simulator}.
   This simulation done at every MCMC iteration is generally very expensive, but experiments showed that we can use a fairly large time-step $\Delta t$ and therefore speeding up the simulation by a great deal, without sacrificing all too much accuracy.
@@ -363,6 +363,7 @@ until convergence, repeat
     \centering
     \includegraphics[width=0.45\linewidth]{figures/jericho.png}
     \caption{Overlay of the routing graph on a map of Jericho, Oxford, Oxfordshire \parencite{osm}, without adjusting for the Merkator projection or non-linear roads, which leads to a slightly skewed appearance. The Mathematical Institute is adjacent to one of the shown edges.}
+    \label{fig:jericho}
   \end{figure}
 
   \begin{figure}[H]
@@ -374,7 +375,14 @@ until convergence, repeat
     \subfloat[Perturbed route.]{\includegraphics[width=.5\linewidth]{figures/route3.png}}\hfill
     \subfloat[Perturbed route.]{\includegraphics[width=.5\linewidth]{figures/route4.png}}\par
     \caption{Routes on the extended user interface including $A^*$ route finding along with the Monte-Carlo route perturbation-based optimisation functionality. The user can select a source and target vertex on the road graph $G = (V_G, E)$ loaded from OpenStreetMap and start the optimisation procedure. The displayed road network is that of Jericho, Oxford, Oxfordshire.}
+    \label{fig:perturbations}
   \end{figure}
+
+  As a small demonstration of the procedure behind the route finding algorithm, consider \Cref{fig:jericho,fig:perturbations} which were obtained by running \\
+  \centerline{\mintinline{bash}{./main.py --locality "Jericho, Oxford"}}
+  where \textit{Jericho, Oxford} can of course be replaced with any locality known to OpenStreetMap as data is fetched on the spot.
+  \Cref{fig:perturbations} depicts the perturbations that were made in between iterations and subsequently simulated using the car and battery simulator described in \Cref{sec:simulator}.
+  % This example contains no charging stations
 
   \section{Conclusion}
   \label{sec:discussion}
