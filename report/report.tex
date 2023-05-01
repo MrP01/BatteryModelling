@@ -5,7 +5,7 @@
 \addbibresource{sources.bib}
 \tikzexternalize[prefix=tikz/]
 
-\newcommand{\topictitle}{Battery Modelling}
+\newcommand{\topictitle}{Battery and Electric Vehicle Modelling \\ \normalsize Route Optimisation with the Battery in Mind}
 \newcommand{\candidatenumber}{1072462}
 \newcommand{\course}{Mathematical Modelling}
 
@@ -24,11 +24,13 @@
     \label{abstract}
     This work will attempt to
 
+    The first part of this report will focus on the model for the battery which was the main focus of our project. The second part is the route optimisation problem in the context of electric vehicles.
+
     % Monte Carlo with Simulated Annealing on the graph
     % A-Star on the graph
     % Chebyshev Ansatz (Finite Element) for I(t), solve model and minimize for coefficients
 
-    The model was implemented in Python and there is a graphical user interface available with live insight into the model (cf. \autoref{fig:user-interface}).
+    The model was implemented in Python and there is a graphical user interface available that provides live insight into the model (cf. \autoref{fig:user-interface}).
   \end{abstract}
 
   \begin{figure}[H]
@@ -47,13 +49,13 @@
   Clearly, electric batteries are largely important for various industries today and demand for them is ever-growing.
   This includes, especially, the renewable energy sector due to the unpredictability of energy supplies such as wind and solar power where short-term storage is a necessary evil.
   Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
-  In many countries and/or regions, Electric Vehicles (EVs) still lack a well-enlarged network of charging stations, for various reasons including incompatibilties between charging station suppliers.
+  In many countries / regions, Electric Vehicles (EVs) still lack a well-enlarged network of charging stations, for various reasons including for example, incompatibilties between charging station suppliers.
   Using methods introduced in the present report, we aim to optimise the customer experience of an electric vehicle owner through a routing application that takes electric battery peculiarities and battery life-time into account.
 
   In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some characteristic data available in the public domain \parencite{panasonicnums}.
   To do this, we will consider an Equivalent Circuit Model (ECM), namely the Thevenin ECM, which may be found in \Cref{fig:ecm}.
   The key idea here is to model the voltage output $V(t)$ given a current profile $I(t)$.
-  This model not only depends on current and time, but also keeps track of internal quantities like the state of charge (SOC, $s \in [0, 1]$) and state of health (SOH, $h \in [0, 1]$).
+  This model not only depends on current and time, but also keeps track of internal quantities like the state of charge (SoC, $s \in [0, 1]$) and state of health (SoH, $h \in [0, 1]$).
   It can be reduced to a system of ordinary differential equations, for which, using given profiles, we find parameters $R_0$, $R_1$, $C_1$ and more by a fitting procedure.
   Later on, we also considered aging effects of the battery through usage over time, which resulted in an additional differential equation in the ODE system.
 
@@ -69,8 +71,8 @@
   \subsection{The Isolated Battery}
   In order to model a Lithium-Ion battery in and of itself, we consider the following (physical) quantities:
   Let
-  $s \in [0, 1]$ denote the \textit{state of charge} (SOC) of the battery,
-  $h \in [0, 1]$ the \textit{state of health} (SOH),
+  $s \in [0, 1]$ denote the \textit{state of charge} (SoC) of the battery,
+  $h \in [0, 1]$ the \textit{state of health} (SoH),
   $Q \in \R^+$ the charge,
   $Q_{00} \in \R^+$ the maximum possible charge at the time of production (\textcolor{gray}{in Coulombs}),
   $V \in \R$ the voltage across the battery (\textcolor{gray}{in Volts}) with
@@ -99,7 +101,6 @@
   Empirically, we know that a battery's voltage output looks roughly as given in \autoref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
   As one can see from the voltage curve, the battery exerts a ``time-relaxation'' behaviour on high-frequency changes in the current.
   One way of modelling this is through an RC circuit, confer \autoref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
-  Normally, RC circuits also
   Additional ohmic impedance is modelled through $R_0$.
   The ``heart'' of the equivalent circuit model is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
   We modelled it accordingly, using a polynomial ansatz including cross-terms $$V_{OC}(s, h, T) = c_1 s + c_2 h + c_3 T + c_4 sh + c_5 sT + c_6 hT + c_7 shT + \mathcal{O}(s^2, h^2, T^2, ...)\,,$$
@@ -122,8 +123,8 @@
   \begin{figure}[H]
     \captionsetup[subfigure]{justification=centering}
     \centering
-    \subfloat[Fit of $R_0$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
-    \subfloat[Fit of $R_1$ as a function of the SOC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
+    \subfloat[Fit of $R_0$ as a function of the SoC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
+    \subfloat[Fit of $R_1$ as a function of the SoC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
     \caption{Dependencies of the Thevenin equivalent circuit (\autoref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the state of charge with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
     \label{fig:parameters}
   \end{figure}
@@ -188,8 +189,8 @@
     F_{\rm current} & = \alpha_5 - \alpha_6 \exp{ \alpha_7 I - \alpha_8}\,,                                                                                                                                  \\
     F_{\rm cal}     & = \int \left( \alpha_9(T) \left\{\cosh({\alpha_{10}s - \alpha_{11}}) + \alpha_{10} t \, \abs{\sinh({\alpha_{10} s- \alpha_{11}})} \, \abs{ \frac{\dds}{\ddt}}\right\}\right) \,\ddt\,,
   \end{align*}
-  largely following \cite{csfpaper}
-  with $\alpha_{1, ..., 11} \in \R$ various parameters obtained through fitting procedures.
+  in part following \cite{csfpaper}, but largely our own work
+  with $\alpha_{1, ..., 11} \in \R$ various parameters obtained through least-squares fitting procedures.
   A plot of the degredation function is given in \autoref{fig:aging}, using the given expressions for $F_{\rm acycle}$, $F_{\rm current}$ and $F_{\rm cal}$.
 
   \begin{figure}[H]
@@ -264,8 +265,17 @@
   An approach of this form can generally be regarded as a spectral method.
 
   \subsection{Shortest Path Finding}
-  As a first step, we aim to find a good initial condition to the MCMC routing
+  As a first step, we aim to find a good initial condition to the MCMC route optimisation routine.
+  This is the shortest path, which we will find using the $A^*$ (A-Star) search algorithm.
+
   The graph data was retrieved using OSMnx \parencite{osmnx} which itself is built on top of NetworkX \parencite{networkx}. The edges retrieved from the OpenStreetMap API also contain data on the highest allowed velocity $v_{\rm max}$, but we did not use it in our solver as this would need to be a carefully considered constraint to the optimisation routine.
+
+  $A^*$ is based on Dijkstra's algorithm which is already highly efficient for any graph but can be made even more effective by incorporating a distance heuristic into the algorithm.
+  This distance heuristic, for our purposes of a road network, is given by the airline distance between two vertices $v_i$ and $v_j \in V_G$.
+  In general, it could be any mapping $H: V_G \times V_G \mapsto \R^+$ that very roughly approximates the true shortest path length between $v_i$ and $v_j$ \parencite{astar}.
+
+  The $A^*$ algorithm then leverages this distance heuristic in order to not need to search through all vertices (as Dijkstra's algorithm would) but only a subset of them which are in the direction of the target node.
+  This facilitates an incredible speedup on street networks which are normally huge.
 
   \begin{algorithm}[language=pseudo,basicstyle=\footnotesize,caption={\centering The $A^*$-search algorithm \parencite{astar}}]
 open_list, closed_list = empty list of possible positions
@@ -283,11 +293,15 @@ while open_list is not empty, do
   push next_position to open_list
   \end{algorithm}
 
-  \subsection{Monte-Carlo Optimisation}
-  \cite{metropolis, hastings}.
+  The truly magical aspect of this algorithm is that in the context of a geometric network, it still returns \textit{the} optimal shortest path in between two vertices, despite taking much less runtime than Dijkstra's algorithm \parencite{astar}.
+  For the accompanying
+  We used NetworkX's implementation of $A^*$.
 
-  Optimise a large problem (huge state-space). Metric: Time! Could be anything.
-  $\Rightarrow$ Use Monte-Carlo Markov Chain Methods!
+  \subsection{Monte-Carlo Optimisation}
+  With this initial route in mind, we will consider small perturbations to each route $E_R$.
+  The state space we are optimising in here is vast, motivating the use of a Monte-Carlo method.
+  So for our purposes here, we use the Metropolis-Hastings Monte-Carlo Markov Chain method due to \cite{metropolis} and \cite{hastings}.
+
   Slightly perturb the route using a specific alteration technique.
   Metropolis-Hastings updates the state (route) based on $$p_{\rm accept} = \min\left(1, \e^{-\beta (T_{\rm next} - T_{\rm current})}\right)\,, \quad \text{ with } \beta \in \R^+ \text{ a transition factor} \,.$$
   Does a full numerical simulation of the drive. Stop to charge?
@@ -342,7 +356,7 @@ else:
   \section{Conclusion}
 
   Potential improvements are, for instance, using more analytical methods to obtain solutions of the variational optimisation problem described in \autoref{sec:problem}.
-  The Monte-Carlo Markov Chain optimisation routine could be significantly improved by further extending it with, for instance, Simulated Annealing, where the transition probabilities reduce over the runtime of the algorithm, slowly closing in at an optimum.
+  The Monte-Carlo Markov Chain optimisation routine could be significantly improved by further extending it with, for instance, Simulated Annealing, where the transition probabilities reduce over the runtime of the algorithm, slowly closing in on an optimum.
 
   \pagebreak
   \printbibliography
@@ -358,16 +372,14 @@ else:
   To use and sustain a Python virtual environment, install
   \href{https://python-poetry.org/}{poetry}, which works with the
   \texttt{pyproject.toml} file. After installing poetry (and subsequently
-  after pulling, each time), run \\
-  \mintinline{bash}{poetry install} \\
-  in the project folder. To install PyBamm as well (which has $\mathcal{O}(\frac{1}{\epsilon})$ number of dependencies), run \\
-  \mintinline{bash}{poetry install --with=pybamm} \\
+  after pulling, each time), run
+  \mintinline{bash}{poetry install}
+  in the project folder. To install PyBamm as well (which has $\mathcal{O}(\frac{1}{\epsilon})$ number of dependencies), run
+  \mintinline{bash}{poetry install --with=pybamm}
   instead or additionally. This sadly requires Python 3.8 based on a
   pybamm restriction. Without pybamm, 3.11 should be fine too.
-
   Having all dependencies installed, the main interface may be launched up
-  by executing \\
-  \mintinline{bash}{python3 main.py} \\
+  by executing \mintinline{bash}{python3 main.py}
   which starts a graphical user interface (with looks depending on your
   operating system). Note that you may need to install some Qt6 dependencies.
 
