@@ -82,7 +82,7 @@
   Let $c \in \R^+$ denote the cycle, so the number of full discharges of the battery.
 
   From the definition of current $I := \frac{\dd Q}{\ddt}$, we further have that for a single cycle,
-  $$s = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \dd\tau \,,$$
+  $$s = \frac{Q}{Q_0} = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \,\dd\tau \,,$$
   under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
 
   \subsection{The Equivalent Circuit Model}
@@ -209,43 +209,38 @@
     \item the total cost of travel $K := \sum_{C \in V_C} P_{C, \rm charge} t_{C} K_C$,
     \item or $-N$ where $N$ is the highest possible number of repetitions (commutes from $A$ to $Z$) with the same battery (requiring $h > 0$). \label{minoption:aging}
   \end{enumerate}
-  In other words, we aim to minimise the functional $F \in \cC(\P)^*, F: \cC(\P) \mapsto \R$ where either $F[a_m] = t_{\rm total}$, $F[a_m] = K$ or $F[a_m] = -N$.
+  In other words, we aim to minimise the functional $F \in \cC(\P)^*$, so $F: \cC(\P) \mapsto \R$ where either $F[a_m, E_R, V_C, t_C] = t_{\rm total}$, $F[a_m, E_R, V_C, t_C] = K$ or $F[a_m, E_R, V_C, t_C] = -N$.
 
-  % \subsection{Notes}
-  % \begin{itemize}
-  %   % \item
-  %   \item Thanks to Nicholas and Zella, we have $R_0$, $R_1$, $C_1$ as functions of $s$, $T$ (and possibly $h$ in the future).
-  % \end{itemize}
+  Obviously, solving the stated problem in its full form and with all the given details is a task exceeding the scope of this project, although we were able to make some progress in the direction of it.
+  The intention here is to state the model in high generality and be clear about the simplifications that were made within the scope of this report in order to be able to move ahead.
 
-  % \subsection{Simplifications}
-  % Endless possibilities, such as
-  % \begin{itemize}
-  %   \item $V_G = \{A, B\}$ and $E = \{AB\}$ with some $d_{AB}$ and $v_{\rm max, AB} = \infty$ and $V_C = \{\}$, so only looking at the minimisation of $t_{\rm total}$.
-  %   \item $P_{\rm heat} = 0$.
-  %   \item $T = T_{\rm env} = \rm const.$ and therefore $P_{\rm heat} = 0$.
-  %   \item $P_{\rm diss} = 0$.
-  %   \item $a_f = 0$.
-  %   \item $h = 1$.
-  %   \item $s = \rm const$.
-  %   \item etc.
-  % \end{itemize}
-  % and many more simplifications are possible, which ones do we choose?
+  There are endless possibilities to simplify, for example one could take
+  $V_G = \{A, B\}$ and $E = \{AB\}$ with some $d_{AB}$, $v_{\rm max, AB} = \infty$ and $V_C = \{\}$, so only looking at the minimisation of $t_{\rm total}$. This is equivalent to ignoring the graph-algorithmic component of the problem, as it is only a single line without a charger.
+  Another potential simplifcation would be to take $h = 1$ to ignore battery aging / degradation effects. Or even more radically, $s = \rm const$ to only model very short-term (on the order of seconds) effects of this model.
+
+  In the remaining sections of the report, we will assume the following:
+  \begin{itemize}
+    \tightlist
+    \item $T = T_{\rm env} = \rm const.$ and therefore $P_{\rm heat} = 0$ to ignore the motor heating component. We neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
+    \item $P_{\rm diss} = 0$ as this is an easily implementable extension to the existing model.
+    \item $a_f = 0$ to ignore friction terms in the acceleration. Then $a = a_m$ is the first argument of the functional $F[a, E_R, V_C, t_C]$ we are trying to minimise.
+    \item $v_{{\rm max}, ij} = \infty \,\forall\, i, j$ so there is no speed limit.
+  \end{itemize}
 
   \section{Numerical Simulation of a Car}
-  For simplification, we neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
 
   \subsection{Forward Euler Simulation}
 
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{figures/screenshot.png}
-    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \autoref{sec:code}). Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network. Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates.}
+    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \autoref{sec:code}) running on the graph depicted in \autoref{fig:graz-to-munich}. Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network. Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates (in this scenario, we used current-control, so $I(t)$ is decreased).}
     \label{fig:user-interface}
   \end{figure}
 
   \section{Metropolis-Hastings and A-Star}
   \subsection{Shortest Path Finding}
-  The graph data was retrieved using OSMnx \parencite{osmnx} which itself is built on NetworkX \parencite{networkx}.
+  The graph data was retrieved using OSMnx \parencite{osmnx} which itself is built on NetworkX \parencite{networkx}. The edges retrieved from the OpenStreetMap API also contain data on the highest allowed velocity $v_{\rm max}$, but we did not use it in our solver as this would need to be a carefully considered constraint to the optimisation routine.
 
   \subsection{Monte-Carlo Optimisation}
   \cite{metropolis, hastings}.
@@ -319,6 +314,8 @@ while open_list is not empty, do
   \end{figure}
 
   \section{Conclusion}
+
+  Potential improvements are, for instance, using more analytical methods to obtain solutions of the variational optimisation problem described in \autoref{sec:problem}.
 
   \pagebreak
   \printbibliography
