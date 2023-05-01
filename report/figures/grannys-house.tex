@@ -1,11 +1,11 @@
 \begin{tikzpicture}
   \node[fill=themecolor,circle,draw] at (-5,-0.5) (nodeA) {Home};
-  \node[fill=themecolor,circle,draw] at (-2,0.5) (nodeB) {\tiny{Charger 1}};
+  \node[fill=themecolor2,circle,draw] at (-2,0.5) (nodeB) {\tiny{Charger 1}};
   \node[fill=themecolor,circle,draw] at (5,0.5) (nodeC) {Granny};
-  \node[fill=themecolor,circle,draw] at (2,-0.5) (nodeD) {\tiny{Charger 2}};
+  \node[fill=themecolor2,circle,draw] at (2,-0.5) (nodeD) {\tiny{Charger 2}};
 
-  \draw (nodeA) -- (nodeB);
-  \draw (nodeB) -- (nodeC);
-  \draw (nodeC) -- (nodeD);
-  \draw (nodeD) -- (nodeA);
+  \draw (nodeA) -> (nodeB);
+  \draw (nodeB) -> (nodeC);
+  \draw (nodeC) -> (nodeD);
+  \draw (nodeD) -> (nodeA);
 \end{tikzpicture}

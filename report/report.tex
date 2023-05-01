@@ -206,7 +206,7 @@
   \label{sec:problem}
   Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, \textbf{which connected set of edges} $E_R \subseteq E$ connecting $A$ to $Z$, set of visited \textbf{charging stations} $V_C \subseteq V_{\rm charge}$ along $E_R$ and \textbf{charging times} $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and \textbf{driving behaviour} $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space, \textbf{minimises}
   \begin{enumerate}
-    \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \,\ddx + \sum_{C \in V_C} t_C$,
+    \item the total travel time $t_{\rm total} := \int_{E_R} \frac{1}{v} \,\ddx + \sum_{C \in V_C} t_C$,
     \item the total cost of travel $K := \sum_{C \in V_C} P_{C, \rm charge} t_{C} K_C$,
     \item or $-N$ where $N$ is the highest possible number of repetitions (commutes from $A$ to $Z$) with the same battery (requiring $h > 0$). \label{minoption:aging}
   \end{enumerate}
@@ -224,11 +224,12 @@
     \tightlist
     \item $T = T_{\rm env} = \rm const.$ and therefore $P_{\rm heat} = 0$ to ignore the motor heating component. We neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
     \item $P_{\rm diss} = 0$ as this is an easily implementable extension to the existing model.
-    \item $a_f = 0$ to ignore friction terms in the acceleration. Then $a = a_m$ is the first argument of the functional $F[a, E_R, V_C, t_C]$ we are trying to minimise.
+          % \item $a_f = 0$ to ignore friction terms in the acceleration. Then $a = a_m$ is the first argument of the functional $F[a, E_R, V_C, t_C]$ we are trying to minimise.
     \item $v_{{\rm max}, ij} = \infty \,\forall\, i, j$ so there is no speed limit.
   \end{itemize}
 
   \section{Numerical Simulation of a Car}
+  \label{sec:simulator}
   Now that the model is defined, it remains to be implemented.
   The resulting ODE system can be solved using a known ODE solver such as \texttt{ode15s} in MATLAB.
   While this is the more accurate approach, it is harder to generalise it to a graph where environmental conditions change along different edges of the network.
@@ -236,19 +237,29 @@
   We will however not focus on it within the scope of this report.
   Our solver uses a simple Forward Euler discretisation.
 
-  \subsection{Forward Euler Simulation}
+  % \subsection{Forward Euler Simulation}
   For a first-order (nonlinear) ODE system $\dot{\vec{x}} = \vec{f}(\vec{x})$, a solution may be approximated by the Forward Euler scheme
-  $$\frac{1}{\Delta t} \left(\vec{x}_{n+1} - \vec{x}_{n}\right) = \vec{f}(\vec{x}_n), \quad \text{ so } \quad \vec{x}_{n+1} = \vec{x}_{n} + \Delta t \cdot \vec{f}(\vec{x}_n)\,,$$
+  \begin{equation}
+    \frac{1}{\Delta t} \left(\vec{x}_{n+1} - \vec{x}_{n}\right) = \vec{f}(\vec{x}_n), \quad \text{ so } \quad \vec{x}_{n+1} = \vec{x}_{n} + \Delta t \cdot \vec{f}(\vec{x}_n)\,,
+    \label{eq:forward-euler}
+  \end{equation}
   to get the approximant $\vec{x}^n$ at the $n$-th timestep with parameter $\Delta t$ and some initial condition $\vec{x}_{0}$.
-  Our code used this discretisation to solve the ODE system resulting from the equivalent cicuit model. More information on the code can be found in \autoref{sec:code}.
-  Along with the numerical simulator and optimiser, we implemented a graphical user interface (cf. \autoref{fig:user-interface}) for the problem, capable of loading any graph data.
+  Our code used this scheme to solve the ODE system resulting from the equivalent cicuit model. More information on the code can be found in \autoref{sec:code}.
+  Along with the numerical simulator and optimiser, we implemented a graphical user interface (cf. \autoref{fig:user-interface}) for the problem, capable of loading any graph.
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{figures/screenshot.png}
-    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \autoref{sec:code}) running on the graph depicted in \autoref{fig:graz-to-munich}. Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network. Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates (in this scenario, we used current-control, so $I(t)$ is decreased).}
+    \includegraphics[width=0.65\linewidth]{figures/screenshot.png}
+    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \autoref{sec:code}) running on the graph depicted in \autoref{fig:graz-to-munich}. Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network.}
     \label{fig:user-interface}
   \end{figure}
+
+  Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates (in this scenario, we used current-control, so $I(t)$ is decreased).
+
+  The simulator then iteratively updates the state $\vec{x}^n$ comprised of position $x$, velocity $v$, acceleration $a$, state of charge $s$, currents $I$ and $I_{R1}$, voltage $V$, current edge $(v_i, v_j) \in E$ to name the most central components, in time using \autoref{eq:forward-euler}.
+  In the implementation, we assume that power output $P = IV$ of the battery is directly proportional to mechanical acceleration $a_m$ using a factor.
+  We model friction by $$a_f = a_{\rm drag} v^2 + a_{\rm friction}\,,\quad a_{\rm drag}, a_{\rm friction} \in \R^-$$ which then results in $a = a_m + a_f$.
+  Integrating results in velocity and position.
 
   Next up, we will consider the route finding approach and optimisation procedure.
 
@@ -258,7 +269,10 @@
   The second step is to perturb this path in a Monte-Carlo Markov Chain (MCMC) optimisation routine that also takes the battery model into account, and finds good driving behaviour along a perturbed route $E_R$ along charging stations $V_C$.
 
   In order to find good / optimal driving behaviour $a_m$ along the route, we consider the following function basis expansion:
-  $$a_m(x, s, t) = \sum_{k=0}^{n} a_{k,1} T_k(x) + a_{k,2} T_k(s) + a_{k,3} T_k(t)\,, \text{ for each edge } (v_i, v_j)$$
+  \begin{equation}
+    a_m(x, s, t) = \sum_{k=0}^{n} a_{k,1} T_k(x) + a_{k,2} T_k(s) + a_{k,3} T_k(t)\,, \text{ for each edge } (v_i, v_j)
+    \label{eq:spectral-expansion}
+  \end{equation}
   where $\{T_k\}_{k\in \N_0}$ may be any function basis, for instance the Chebyshev polynomials defined by $T_k(\cos \theta) = \cos(k\theta)$.
   We assume that the driving behaviour along an edge does not need to be complex in order to be effective, so low expansion orders might suffice for a relatively good result (e.g. $n = 1, 2, 3$).
   The problem of finding the optimal driving behaviour is then reduced to finding the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ which is already much more straightforward than minimising a functional.
@@ -294,30 +308,34 @@ while open_list is not empty, do
   \end{algorithm}
 
   The truly magical aspect of this algorithm is that in the context of a geometric network, it still returns \textit{the} optimal shortest path in between two vertices, despite taking much less runtime than Dijkstra's algorithm \parencite{astar}.
-  For the accompanying
-  We used NetworkX's implementation of $A^*$.
+  For the optimiser accompanying this report, we used NetworkX's implementation of $A^*$.
 
   \subsection{Monte-Carlo Optimisation}
   With this initial route in mind, we will consider small perturbations to each route $E_R$.
   The state space we are optimising in here is vast, motivating the use of a Monte-Carlo method.
   So for our purposes here, we use the Metropolis-Hastings Monte-Carlo Markov Chain method due to \cite{metropolis} and \cite{hastings}.
 
-  Slightly perturb the route using a specific alteration technique.
-  Metropolis-Hastings updates the state (route) based on $$p_{\rm accept} = \min\left(1, \e^{-\beta (T_{\rm next} - T_{\rm current})}\right)\,, \quad \text{ with } \beta \in \R^+ \text{ a transition factor} \,.$$
-  Does a full numerical simulation of the drive. Stop to charge?
-  Explore the state-space to some extent, and return the best route!
-  Larger scales / maps (e.g. England) are not a problem!
+  The algorithm can then be outlined as follows, with $F^{n}$ the metric we are optimising for, for instance the total travel time $F^n = t_{\rm total} := \int_{E_R^n} \frac{1}{v} \,\ddx + \sum_{C \in V_C^n} t_C$.
+  \begin{algorithm}[language=pseudo,caption={\centering The Metropolis-Hastings algorithm \parencite{metropolis, hastings}},basicstyle=\footnotesize]
+until convergence, repeat
+  sample a candidate $\vec{x}^*$.
+  set $\vec{x}^{n+1} = \vec{x}^*$ with acceptance probability
+    $p_{\rm accept} = \min\left(1, \e^{-\beta (F^{n+1} - F^n)}\right)\,,$ with $\beta \in \R^+$ a transition factor.
+  Otherwise, let $\vec{x}^{n+1} = \vec{x}^{n}$.
+  \end{algorithm}
 
-  \begin{minted}{python}
-newEnergy = self.measureRoute(newRoute) if newRoute not in self.testedRoutes else self.testedRoutes[newRoute]
-delta = newEnergy - self.testedRoutes[self.route]
-acceptanceProbability = min(1, math.exp(-delta / self.temperature))
-if random.random() < acceptanceProbability:
-    self.route = newRoute
-    print(f"Accepted new route {newRoute} with delta: {delta:.2f}. Total: {self.testedRoutes[newRoute]:.2f}.")
-else:
-    print(f"Rejected route {newRoute} with delta: {delta:.2f}.")
-  \end{minted}
+  In order to sample a route candidate $\vec{x}^*$, we take the old route $E_R^n$ and perturb it to get $E_R^*$.
+  We define four types of perturbations: Type-1 which turns one edge into two (taking a small detour with a connected vertex). So the route length increases.
+  Type-2 which replaces a node by an adjacent node that still connects the two neighbouring vertices. The route length stays the same.
+  Type-3 is a special case where the destination becomes a part of the perturbation which shortens the route to this node.
+  Finally, Type-4 was added to allow for much larger changes using a NetworkX subroutine yielding a simple path between two vertices which were neighbours in the previous route.
+
+  The key idea here is to perturb charging stations in- and out of the route and compare results after performing the numerical simulation described in \autoref{sec:simulator}.
+  This simulation done at every MCMC iteration is generally very expensive, but experiments showed that we can use a fairly large time-step $\Delta t$ and therefore speeding up the simulation by a great deal, without sacrificing all too much accuracy.
+
+  So the Monte-Carlo method explores the state-space to some extent, and returns the best route!
+  Not only that, the optimal driving strategy $a_m$ can be found by incorporating the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ into the Monte-Carlo state variable $\vec{x}^{n}$ and perturbing these by sampling from a probability distribution.
+  Because this is an iterative optimisation method, larger scales / maps (e.g. England) are not a problem! The Mathematical Institute's Linux machines are capable of handling a route between Cavan and Dublin (in Ireland) within half an hour of running time.
 
   \subsection{Special Case: Granny's House}
   \begin{figure}[H]
@@ -330,16 +348,15 @@ else:
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{figures/grannys-stations.png}
-    \caption{The unperturbed route for the ``Granny's House'' problem in Ireland, with charging stations depicted using red pins. Screenshot due to \cite{googlemaps}.}
+    \caption{The unperturbed route for the ``Granny's House'' problem in Ireland from Dublin to Cavan, with charging stations depicted using red pins. Screenshot due to \cite{googlemaps}.}
     \label{fig:grannys-stations}
   \end{figure}
 
   \subsection{Routing in Jericho}
-
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/jericho.png}
-    \caption{Overlay of the routing graph on a map of Jericho, Oxford, Oxfordshire \parencite{osm}, without adjusting for the Merkator projection or non-linear roads, which leads to a slightly skewed appearance. The Oxford Mathematical Institute is adjacent to one of the shown edges.}
+    \includegraphics[width=0.45\linewidth]{figures/jericho.png}
+    \caption{Overlay of the routing graph on a map of Jericho, Oxford, Oxfordshire \parencite{osm}, without adjusting for the Merkator projection or non-linear roads, which leads to a slightly skewed appearance. The Mathematical Institute is adjacent to one of the shown edges.}
   \end{figure}
 
   \begin{figure}[H]
@@ -379,9 +396,8 @@ else:
   instead or additionally. This sadly requires Python 3.8 based on a
   pybamm restriction. Without pybamm, 3.11 should be fine too.
   Having all dependencies installed, the main interface may be launched up
-  by executing \mintinline{bash}{python3 main.py}
-  which starts a graphical user interface (with looks depending on your
-  operating system). Note that you may need to install some Qt6 dependencies.
+  by executing \mintinline{bash}{./main.py --locality "Jericho, Oxford"}
+  which starts a graphical user interface. Note that you may need to install some Qt6 dependencies.
 
   The relevant code structure is:
 
@@ -434,4 +450,45 @@ else:
           \texttt{main.py} creates a \texttt{MainWindow} and runs the simulator
           GUI.
   \end{itemize}
+
+  \section{Graph Perturbation}
+  The graph perturbations described above for the MCMC optimisation routine are implemented in \texttt{simulator/batgraph.py}. This is the most relevant part of the code for perturbation and subsequent optimisation:
+
+  \begin{minted}{python}
+def airlineDistance(self, A, B):
+    """Returns airline length (heuristic) between A and B."""
+    dx = self.nodes[A]["x"] - self.nodes[B]["x"]
+    dy = self.nodes[A]["y"] - self.nodes[B]["y"]
+    return math.hypot(dx, dy)
+
+def findShortestPath(self, source, destination) -> tuple:
+    """Determine the literal shortest path from source to target, in terms of length."""
+    return tuple(shortest_paths.astar_path(self, source, destination, heuristic=self.airlineDistance))
+
+def perturbRoute(self, route: tuple) -> tuple:
+    """Return a type-1, type-2 or type-3 perturbation of a given path.
+    type-1: turn one edge into two edges -> route length increases by one.
+    type-2: replace one node along the route with another adjacent one -> route length stays the same.
+    type-3: the destination becomes part of the perturbation (shortened route).
+    type-4: take a larger detour using a simple path
+    """
+    i = random.randrange(0, len(route))
+    j = random.choice([x for x in (i + 1, i + 2, i + 3, i + 4, i - 1, i - 2, i - 3, i - 4) if 0 <= x < len(route)])
+    indexA, indexB = min(i, j), max(i, j)
+    nodeA, nodeB = route[indexA], route[indexB]
+    if indexB - indexA <= 2:
+        # type-1-2-3 perturbation:
+        sharedNeighbours = set(self.neighbors(nodeA)).intersection(self.neighbors(nodeB))
+        if indexB - indexA == 2:  # type-2 perturbation
+            inbetween = route[indexA + 1]
+            sharedNeighbours.remove(inbetween)  # ignore the element that is already part of the route
+        middle = sharedNeighbours.pop()
+        if middle == route[-1]:  # type-3 perturbation, destination is perturbed in
+            return route[: indexA + 1] + (middle,)  # so ignore the remaining route (which will be a loop)
+        return route[: indexA + 1] + (middle,) + route[indexB:]  # choose any shared neighboudan
+    else:
+        # type-4 perturbation:
+        generator = networkx.all_simple_paths(self, nodeA, nodeB)
+        return route[:indexA] + tuple(next(generator)) + route[indexB + 1 :]
+  \end{minted}
 \end{document}
