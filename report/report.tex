@@ -23,6 +23,8 @@
     % Monte Carlo with Simulated Annealing on the graph
     % A-Star on the graph
     % Chebyshev Ansatz (Finite Element) for I(t), solve model and minimize for coefficients
+
+    The model was implemented in Python and there is a graphical user interface available with live insight into the model (cf. \autoref{fig:user-interface}).
   \end{abstract}
 
   \tableofcontents
@@ -218,6 +220,7 @@
     \centering
     \includegraphics[width=0.8\linewidth]{figures/screenshot.png}
     \caption{User Interface}
+    \label{fig:user-interface}
   \end{figure}
 
   \section{Metropolis-Hastings and A-Star}
@@ -284,6 +287,76 @@ else:
 
   \pagebreak
   \appendix
-  \section{Simulation Code}
-  \inputminted{python}{../simulator/optimiser.py}
+  % \section{Simulation Code}
+  % \inputminted{python}{../simulator/optimiser.py}
+
+  \section{Code Structure and Setup}
+  The code can be found on GitHub, namely in \href{https://github.com/MrP01/BatteryModelling}{this repository}.
+  To use and sustain a Python virtual environment, install
+  \href{https://python-poetry.org/}{poetry}, which works with the
+  \texttt{pyproject.toml} file. After installing poetry (and subsequently
+  after pulling, each time), run \\
+  \mintinline{bash}{poetry install} \\
+  in the project folder. To install PyBamm as well (which has $\mathcal{O}(\frac{1}{\epsilon})$ number of dependencies), run \\
+  \mintinline{bash}{poetry install --with=pybamm} \\
+  instead or additionally. This sadly requires Python 3.8 based on a
+  pybamm restriction. Without pybamm, 3.11 should be fine too.
+
+  Having all dependencies installed, the main interface may be launched up
+  by executing \\
+  \mintinline{bash}{python3 main.py} \\
+  which starts a graphical user interface (with looks depending on your
+  operating system). Note that you may need to install some Qt6 dependencies.
+
+  The relevant code structure is:
+
+  \begin{itemize}
+    \tightlist
+    \item
+          The folder \texttt{simulator/} is responsible for the (numerical)
+          simulation itself, which may be invoked without any interface at all.
+
+          \begin{itemize}
+            \tightlist
+            \item
+                  \texttt{simulation.py} features the Simulation class with an
+                  \texttt{iterate()} method that represents a numerical integration
+                  step in time by an amount of \texttt{dt}.
+            \item
+                  \texttt{batgraph.py} exports a class \texttt{BatGraph} that
+                  represents a graph (a tuple of sets of edges and vertices) that the
+                  car will drive on.
+            \item
+                  \texttt{batmobile.py} contains the \texttt{BatMobile} class that
+                  represents our battery mobile i.e.~car. \textbf{Much of the
+                    simulation takes place in this file!}
+            \item
+                  \texttt{battery.py} is the central file for our battery modelling
+                  project, which exports a \texttt{Battery} class, also featuring an
+                  \texttt{iterate()} method. \textbf{Most of the battery simulation
+                    takes place in this file!}
+            \item
+                  \texttt{optimiser.py} takes care of the optimisation part of the routing problem. It implements the Metropolis-Hastings (Monte-Carlo Markov Chain) method and defines the graph perturbations.
+          \end{itemize}
+    \item
+          The interface code is contained within the \texttt{interface/} folder.
+
+          \begin{itemize}
+            \tightlist
+            \item
+                  \texttt{mainwindow.py} defines the general layout and actions in the
+                  user interface.
+            \item
+                  \texttt{batmap.py} exports the central widget that renders /
+                  animates the BatMobile car on the BatGraph.
+            \item
+                  \texttt{graphs.py} handles the connection of the interface and
+                  (live) plots. The plots are handled by \texttt{matplotlib} and are
+                  very intuitive to use, further almost all commands are the same as
+                  they are in MatLab.
+          \end{itemize}
+    \item
+          \texttt{main.py} creates a \texttt{MainWindow} and runs the simulator
+          GUI.
+  \end{itemize}
 \end{document}

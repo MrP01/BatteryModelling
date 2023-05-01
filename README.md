@@ -118,6 +118,7 @@ The relevant code structure is:
   - `batgraph.py` exports a class `BatGraph` that represents a graph (a tuple of sets of edges and vertices) that the car will drive on.
   - `batmobile.py` contains the `BatMobile` class that represents our battery mobile i.e. car. **Much of the simulation takes place in this file!**
   - `battery.py` is the central file for our battery modelling project, which exports a `Battery` class, also featuring an `iterate()` method. **Most of the battery simulation takes place in this file!**
+  - `optimiser.py` takes care of the optimisation part of the routing problem. It implements the Metropolis-Hastings (Monte-Carlo Markov Chain) method and defines the graph perturbations.
 - The interface code is contained within the `interface/` folder.
   - `mainwindow.py` defines the general layout and actions in the user interface.
   - `batmap.py` exports the central widget that renders / animates the BatMobile car on the BatGraph.
