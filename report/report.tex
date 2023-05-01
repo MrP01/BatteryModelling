@@ -30,7 +30,7 @@
     % A-Star on the graph
     % Chebyshev Ansatz (Finite Element) for I(t), solve model and minimize for coefficients
 
-    The model was implemented in Python and there is a graphical user interface available that provides live insight into the model (cf. \autoref{fig:user-interface}).
+    The model was implemented in Python and there is a graphical user interface available that provides live insight into the model (cf. \Cref{fig:user-interface}).
   \end{abstract}
 
   \begin{figure}[H]
@@ -98,14 +98,14 @@
     \label{fig:hppc-pulse}
   \end{figure}
 
-  Empirically, we know that a battery's voltage output looks roughly as given in \autoref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
+  Empirically, we know that a battery's voltage output looks roughly as given in \Cref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
   As one can see from the voltage curve, the battery exerts a ``time-relaxation'' behaviour on high-frequency changes in the current.
-  One way of modelling this is through an RC circuit, confer \autoref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
+  One way of modelling this is through an RC circuit, confer \Cref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
   Additional ohmic impedance is modelled through $R_0$.
   The ``heart'' of the equivalent circuit model is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
   We modelled it accordingly, using a polynomial ansatz including cross-terms $$V_{OC}(s, h, T) = c_1 s + c_2 h + c_3 T + c_4 sh + c_5 sT + c_6 hT + c_7 shT + \mathcal{O}(s^2, h^2, T^2, ...)\,,$$
   and similar polynomials are chosen for $R_0$, $R_1$ and $C_1$, completing the model.
-  Using the abovementioned dataset \parencite{panasonicnums}, these fits were obtained numerically using a least-squares fitting procedure. An example of the dependency on the state of charge $s$ can be found in \autoref{fig:parameters}.
+  Using the abovementioned dataset \parencite{panasonicnums}, these fits were obtained numerically using a least-squares fitting procedure. An example of the dependency on the state of charge $s$ can be found in \Cref{fig:parameters}.
 
   \begin{figure}[H]
     \centering
@@ -125,7 +125,7 @@
     \centering
     \subfloat[Fit of $R_0$ as a function of the SoC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
     \subfloat[Fit of $R_1$ as a function of the SoC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
-    \caption{Dependencies of the Thevenin equivalent circuit (\autoref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the state of charge with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
+    \caption{Dependencies of the Thevenin equivalent circuit (\Cref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the state of charge with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
     \label{fig:parameters}
   \end{figure}
 
@@ -146,7 +146,7 @@
   Then let
   $T_{\rm env}(x) \in [-273.15, \infty)$ denote the temperature of the environment (\textcolor{gray}{in degrees Celsius}) at location $x$.
   Note that this graph-based approach to the problem does not require any more geometric information about the network than edge lengths $\{d_{ij}\}_{i,j}$, while it may of course be motivated by spherical coordinates on the earth.
-  Consider for example \autoref{fig:graz-to-munich} or \autoref{fig:grannys-stations} for an actual route in Ireland.
+  Consider for example \Cref{fig:graz-to-munich} or \Cref{fig:grannys-stations} for an actual route in Ireland.
 
   \begin{figure}[H]
     \centering
@@ -182,7 +182,7 @@
 
   The state of health $h$, the ratio between $Q_0$ and $Q_{00}$ is then given by
   $$h = \frac{Q_0}{Q_{00}} = 1 - \frac{F_{\rm acycle}(c) + F_{\rm cal} F_{\rm current}(I)}{F_{\rm current}(I) Q_{00}} \quad \in [0, 1]\,,$$
-  directly following from \autoref{eq:cap} and yielding a simple, yet effective approximation for aging of the battery.
+  directly following from \Cref{eq:cap} and yielding a simple, yet effective approximation for aging of the battery.
   In our model, we used
   \begin{align*}
     F_{\rm acycle}  & = c \left( \alpha_1 + \alpha_2 \exp{\alpha_3c-\alpha_4} \right)\,,                                                                                                                     \\
@@ -191,12 +191,12 @@
   \end{align*}
   in part following \cite{csfpaper}, but largely our own work
   with $\alpha_{1, ..., 11} \in \R$ various parameters obtained through least-squares fitting procedures.
-  A plot of the degredation function is given in \autoref{fig:aging}, using the given expressions for $F_{\rm acycle}$, $F_{\rm current}$ and $F_{\rm cal}$.
+  A plot of the degredation function is given in \Cref{fig:aging}, using the given expressions for $F_{\rm acycle}$, $F_{\rm current}$ and $F_{\rm cal}$.
 
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{figures/aging.pdf}
-    \caption{Capacity over discharging cycles behaviour according to the degradation model of the battery, according to \autoref{eq:cap} with $Q_{00} = \SI{2.9}{\ampere\hour}$. Each line corresponds to different discharge currents $I$, as multiples of the capacity, and a different battery aging time.}
+    \caption{Capacity over discharging cycles behaviour according to the degradation model of the battery, according to \Cref{eq:cap} with $Q_{00} = \SI{2.9}{\ampere\hour}$. Each line corresponds to different discharge currents $I$, as multiples of the capacity, and a different battery aging time.}
     \label{fig:aging}
   \end{figure}
 
@@ -244,19 +244,19 @@
     \label{eq:forward-euler}
   \end{equation}
   to get the approximant $\vec{x}^n$ at the $n$-th timestep with parameter $\Delta t$ and some initial condition $\vec{x}_{0}$.
-  Our code used this scheme to solve the ODE system resulting from the equivalent cicuit model. More information on the code can be found in \autoref{sec:code}.
-  Along with the numerical simulator and optimiser, we implemented a graphical user interface (cf. \autoref{fig:user-interface}) for the problem, capable of loading any graph.
+  Our code used this scheme to solve the ODE system resulting from the equivalent cicuit model. More information on the code can be found in \Cref{sec:code}.
+  Along with the numerical simulator and optimiser, we implemented a graphical user interface (cf. \Cref{fig:user-interface}) for the problem, capable of loading any graph.
 
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.65\linewidth]{figures/screenshot.png}
-    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \autoref{sec:code}) running on the graph depicted in \autoref{fig:graz-to-munich}. Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network.}
+    \caption{Screenshot of the Qt6 user interface of the car simulation software accompanying this report (confer \Cref{sec:code}) running on the graph depicted in \Cref{fig:graz-to-munich}. Using the arrow keys, one can control the battery mobile (\textit{batmobile}) along edges of the road network.}
     \label{fig:user-interface}
   \end{figure}
 
   Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates (in this scenario, we used current-control, so $I(t)$ is decreased).
 
-  The simulator then iteratively updates the state $\vec{x}^n$ comprised of position $x$, velocity $v$, acceleration $a$, state of charge $s$, currents $I$ and $I_{R1}$, voltage $V$, current edge $(v_i, v_j) \in E$ to name the most central components, in time using \autoref{eq:forward-euler}.
+  The simulator then iteratively updates the state $\vec{x}^n$ comprised of position $x$, velocity $v$, acceleration $a$, state of charge $s$, currents $I$ and $I_{R1}$, voltage $V$, current edge $(v_i, v_j) \in E$ to name the most central components, in time using \Cref{eq:forward-euler}.
   In the implementation, we assume that power output $P = IV$ of the battery is directly proportional to mechanical acceleration $a_m$ using a factor.
   We model friction by $$a_f = a_{\rm drag} v^2 + a_{\rm friction}\,,\quad a_{\rm drag}, a_{\rm friction} \in \R^-$$ which then results in $a = a_m + a_f$.
   Integrating results in velocity and position.
@@ -330,25 +330,31 @@ until convergence, repeat
   Type-3 is a special case where the destination becomes a part of the perturbation which shortens the route to this node.
   Finally, Type-4 was added to allow for much larger changes using a NetworkX subroutine yielding a simple path between two vertices which were neighbours in the previous route.
 
-  The key idea here is to perturb charging stations in- and out of the route and compare results after performing the numerical simulation described in \autoref{sec:simulator}.
+  The key idea here is to perturb charging stations in- and out of the route and compare results after performing the numerical simulation described in \Cref{sec:simulator}.
   This simulation done at every MCMC iteration is generally very expensive, but experiments showed that we can use a fairly large time-step $\Delta t$ and therefore speeding up the simulation by a great deal, without sacrificing all too much accuracy.
 
   So the Monte-Carlo method explores the state-space to some extent, and returns the best route!
   Not only that, the optimal driving strategy $a_m$ can be found by incorporating the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ into the Monte-Carlo state variable $\vec{x}^{n}$ and perturbing these by sampling from a probability distribution.
-  Because this is an iterative optimisation method, larger scales / maps (e.g. England) are not a problem! The Mathematical Institute's Linux machines are capable of handling a route between Cavan and Dublin (in Ireland) within half an hour of running time.
+  Because this is an iterative optimisation method, larger scales / maps (e.g. England) are not a problem! The Mathematical Institute's Linux machines are capable of handling a route between Cavan and Dublin (in Ireland) within half an hour of running time and return a reasonable result.
+  Of course that is still far from optimal for a routing application where customers are used to running times below a second.
+  The code is written in Python and therefore not as fast as it could be, but more remarkable performance gains can be made by further extensions and improvements to the method itself, as briefly discussed in \Cref{sec:discussion}.
 
   \subsection{Special Case: Granny's House}
+  From a more analytical rather than numerical / simulative perspective, we considered the ``Granny's House problem'' (cf. \Cref{fig:grannys-idealised-problem-setting,fig:grannys-stations}).
+  For such a simple graph, many results can be derived much more directly but they will not be presented here.
+  Especially battery degradation (aging) can be much better considered in this simple setting, where we found that for young batteries it is best to run them at a high SoC and store at a moderate charge. Similarly, for old batteries it is best to avoid usage close to the extremes $s = 0$ and $s = 1$.
+
   \begin{figure}[H]
     \centering
     \inputtikz{grannys-house}
-    \caption{The graph of our exemplary problem ``Granny's House'', a simplified case of the problem described in \autoref{sec:problem}. The situation is that we want to visit our grandmother, who lives \SI{115}{\kilo\meter} away from our home, in regular intervals. Along the route, there are two chargers. Our car only has a range of \SI{200}{\kilo\meter}. Is it better to charge at the first or second charger, on the way there or on the way back?}
+    \caption{The graph of our exemplary problem ``Granny's House'', a simplified case of the problem described in \Cref{sec:problem}. The situation is that we want to visit our grandmother, who lives \SI{115}{\kilo\meter} away from our home, in regular intervals. Along the route, there are two chargers. Our car only has a range of \SI{200}{\kilo\meter}. Is it better to charge at the first or second charger, on the way there or on the way back?}
     \label{fig:grannys-idealised-problem-setting}
   \end{figure}
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/grannys-stations.png}
-    \caption{The unperturbed route for the ``Granny's House'' problem in Ireland from Dublin to Cavan, with charging stations depicted using red pins. Screenshot due to \cite{googlemaps}.}
+    \includegraphics[width=0.4\linewidth]{figures/grannys-stations.png}
+    \caption{The unperturbed route for the ``Granny's House'' problem in Ireland from Dublin to Cavan, with charging stations depicted using red pins \parencite{googlemaps}.}
     \label{fig:grannys-stations}
   \end{figure}
 
@@ -371,8 +377,9 @@ until convergence, repeat
   \end{figure}
 
   \section{Conclusion}
+  \label{sec:discussion}
 
-  Potential improvements are, for instance, using more analytical methods to obtain solutions of the variational optimisation problem described in \autoref{sec:problem}.
+  Potential improvements are, for instance, using more analytical methods to obtain solutions of the variational optimisation problem described in \Cref{sec:problem}.
   The Monte-Carlo Markov Chain optimisation routine could be significantly improved by further extending it with, for instance, Simulated Annealing, where the transition probabilities reduce over the runtime of the algorithm, slowly closing in on an optimum.
 
   \pagebreak
