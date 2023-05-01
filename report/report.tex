@@ -129,27 +129,50 @@
     \label{fig:graz-to-munich}
   \end{figure}
 
-  The model of our car still lacks a component realising electrical into mechanical power (a motor), which we model very simplistically.
+  The model of our car still lacks a component realising electrical into mechanical power (a motor), which we model very in a very ordinary fashion.
   Let $P \in \R$, $P := I \cdot V$ denote the (electrical) power the car draws from the battery (\textcolor{gray}{in Watts}) so $P > 0$ corresponds to discharging the battery.
   This power is to be realised into a mechanical component $P_{\rm motor} \in \R^+$ driving the car forwards, heating for the battery $P_{\rm heat} \in \R^+$, $P_{\rm heat} = c (T - T_{\rm env})$, with $c \in \R^+$ the heat conduction constant describing the relation between the heater and battery, and power dissipation $P_{\rm diss} \in \R^+$.
   While driving, $P = P_{\rm motor} + P_{\rm heat} + P_{\rm diss}$.
   The acceleration of the car $a \in \R$ (\textcolor{gray}{in meters per second squared}), where $a := \frac{\dd v}{\ddt} = \frac{\dd^2 x}{\ddt}$ is decomposed into $a_m \in \R$, which directly impacts $P_{\rm motor}(a_m)$, and the deceleration due to friction (air, etc.) $a_f(v) \in \R^-$, so that in total $a = a_m + a_f$.
 
-  On the graph $(V_G, E)$ there exists a set of EV charging stations $V_{\rm charge} \subseteq V_G$ where $P_{C,\rm charge}$ denotes the possible charging power (\textcolor{gray}{in Watts}) at the charging station vertex $C \in V_{\rm charge}$ with $K_C \in \R^+$ the occuring costs per energy unit (\textcolor{gray}{in Euros per Watt second}) and $t_C \in \R^+$ the charging time per charging station $B$ (\textcolor{gray}{in seconds}).
+  Most electric cars have a range from approximately 160 up to 650 km \parencite{range}, making route changes through charging stations a necessity for longer trips.
+  The resulting routing problem we want to solve then inspires the following definitions of charging stations.
+  On the graph $(V_G, E)$ there exists a set of EV charging stations $V_{\rm charge} \subseteq V_G$ where $P_{C,\rm charge}$ denotes the possible charging power (\textcolor{gray}{in Watts}) at the charging station vertex $C \in V_{\rm charge}$ with $K_C \in \R^+$ the occuring costs per energy unit (\textcolor{gray}{in Euros per Watt second}) and $t_C \in \R^+$ the charging time per charging station $B$ (\textcolor{gray}{in seconds})\footnote{
+    Charging station \& street data was obtained from \href{https://osm.org/}{OpenStreetMap} and subsequently invoking
+    \texttt{osmfilter england-latest.o5m \-\-keep="amenity=charging\_station"}.
+    Daily dumps of OSM's public map data were obtained from \url{https://download.geofabrik.de/}.
+  }.
+
+  \subsection{Battery Aging}
+  A central aspect considered in our project was to study the effects of battery degredation, or aging. One possible model for this would be to express $Q_0$ in terms of the original capacity at the time of production $Q_{00}$ along with multiple degradation effects that we consider:
+  \begin{equation*}
+    \label{eq:cap}
+    Q_0(t,c,s,I) = Q_{00} - \frac{F_{\rm acycle}(c)}{F_{\rm current}(I)} - F_{\rm cal} \quad \in [0, Q_{00}]\,.
+  \end{equation*}
+  By $F_{\rm acycle}(c)$ we denote the \textit{Current Agnostic Cycle Degradation Factor} models cycle aging at a single current.
+  Also $F_{\rm current}(I)$ represents the \textit{Current Scaling Factor}, a value $0 < F_{\rm current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging.
+  Finally, $F_{\rm cal}(s,t)$, the \textit{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of state of charge.
+
+  The state of health is then given by
+  $$h = \frac{Q_0}{Q_{00}} = 1 - \frac{F_{\rm acycle}(c) + F_{\rm cal} F_{\rm current}(I)}{F_{\rm current}(I) Q_{00}} \quad \in [0, 1]\,.$$
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/aging.png}
+    \caption{Aging}
+    \label{fig:aging}
+  \end{figure}
+
+  Using the car and road network models introduced above, in general terms the problem may be stated as follows:
 
   \subsection{A Variational Optimisation Problem}
-  Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, which connected set of edges $E_R \subseteq E$ connecting $A$ to $Z$,
-  set of visited charging stations $V_C \subseteq V_{\rm charge}$ and charging times $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and driving behaviour $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space \footnote{to be defined.. TODO} minimises
+  Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, \textbf{which connected set of edges} $E_R \subseteq E$ connecting $A$ to $Z$, set of visited \textbf{charging stations} $V_C \subseteq V_{\rm charge}$ along $E_R$ and \textbf{charging times} $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and \textbf{driving behaviour} $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space, \textbf{minimises}
   \begin{enumerate}
-    \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \ddx + \sum_{C \in V_C} t_C$,
+    \item the total travel time $t_{\rm total} := \int_{V_R} \frac{1}{v} \,\ddx + \sum_{C \in V_C} t_C$,
     \item the total cost of travel $K := \sum_{C \in V_C} P_{C, \rm charge} t_{C} K_C$,
-    \item $-N$ where $N$ is the highest possible number of repetitions (commutes from $A$ to $Z$) with the same battery (requiring $h > 0$).
+    \item or $-N$ where $N$ is the highest possible number of repetitions (commutes from $A$ to $Z$) with the same battery (requiring $h > 0$). \label{minoption:aging}
   \end{enumerate}
-  Formulated differently, we aim to minimise the functional
-  $F \in \cC(\P)^*, F: \cC(\P) \mapsto \R$ where either $F[\chi] = t_{\rm total}$ or $F[\chi] = K$.
-
-  Charging station + street data could be obtained from \href{https://osm.org/}{OpenStreetMap} by calling \\
-  \texttt{osmfilter england-latest.o5m \-\-keep="amenity=charging\_station"} \footnote{OSM's public map data may be obtained from \url{https://download.geofabrik.de/}}.
+  In other words, we aim to minimise the functional $F \in \cC(\P)^*, F: \cC(\P) \mapsto \R$ where either $F[a_m] = t_{\rm total}$, $F[a_m] = K$ or $F[a_m] = -N$.
 
   % \subsection{Notes}
   % \begin{itemize}
@@ -170,22 +193,6 @@
   %   \item etc.
   % \end{itemize}
   % and many more simplifications are possible, which ones do we choose?
-
-  \subsection{Battery Aging}
-  \begin{equation*}
-    \label{eq:cap}
-    Q (t,c,s,I) = Q_{0} - \frac{F_{acycle}(c)}{F_{current}(I)} - F_{cal}
-  \end{equation*}
-  By $F_{acycle}(c)$ we denote the \textit{Current Agnostic Cycle Degradation Factor} models cycle aging at a single current.
-  Also $F_{current}(I)$ represents the \textit{Current Scaling Factor}, a value $0 < F_{current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging.
-  Finally, $F_{cal}(s,t)$, the \textit{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of state of charge.
-
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\linewidth]{figures/aging.png}
-    \caption{Aging}
-    \label{fig:aging}
-  \end{figure}
 
   \begin{figure}[H]
     \centering
@@ -211,7 +218,7 @@
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{figures/screenshot.png}
+    \includegraphics[width=0.8\linewidth]{figures/screenshot.png}
     \caption{User Interface}
   \end{figure}
 
