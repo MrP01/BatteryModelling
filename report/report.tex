@@ -120,7 +120,7 @@
   Then let
   $T_{\rm env}(x) \in [-273.15, \infty)$ denote the temperature of the environment (\textcolor{gray}{in degrees Celsius}) at location $x$.
   Note that this graph-based approach to the problem does not require any more geometric information about the network than edge lengths $\{d_{ij}\}_{i,j}$, while it may of course be motivated by spherical coordinates on the earth.
-  Consider for example \autoref{fig:graz-to-munich}.
+  Consider for example \autoref{fig:graz-to-munich} or \autoref{fig:grannys-stations} for an actual route in Ireland.
 
   \begin{figure}[H]
     \centering
@@ -150,7 +150,7 @@
     Q_0(t,c,s,I) = Q_{00} - \frac{F_{\rm acycle}(c)}{F_{\rm current}(I)} - F_{\rm cal} \quad \in [0, Q_{00}]\,.
   \end{equation*}
   By $F_{\rm acycle}(c)$ we denote the \textit{Current Agnostic Cycle Degradation Factor} models cycle aging at a single current.
-  Also $F_{\rm current}(I)$ represents the \textit{Current Scaling Factor}, a value $0 < F_{\rm current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging.
+  Also $F_{\rm current}(I)$ represents the \textit{Current Scaling Factor}, a value $0 < F_{\rm current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging \parencite{csfpaper}.
   Finally, $F_{\rm cal}(s,t)$, the \textit{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of state of charge.
 
   The state of health is then given by
@@ -201,8 +201,6 @@
     \label{fig:model-overview}
   \end{figure}
 
-  \cite{csfpaper}.
-
   \section{Numerical Simulation of a Car}
   For simplification, we neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
 
@@ -236,8 +234,8 @@
   Larger scales / maps (e.g. England) are not a problem!
 
   \begin{minted}{python}
-newRoute = self.simulator.batgraph.perturbRoute(self.route)
-delta = self.measureRoute(newRoute) - self.testedRoutes[self.route]
+newEnergy = self.measureRoute(newRoute) if newRoute not in self.testedRoutes else self.testedRoutes[newRoute]
+delta = newEnergy - self.testedRoutes[self.route]
 acceptanceProbability = min(1, math.exp(-delta / self.temperature))
 if random.random() < acceptanceProbability:
     self.route = newRoute
@@ -251,6 +249,14 @@ else:
     \centering
     \inputtikz{grannys-house}
     \caption{The exemplary problem ``Granny's House'', a special case of Problem (TODO).}
+    \label{fig:grannys-idealised-problem-setting}
+  \end{figure}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{figures/grannys-stations.png}
+    \caption{Route in Ireland}
+    \label{fig:grannys-stations}
   \end{figure}
 
   \subsection{Routing in Jericho}
@@ -258,6 +264,17 @@ else:
     \centering
     \includegraphics[width=0.6\linewidth]{figures/jericho.png}
     \caption{Overlay of the routing graph on a map of Jericho \parencite{osm}, without adjusting for the Merkator projection, which leads to a slightly skewed appearance. The underlying data is exactly the same.}
+  \end{figure}
+
+  \begin{figure}[H]
+    \captionsetup[subfigure]{justification=centering}
+    \centering
+    \subfloat[Route 1.]{\includegraphics[width=.5\linewidth]{figures/route1.png}}\hfill
+    \subfloat[Route 2.]{\includegraphics[width=.5\linewidth]{figures/route2.png}}\par
+    \vspace{0.5cm}
+    \subfloat[Route 3.]{\includegraphics[width=.5\linewidth]{figures/route3.png}}\hfill
+    \subfloat[Route 4.]{\includegraphics[width=.5\linewidth]{figures/route4.png}}\par
+    \caption{Routes}
   \end{figure}
 
   \section{Conclusion}
