@@ -216,7 +216,7 @@
 
   There are endless possibilities to simplify, for example one could take
   $V_G = \{A, B\}$ and $E = \{AB\}$ with some $d_{AB}$, $v_{\rm max, AB} = \infty$ and $V_C = \{\}$, so only looking at the minimisation of $t_{\rm total}$. This is equivalent to ignoring the graph-algorithmic component of the problem, as it is only a single line without a charger.
-  Another potential simplifcation would be to take $h = 1$ to ignore battery aging / degradation effects. Or even more radically, $s = \rm const$ to only model very short-term (on the order of seconds) effects of this model.
+  Another potential simplifcation would be to take $h = 1$ to ignore battery aging / degradation effects. Or even more radically, $s = \rm const.$ to only model very short-term (on the order of seconds) effects of this model.
 
   In the remaining sections of the report, we will assume the following:
   \begin{itemize}
@@ -228,8 +228,19 @@
   \end{itemize}
 
   \section{Numerical Simulation of a Car}
+  Now that the model is defined, it remains to be implemented.
+  The resulting ODE system can be solved using a known ODE solver such as \texttt{ode15s} in MATLAB.
+  While this is the more accurate approach, it is harder to generalise it to a graph where environmental conditions change along different edges of the network.
+  But given the problem settings, it is very well possible.
+  We will however not focus on it within the scope of this report.
+  Our solver uses a simple Forward Euler discretisation.
 
   \subsection{Forward Euler Simulation}
+  For a first-order (nonlinear) ODE system $\dot{\vec{x}} = \vec{f}(\vec{x})$, a solution may be approximated by the Forward Euler scheme
+  $$\frac{1}{\Delta t} \left(\vec{x}_{n+1} - \vec{x}_{n}\right) = \vec{f}(\vec{x}_n), \quad \text{ so } \quad \vec{x}_{n+1} = \vec{x}_{n} + \Delta t \cdot \vec{f}(\vec{x}_n)\,,$$
+  to get the approximant $\vec{x}^n$ at the $n$-th timestep with parameter $\Delta t$ and some initial condition $\vec{x}_{0}$.
+  Our code used this discretisation to solve the ODE system resulting from the equivalent cicuit model. More information on the code can be found in \autoref{sec:code}.
+  Along with the numerical simulator and optimiser, we implemented a graphical user interface (cf. \autoref{fig:user-interface}) for the problem, capable of loading any graph data.
 
   \begin{figure}[H]
     \centering
@@ -238,9 +249,39 @@
     \label{fig:user-interface}
   \end{figure}
 
+  Next up, we will consider the route finding approach and optimisation procedure.
+
   \section{Metropolis-Hastings and A-Star}
+  As mentioned in the introduction, our algorithm consists of two main parts.
+  The first step is to find the geometrically shortest path using the $A^*$-algorithm from computer science.
+  The second step is to perturb this path in a Monte-Carlo Markov Chain (MCMC) optimisation routine that also takes the battery model into account, and finds good driving behaviour along a perturbed route $E_R$ along charging stations $V_C$.
+
+  In order to find good / optimal driving behaviour $a_m$ along the route, we consider the following function basis expansion:
+  $$a_m(x, s, t) = \sum_{k=0}^{n} a_{k,1} T_k(x) + a_{k,2} T_k(s) + a_{k,3} T_k(t)\,, \text{ for each edge } (v_i, v_j)$$
+  where $\{T_k\}_{k\in \N_0}$ may be any function basis, for instance the Chebyshev polynomials defined by $T_k(\cos \theta) = \cos(k\theta)$.
+  We assume that the driving behaviour along an edge does not need to be complex in order to be effective, so low expansion orders might suffice for a relatively good result (e.g. $n = 1, 2, 3$).
+  The problem of finding the optimal driving behaviour is then reduced to finding the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ which is already much more straightforward than minimising a functional.
+  An approach of this form can generally be regarded as a spectral method.
+
   \subsection{Shortest Path Finding}
-  The graph data was retrieved using OSMnx \parencite{osmnx} which itself is built on NetworkX \parencite{networkx}. The edges retrieved from the OpenStreetMap API also contain data on the highest allowed velocity $v_{\rm max}$, but we did not use it in our solver as this would need to be a carefully considered constraint to the optimisation routine.
+  As a first step, we aim to find a good initial condition to the MCMC routing
+  The graph data was retrieved using OSMnx \parencite{osmnx} which itself is built on top of NetworkX \parencite{networkx}. The edges retrieved from the OpenStreetMap API also contain data on the highest allowed velocity $v_{\rm max}$, but we did not use it in our solver as this would need to be a carefully considered constraint to the optimisation routine.
+
+  \begin{algorithm}[language=pseudo,basicstyle=\footnotesize,caption={\centering The $A^*$-search algorithm \parencite{astar}}]
+open_list, closed_list = empty list of possible positions
+adjacent_val = 0
+next_position = null
+push start_position to open_list
+while open_list is not empty, do
+  current_node = pop(open_list)
+  for each adjacent position of current_node (ap_current)
+        with value (av_current), do
+    if (adjacent_val < av_current) or (ap_current $\in$ closed_list), do
+      adjacent_val = av_current
+      next_position = ap_current
+    push ap_current to closed_list
+  push next_position to open_list
+  \end{algorithm}
 
   \subsection{Monte-Carlo Optimisation}
   \cite{metropolis, hastings}.
@@ -280,21 +321,6 @@ else:
   \end{figure}
 
   \subsection{Routing in Jericho}
-  \begin{algorithm}[language=pseudo,basicstyle=\footnotesize,caption={\centering The $A^*$-search algorithm \parencite{astar}}]
-open_list, closed_list = empty list of possible positions
-adjacent_val = 0
-next_position = null
-push start_position to open_list
-while open_list is not empty, do
-  current_node = pop(open_list)
-  for each adjacent position of current_node (ap_current)
-        with value (av_current), do
-    if (adjacent_val < av_current) or (ap_current $\in$ closed_list), do
-      adjacent_val = av_current
-      next_position = ap_current
-    push ap_current to closed_list
-  push next_position to open_list
-  \end{algorithm}
 
   \begin{figure}[H]
     \centering
@@ -316,6 +342,7 @@ while open_list is not empty, do
   \section{Conclusion}
 
   Potential improvements are, for instance, using more analytical methods to obtain solutions of the variational optimisation problem described in \autoref{sec:problem}.
+  The Monte-Carlo Markov Chain optimisation routine could be significantly improved by further extending it with, for instance, Simulated Annealing, where the transition probabilities reduce over the runtime of the algorithm, slowly closing in at an optimum.
 
   \pagebreak
   \printbibliography
