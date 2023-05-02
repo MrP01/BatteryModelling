@@ -17,6 +17,8 @@
 \newacronym{soh}{SoH}{State of Health}
 \newacronym{osm}{OSM}{OpenStreetMap}
 \newacronym{mcmc}{MCMC}{Markov Chain Monte Carlo}
+\newacronym{hppc}{HPPC}{Hybrid Pulse Power Characterization}
+\newacronym{rc}{RC}{Resistor Capacitor}
 
 \title{\topictitle}
 \author{Candidate \candidatenumber}
@@ -29,8 +31,8 @@
   \begin{abstract}
     \label{abstract}
     This work will attempt to devise a mathematical model for Lithium-Ion batteries (cf. \Cref{fig:model-overview}) and, building on it, a model for an \gls{ev}.
-    We implement the \gls{ev} model, which is a first-order system of \glstext{ode}s, using the system  solver functionality of MATLAB as well as a numerical forward integration scheme.
-    We will use the implemented numerical simulator to make progress in a complex route finding problem using real-world road network data fetched from \gls{osm}.
+    We implement the model, a first-order system of \glstext{ode}s, using the system solver functionality of MATLAB as well as a numerical forward integration scheme.
+    We will use the implemented numerical simulator to make progress in a complex route finding problem using real-world road network data obtained from \gls{osm}.
 
     The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route finding and optimisation problem in the context of \glstext{ev}s.
 
@@ -44,8 +46,6 @@
     \label{fig:model-overview}
   \end{figure}
 
-  % \tableofcontents
-
   \pagebreak
   \pagestyle{normal}
 
@@ -54,17 +54,17 @@
   This includes, especially, the renewable energy sector due to the unpredictability of energy supplies such as wind and solar power where short-term storage is a necessary evil.
   Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
   In many countries / regions, \glstext{ev}s still lack a well-enlarged network of charging stations, for various reasons including for example, incompatibilties between charging station suppliers.
-  Using methods introduced in the present report, we aim to optimise the customer experience of an \gls{ev} owner through a routing application that takes electric battery peculiarities and battery life-time into account.
+  Using methods introduced in the present report, we aim to optimise the customer experience and ecological friendliness of an \gls{ev} through a routing application that takes electric battery peculiarities and battery life-time into account.
 
   In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some characteristic data available in the public domain \parencite{panasonicnums}.
   To do this, we will consider the Thevenin \gls{ecm}, which may be found in \Cref{fig:ecm}.
   The key idea here is to model the voltage output $V(t)$ given a current profile $I(t)$.
   This model not only depends on current and time, but also keeps track of internal quantities like the \gls{soc} $s \in [0, 1]$ and \gls{soh} $h \in [0, 1]$.
-  It can be reduced to a system of ordinary differential equations, for which, using given profiles, we find parameters $R_0$, $R_1$, $C_1$ and more by a fitting procedure.
+  It can be reduced to an \gls{ode} system, for which, using given profiles, we find parameters $R_0$, $R_1$, $C_1$ and more by a fitting procedure.
   Later on, we also considered aging effects of the battery through usage over time, which resulted in an additional differential equation in the system of \glstext{ode}s.
 
   Based on the model we obtained, verified and validated on new pulse test data, the next step was to apply the model to a real-world application, namely that of \gls{ev} routing.
-  For this purpose, we obtain graph data of the road network of choice (users may enter new localities as a text input) from \gls{osm} \parencite{osm}.
+  For this purpose, we obtain graph data of the road network of choice (users may enter localities as a text input) from \gls{osm} \parencite{osm}.
   In order to find the best route from A to B, the algorithm then performs a classical routing algorithm called $A^*$ (\emph{A-Star}) to find the (geometrically) shortest path between A and B, which may not yet be a feasible or optimal path to the destination but a good start.
   A good initial condition is all that the remaining algorithm requires, which is a Monte-Carlo iterative method that repeatedly applies small, well-defined, perturbations to the graph route and then obtains a time or cost estimate of the modified trip using the battery (and car) model we introduced.
   If the modified route yields an improvement in the metric of choice, it is accepted as the new state and the process repeats until a satisfactory route was found.
@@ -91,25 +91,25 @@
   $$s(t) = \frac{Q(t)}{Q_0} = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \,\dd\tau \,,$$
   under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
 
-  \subsection{The Equivalent Circuit Model (ECM)}
+  \subsection{The Equivalent Circuit Model}
   As mentioned earlier, we want to model the battery as an electrical component which exerts specific behaviour in an electrical circuit.
   In electrical engineering, such models of more complicated components are frequently represented by equivalent circuits which only consist of basic components, mostly resistors, diodes, transistors, capacitors and inductors.
 
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{figures/hppc-pulse.png}
-    \caption{One of the sample HPPC (Hybrid Pulse Power Characterization) pulses we used for parameter finding. We want to model the output voltage $V(t)$ given a current input profile $I(t)$. Each sample is characterised at a specific state of charge $s$, state of health $h$ and temperature $T$, this one was taken at $s \approx 1$, $h \approx 1$ and $T = \SI{10}{\degreeCelsius}$.}
+    \caption{One of the sample \gls{hppc} pulses we used for parameter finding. We want to model the output voltage $V(t)$ given a current input profile $I(t)$. Each sample is characterised at a specific \glsdesc{soc} $s$, \glsdesc{soh} $h$ and temperature $T$, this one was taken at $s \approx 1$, $h \approx 1$ and $T = \SI{10}{\degreeCelsius}$.}
     \label{fig:hppc-pulse}
   \end{figure}
 
   Empirically, we know that a battery's voltage output for a current pulse looks roughly as given in \Cref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
   As one can see from the voltage curve, the battery exerts a ``time-relaxation'' behaviour on high-frequency changes in the current.
-  One way of modelling this is through an RC circuit, confer \Cref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
+  One way of modelling this is through an \glstext{rc} circuit, confer \Cref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for the exponentially decaying behaviour in the voltage curve given (near-)jumps in the current.
   Additional ohmic impedance is modelled through $R_0$.
   The ``heart'' of the \gls{ecm} is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
   We modelled it accordingly, using a polynomial ansatz including cross-terms $$V_{OC}(s, h, T) = c_1 s + c_2 h + c_3 T + c_4 sh + c_5 sT + c_6 hT + c_7 shT + \mathcal{O}(s^2, h^2, T^2, ...)\,,$$
   and similar polynomials are chosen for $R_0$, $R_1$ and $C_1$, completing the model.
-  Using the abovementioned dataset \parencite{panasonicnums}, these fits were obtained numerically using a least-squares fitting procedure. An example of the dependency on the state of charge $s$ can be found in \Cref{fig:parameters}.
+  Using the abovementioned dataset \parencite{panasonicnums}, these fits were obtained numerically using a least-squares fitting procedure. An example of the dependency on the \gls{soc} can be found in \Cref{fig:parameters}.
 
   \begin{figure}[H]
     \centering
@@ -135,7 +135,7 @@
 
   Let us consider an application of this model in an \glsdesc{ev} next.
 
-  \subsection{Battery in an Electric Vehicle (EV)}
+  \subsection{Battery in an Electric Vehicle}
   In order to model a road network, let us first consider the definition of an undirected graph $G = (V_G, E)$. We take an undirected graph for simplicity, assuming that cars may go in arbitrary direction along each edge.
   \begin{definition}{Undirected Graph}{undirected-graph}
     A graph $G = (V_G, E)$ with vertices $V_G$ and edges $E \subseteq V_G \times V_G$ is undirected if and only if $(v_i, v_j) \in E \Rightarrow (v_j, v_i) \in E \quad \forall\; v_i, v_j \in V_G$.
@@ -173,7 +173,7 @@
     Daily dumps of \gls{osm}'s public map data were obtained from \url{https://download.geofabrik.de/}.
   }.
 
-  \subsection{Battery Aging}
+  \subsection{Battery Degradation (Aging)}
   A central aspect considered in our project was to study the effects of battery degredation, or aging. One possible model for this would be to express $Q_0$ in terms of the original capacity at the time of production $Q_{00}$ along with multiple degradation effects that we consider:
   \begin{equation}
     \label{eq:cap}
@@ -386,14 +386,13 @@ until convergence, repeat
   \centerline{\mintinline{bash}{./main.py --locality "Jericho, Oxford"}}
   where \textit{Jericho, Oxford} can of course be replaced with any locality known to \gls{osm} as data is fetched on the spot.
   \Cref{fig:perturbations} depicts the perturbations that were made in between iterations and subsequently simulated using the car and battery simulator described in \Cref{sec:simulator}.
-  % This example contains no charging stations
 
   \section{Conclusion}
   \label{sec:discussion}
   In this report, we introduced a battery model based on the Thevenin \gls{ecm} (\Cref{fig:ecm}) which we equipped with adaptive parameters based on real-world data from a Panasonic battery product.
   We also discussed aging of the battery and how to model it effectively.
 
-  The battery model laid the foundation for the discussion of a route finding problem on real-world road networks, which we tackled by finding the shortest route using the $A^*$-algorithm and then optimising from there using a Monte-Carlo simulation.
+  The battery model laid the foundation for the discussion of a route finding problem on real-world road networks, which we tackled by finding the shortest route using the $A^*$-algorithm and then optimising from there using a Monte-Carlo method.
 
   Potential improvements are, for instance, including temperature in the discussion of aging, or using analytical methods to obtain solutions of the variational optimisation problem described in \Cref{sec:problem}.
   Namely, one could turn the optimal driving behaviour determination into a subproblem to be solved using a fully developed, deterministic spectral method in between iterations of \gls{mcmc}.
@@ -410,8 +409,6 @@ until convergence, repeat
 
   \pagebreak
   \appendix
-  % \section{Simulation Code}
-  % \inputminted{python}{../simulator/optimiser.py}
 
   \section{Code Structure and Setup}
   \label{sec:code}
