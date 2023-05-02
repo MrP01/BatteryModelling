@@ -22,15 +22,13 @@
 
   \begin{abstract}
     \label{abstract}
-    This work will attempt to
+    This work will attempt to devise a mathematical model for Lithium-Ion batteries (cf. \Cref{fig:model-overview}) and, building on it, one for electric vehicles (EVs).
+    We implement the EV model, which is just a first-order system of ODEs, using known solvers as well as a numerical forward integration scheme.
+    We will use the implemented numerical simulator to make progress in a complex route finding problem using real-world road network data fetched from OpenStreetMap.
 
-    The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route optimisation problem in the context of electric vehicles.
+    The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route finding and optimisation problem in the context of electric vehicles.
 
-    % Monte Carlo with Simulated Annealing on the graph
-    % A-Star on the graph
-    % Chebyshev Ansatz (Finite Element) for I(t), solve model and minimize for coefficients
-
-    The model was implemented in Python and there is a graphical user interface available that provides live insight into the model (cf. \Cref{fig:user-interface}).
+    Our model was implemented in Python and MATLAB and there is a graphical user interface available with it that provides live insight into the model (cf. \Cref{fig:user-interface}).
   \end{abstract}
 
   \begin{figure}[H]
@@ -475,7 +473,7 @@ until convergence, repeat
   \end{itemize}
 
   \section{Graph Perturbation}
-  The graph perturbations described above for the MCMC optimisation routine are implemented in \texttt{simulator/batgraph.py}. This is the most relevant part of the code for perturbation and subsequent optimisation:
+  The graph perturbations described above for the MCMC optimisation routine are implemented in \texttt{simulator/batgraph.py}. For reference, this is the relevant part of the code for perturbation and subsequent optimisation:
 
   \begin{minted}{python}
 def airlineDistance(self, A, B):
