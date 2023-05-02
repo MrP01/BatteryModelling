@@ -34,15 +34,15 @@
     We implement the model, a first-order system of \glstext{ode}s, using the system solver functionality of MATLAB as well as a numerical forward integration scheme.
     We will use the implemented numerical simulator to make progress in a complex route finding problem using real-world road network data obtained from \gls{osm}.
 
-    The first part of this report will focus on the model for a Lithium-Ion battery which was the focus of our project. The electrical behaviour was modelled through the Thevenin \gls{ecm}, in which we also considered battery aging effects. The second part is the route finding and optimisation problem in the context of \glstext{ev}s.
+    The first part of this report will focus on the model for a Lithium-Ion battery which was the focus of our project. The electrical behaviour was modelled through the Thevenin \gls{ecm}, in which we also considered battery aging effects. The second part is the route finding and optimisation problem in the context of \glstext{ev}s, which we approached using the $A^*$-algorithm and a \gls{mcmc} optimisation method.
 
-    Our model was implemented in Python and MATLAB and there is a graphical user interface available with it that provides live insight into the model (cf. the screenshot in \Cref{fig:user-interface}).
+    Our model was implemented in Python and MATLAB and there is a graphical user interface available with it that provides live insight into the model simulation and route-finding procedure (cf. \Cref{fig:user-interface,fig:perturbations}).
   \end{abstract}
 
   \begin{figure}[H]
     \centering
     \inputtikz{battery-model-overview}
-    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding \glsdesc{soh} $h(t)$ due to battery degradation (aging). The core part of the model is an \gls{ecm}, while aging is modelled by the capacity model.}
+    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding \glsdesc{soh} $h(t)$ due to battery degradation (aging). The core part of the model is an \gls{ecm}, while aging is characterised by the capacity model.}
     \label{fig:model-overview}
   \end{figure}
 
