@@ -42,7 +42,7 @@
   \begin{figure}[H]
     \centering
     \inputtikz{battery-model-overview}
-    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding state of health $h(t)$ due to battery degradation (aging). The core part of the model is an \gls{ecm}, while aging is modelled by the capacity model.}
+    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding \glsdesc{soh} $h(t)$ due to battery degradation (aging). The core part of the model is an \gls{ecm}, while aging is modelled by the capacity model.}
     \label{fig:model-overview}
   \end{figure}
 
@@ -54,7 +54,7 @@
   This includes, especially, the renewable energy sector due to the unpredictability of energy supplies such as wind and solar power where short-term storage is a necessary evil.
   Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
   In many countries / regions, \glstext{ev}s still lack a well-enlarged network of charging stations, for various reasons including for example, incompatibilties between charging station suppliers.
-  Using methods introduced in the present report, we aim to optimise the customer experience and ecological friendliness of an \gls{ev} through a routing application that takes electric battery peculiarities and battery life-time into account.
+  Using methods introduced in the present report, we aim to optimise the customer experience and ecological friendliness of an \gls{ev} through a routing application that takes electric battery peculiarities and battery lifetime into account.
 
   In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some characteristic data available in the public domain \parencite{panasonicnums}.
   To do this, we will consider the Thevenin \gls{ecm}, which may be found in \Cref{fig:ecm}.
@@ -81,7 +81,7 @@
   $Q_{00} \in \R^+$ the maximum possible charge at the time of production (\textcolor{gray}{in Coulombs}),
   $V \in \R$ the voltage across the battery (\textcolor{gray}{in Volts}) with
   $I \in \R$ the corresponding current (\textcolor{gray}{in Amperes}) where $I > 0$ corresponds to discharging the battery.
-  Then, per common definition, $s := \frac{Q}{Q_0}$ is the amount of charge currently present in the battery as compared to $Q_0 \in \R^+$ the current maximum capacity, which itself is dependent on the state of health, as given by $Q_0 := h Q_{00}$.
+  Then, per common definition, $s := \frac{Q}{Q_0}$ is the amount of charge currently present in the battery as compared to $Q_0 \in \R^+$ the current maximum capacity, which itself is dependent on the \gls{soh}, as given by $Q_0 := h Q_{00}$.
   Further let
   $T \in [-273.15, \infty)$ denote the temperature of the battery (\textcolor{gray}{in degrees Celsius}) and
   let $t \in \R$ represent time (\textcolor{gray}{in seconds}).
@@ -129,7 +129,7 @@
     \centering
     \subfloat[Fit of $R_0$ as a function of the \gls{soc} ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
     \subfloat[Fit of $R_1$ as a function of the \gls{soc} ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
-    \caption{Dependencies of the Thevenin equivalent circuit (\Cref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the state of charge with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
+    \caption{Dependencies of the Thevenin equivalent circuit (\Cref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the \gls{soc} with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
     \label{fig:parameters}
   \end{figure}
 
@@ -174,19 +174,22 @@
   }.
 
   \subsection{Battery Degradation (Aging)}
-  A central aspect considered in our project was to study the effects of battery degredation, or aging. One possible model for this would be to express $Q_0$ in terms of the original capacity at the time of production $Q_{00}$ along with multiple degradation effects that we consider:
+  A central aspect considered in our project was to study the effects of battery degredation, or aging.
+  In this context, cycle aging (a short-term effect) is frequently distinguished from calendar aging (a long-term effect).
+  One possible model for this would be to express $Q_0$ in terms of the original capacity at the time of production $Q_{00}$ along with multiple degradation effects that we consider:
   \begin{equation}
     \label{eq:cap}
     Q_0(t,c,s,I) = Q_{00} - \frac{F_{\rm acycle}(c)}{F_{\rm current}(I)} - F_{\rm cal} \quad \in [0, Q_{00}]\,.
   \end{equation}
   By $F_{\rm acycle}(c) \in \R$ we denote the \textbf{Current Agnostic Cycle Degradation Factor} which models cycle aging at a single current. It models the aging effects resulting only from discharge usage of the battery, at an idealised single current.
-  $F_{\rm current}(I) \in \R$ represents the \textbf{Current Scaling Factor}, a value $0 < F_{\rm current} \leq 1$ that incorporates behaviour where higher currents are worse for cycle aging \parencite{csfpaper}. This term is highly relevant for scenarios where one can choose the amount of current drawn from the battery and then optimise accordingly if this behaviour is well-known.
-  Finally, $F_{\rm cal}(s,t) \in \R$, the \textbf{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of the state of charge.
-  Storage at the right state of charge and environment is one of the most crucial aspects for battery lifetime.
+  $F_{\rm current}(I) \in (0, 1]$ represents the \textbf{Current Scaling Factor}, a value that incorporates behaviour where higher currents are worse for cycle aging \parencite{csfpaper}. This term is highly relevant for scenarios where one can choose the amount of current drawn from the battery and then optimise accordingly if this behaviour is well-known.
+  Finally, $F_{\rm cal}(s,t) \in \R$, the \textbf{Calendar Degradation Factor}, ages the battery over time and accounts for suboptimal storage in terms of the \gls{soc}.
+  Storage at the right \gls{soc} and environment is one of the most crucial aspects for battery lifetime.
 
-  The state of health $h$, the ratio between $Q_0$ and $Q_{00}$ is then given by
+  The \glsdesc{soh} $h$, the ratio between $Q_0$ and $Q_{00}$ is then given by
   $$h = \frac{Q_0}{Q_{00}} = 1 - \frac{F_{\rm acycle}(c) + F_{\rm cal} F_{\rm current}(I)}{F_{\rm current}(I) Q_{00}} \quad \in [0, 1]\,,$$
   directly following from \Cref{eq:cap} and yielding a simple, yet effective approximation for aging of the battery.
+  Experimental data suggests a ``knee-bending'' behaviour towards the end of a battery's lifetime, which motivated the following expressions.
   In our model, we used
   \begin{align*}
     F_{\rm acycle}  & = c \left( \alpha_1 + \alpha_2 \exp{\alpha_3c-\alpha_4} \right)\,,                                                                                                                     \\
@@ -258,7 +261,7 @@
 
   Pressing \keys{$\uparrow$} accelerates the car and the resulting battery model changes can be observed in real-time using the charts at the bottom. \keys{$\downarrow$} decelerates (in this scenario, we used current-control, so $I(t)$ is decreased).
 
-  The simulator then iteratively updates the state $\vec{x}^n$ comprised of position $x$, velocity $v$, acceleration $a$, state of charge $s$, currents $I$ and $I_{R1}$, voltage $V$, current edge $(v_i, v_j) \in E$ to name the most central components, in time using \Cref{eq:forward-euler}.
+  The simulator then iteratively updates the state $\vec{x}^n$ comprised of position $x$, velocity $v$, acceleration $a$, \glsdesc{soc} $s$, currents $I$ and $I_{R1}$, voltage $V$, current edge $(v_i, v_j) \in E$ to name the most central components, in time using \Cref{eq:forward-euler}.
   In the implementation, we assume that power output $P = IV$ of the battery is directly proportional to mechanical acceleration $a_m$ using a factor.
   We model friction by
   $$a_f = a_{\rm drag} v^2 + a_{\rm friction}\,,\quad a_{\rm drag}, a_{\rm friction} \in \R^-\,,$$
