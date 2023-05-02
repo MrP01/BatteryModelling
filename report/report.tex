@@ -24,7 +24,7 @@
     \label{abstract}
     This work will attempt to
 
-    The first part of this report will focus on the model for the battery which was the main focus of our project. The second part is the route optimisation problem in the context of electric vehicles.
+    The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route optimisation problem in the context of electric vehicles.
 
     % Monte Carlo with Simulated Annealing on the graph
     % A-Star on the graph
@@ -155,7 +155,7 @@
     \label{fig:graz-to-munich}
   \end{figure}
 
-  The model of our car still lacks a component realising electrical into mechanical power (a motor), which we model very in a very ordinary fashion.
+  The model of our car still lacks a component realising electrical into mechanical power (a motor), which we model in a fairly ordinary fashion.
   Let $P \in \R$, $P := I \cdot V$ denote the (electrical) power the car draws from the battery (\textcolor{gray}{in Watts}) so $P > 0$ corresponds to discharging the battery.
   This power is to be realised into a mechanical component $P_{\rm motor} \in \R^+$ driving the car forwards, heating for the battery $P_{\rm heat} \in \R^+$, $P_{\rm heat} = c (T - T_{\rm env})$, with $c \in \R^+$ the heat conduction constant describing the relation between the heater and battery, and power dissipation $P_{\rm diss} \in \R^+$.
   While driving, $P = P_{\rm motor} + P_{\rm heat} + P_{\rm diss}$.
@@ -206,7 +206,7 @@
   \label{sec:problem}
   Given source and destination vertices $A, Z \in V_G$ on the graph $(V_G, E)$, \textbf{which connected set of edges} $E_R \subseteq E$ connecting $A$ to $Z$, set of visited \textbf{charging stations} $V_C \subseteq V_{\rm charge}$ along $E_R$ and \textbf{charging times} $\{t_C\}_{C \in V_C}$ visited on the route $E_R$, and \textbf{driving behaviour} $a_m(x, v, t, s, h, T_{\rm env}, ...),\, a_m \in \cC^1(\P)$ with $\P$ the parameter space, \textbf{minimises}
   \begin{enumerate}
-    \item the total travel time $t_{\rm total} := \int_{E_R} \frac{1}{v} \,\ddx + \sum_{C \in V_C} t_C$,
+    \item the total travel time $t_{\rm total} := \int_{E_R} \frac{1}{v} \,\ddx + \sum_{C \in V_C} t_C$, where we assume that turning takes no additional time,
     \item the total cost of travel $K := \sum_{C \in V_C} P_{C, \rm charge} t_{C} K_C$,
     \item or $-N$ where $N$ is the highest possible number of repetitions (commutes from $A$ to $Z$) with the same battery (requiring $h > 0$). \label{minoption:aging}
   \end{enumerate}
@@ -217,7 +217,7 @@
 
   There are endless possibilities to simplify, for example one could take
   $V_G = \{A, B\}$ and $E = \{AB\}$ with some $d_{AB}$, $v_{\rm max, AB} = \infty$ and $V_C = \{\}$, so only looking at the minimisation of $t_{\rm total}$. This is equivalent to ignoring the graph-algorithmic component of the problem, as it is only a single line without a charger.
-  Another potential simplifcation would be to take $h = 1$ to ignore battery aging / degradation effects. Or even more radically, $s = \rm const.$ to only model very short-term (on the order of seconds) effects of this model.
+  Another potential simplifcation would be to take $h = 1$ to ignore battery aging / degradation effects. Or even more radically, $s = \rm const.$ to only model extremely short-term (on the order of seconds) effects of this model.
 
   In the remaining sections of the report, we will assume the following:
   \begin{itemize}
@@ -233,7 +233,7 @@
   Now that the model is defined, it remains to be implemented.
   The resulting ODE system can be solved using a known ODE solver such as \texttt{ode15s} in MATLAB.
   While this is the more accurate approach, it is harder to generalise it to a graph where environmental conditions change along different edges of the network.
-  But given the problem settings, it is very well possible.
+  Nevertheless, given the problem settings, it is well possible.
   We will however not focus on it within the scope of this report.
   Our solver uses a simple Forward Euler discretisation.
 
@@ -286,7 +286,7 @@
 
   $A^*$ is based on Dijkstra's algorithm which is already highly efficient for any graph but can be made even more effective by incorporating a distance heuristic into the algorithm.
   This distance heuristic, for our purposes of a road network, is given by the airline distance between two vertices $v_i$ and $v_j \in V_G$.
-  In general, it could be any mapping $H: V_G \times V_G \mapsto \R^+$ that very roughly approximates the true shortest path length between $v_i$ and $v_j$ \parencite{astar}.
+  In general, it could be any mapping $H: V_G \times V_G \mapsto \R^+$ that roughly approximates the true shortest path length between $v_i$ and $v_j$ \parencite{astar}.
 
   The $A^*$ algorithm then leverages this distance heuristic in order to not need to search through all vertices (as Dijkstra's algorithm would) but only a subset of them which are in the direction of the target node.
   This facilitates an incredible speedup on street networks which are normally huge.
@@ -331,7 +331,7 @@ until convergence, repeat
   Finally, Type-4 was added to allow for much larger changes using a NetworkX subroutine yielding a simple path between two vertices which were neighbours in the previous route. Consider for example \Cref{fig:perturbations}.
 
   The key idea here is to perturb charging stations in- and out of the route and compare results after performing the numerical simulation described in \Cref{sec:simulator}.
-  This simulation done at every MCMC iteration is generally very expensive, but experiments showed that we can use a fairly large time-step $\Delta t$ and therefore speeding up the simulation by a great deal, without sacrificing all too much accuracy.
+  This simulation done at every MCMC iteration is generally highly expensive, but experiments showed that we can use a fairly large time-step $\Delta t$ and therefore speed up the simulation by a great deal, without sacrificing all too much accuracy.
 
   So the Monte-Carlo method explores the state-space to some extent, and returns the best route!
   Not only that, the optimal driving strategy $a_m$ can be found by incorporating the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ into the Monte-Carlo state variable $\vec{x}^{n}$ and perturbing these by sampling from a probability distribution.
@@ -386,9 +386,20 @@ until convergence, repeat
 
   \section{Conclusion}
   \label{sec:discussion}
+  In this report, we introduced a battery model based on the Thevenin equivalent circuit model (\Cref{fig:ecm}) which we equipped with adaptive parameters based on real-world data from a Panasonic battery product.
+  We also discussed aging of the battery and how to model it effectively.
 
-  Potential improvements are, for instance, using more analytical methods to obtain solutions of the variational optimisation problem described in \Cref{sec:problem}.
-  The Monte-Carlo Markov Chain optimisation routine could be significantly improved by further extending it with, for instance, Simulated Annealing, where the transition probabilities reduce over the runtime of the algorithm, slowly closing in on an optimum.
+  The battery model laid the foundation for the discussion of a route finding problem on real-world road networks, which we tackled by finding the shortest route using the $A^*$-algorithm and then optimising from there using a Monte-Carlo Markov Chain simulation.
+
+  Potential improvements are, for instance, including temperature in the discussion of aging, or using analytical methods to obtain solutions of the variational optimisation problem described in \Cref{sec:problem}.
+  Namely, one could turn the optimal driving behaviour determination into a subproblem to be solved using a fully developed, deterministic spectral method in between iterations of MCMC.
+  Its optimisation routine could be significantly improved by further extending it with, for instance, Simulated Annealing, where the transition probabilities reduce over the runtime of the algorithm, slowly closing in on an optimum.
+  One could even come up with a context-independent approximant for battery usage across every edge of the graph and then use this information in combination with the heuristic for the $A^*$-algorithm.
+
+  While this paper may cover a lot of definitions and introductions, many of these can be simplified away later on and brought back into consideration when necessary.
+
+  An even more sophisticated model could introduce the effects of other drivers influencing one's own driving behaviour.
+  For example, it is neither realistic to assume one can drive at their own pace (consider traffic jams for example) nor that turning takes up no time when in many cases, crossings make up for a large portion of the driving time.
 
   \pagebreak
   \printbibliography
@@ -456,10 +467,7 @@ until convergence, repeat
                   \texttt{batmap.py} exports the central widget that renders /
                   animates the BatMobile car on the BatGraph.
             \item
-                  \texttt{graphs.py} handles the connection of the interface and
-                  (live) plots. The plots are handled by \texttt{matplotlib} and are
-                  very intuitive to use, further almost all commands are the same as
-                  they are in MatLab.
+                  \texttt{graphs.py} handles the connection of the interface and (live) plots. The plots are handled by \texttt{matplotlib} and are intuitive to use, further almost all commands are the same as they are in MatLab.
           \end{itemize}
     \item
           \texttt{main.py} creates a \texttt{MainWindow} and runs the simulator
