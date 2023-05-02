@@ -15,7 +15,7 @@
 \newacronym{ode}{ODE}{Ordinary Differential Equations}
 \newacronym{soc}{SoC}{State of Charge}
 \newacronym{soh}{SoH}{State of Health}
-\newacronym{osm}{OSM}{OpenStreetMap}
+\newacronym{osm}{OSM}{Open Street Map}
 \newacronym{mcmc}{MCMC}{Markov Chain Monte Carlo}
 \newacronym{hppc}{HPPC}{Hybrid Pulse Power Characterization}
 \newacronym{rc}{RC}{Resistor Capacitor}
@@ -34,9 +34,9 @@
     We implement the model, a first-order system of \glstext{ode}s, using the system solver functionality of MATLAB as well as a numerical forward integration scheme.
     We will use the implemented numerical simulator to make progress in a complex route finding problem using real-world road network data obtained from \gls{osm}.
 
-    The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route finding and optimisation problem in the context of \glstext{ev}s.
+    The first part of this report will focus on the model for a Lithium-Ion battery which was the focus of our project. The electrical behaviour was modelled through the Thevenin \gls{ecm}, in which we also considered battery aging effects. The second part is the route finding and optimisation problem in the context of \glstext{ev}s.
 
-    Our model was implemented in Python and MATLAB and there is a graphical user interface available with it that provides live insight into the model (cf. \Cref{fig:user-interface}).
+    Our model was implemented in Python and MATLAB and there is a graphical user interface available with it that provides live insight into the model (cf. the screenshot in \Cref{fig:user-interface}).
   \end{abstract}
 
   \begin{figure}[H]
@@ -231,7 +231,7 @@
     \tightlist
     \item $T = T_{\rm env} = \rm const. = \SI{10}{\degreeCelsius}$ and therefore $P_{\rm heat} = 0$ to ignore the motor heating component. We neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
     \item $P_{\rm diss} = 0$ as this is an easily implementable extension to the existing model.
-    \item $v_{{\rm max}, ij} = \infty \,\forall\, i, j$ so there is no speed limit.
+    \item $v_{{\rm max}, ij} = \infty \,\forall\, i, j$ so there is no speed limit, although data is potentially available.
   \end{itemize}
 
   \section{Numerical Simulation of a Car}
@@ -277,12 +277,12 @@
 
   In order to find good / optimal driving behaviour $a_m$ along the route, we consider the following function basis expansion:
   \begin{equation}
-    a_m(x, s, t) = \sum_{k=0}^{n} a_{k,1} T_k(x) + a_{k,2} T_k(s) + a_{k,3} T_k(t)\,, \text{ for each edge } (v_i, v_j)\,,
+    a_m^{(i,j)}(x, s, t) = \sum_{k=0}^{n} a_{k,1}^{(i,j)} T_k(x) + a_{k,2}^{(i,j)} T_k(s) + a_{k,3} T_k(t)\,, \text{ per edge } (v_i, v_j) \in E_R\,,
     \label{eq:spectral-expansion}
   \end{equation}
   where $\{T_k\}_{k\in \N_0}$ may be any function basis, for instance the Chebyshev polynomials defined by $T_k(\cos \theta) = \cos(k\theta)$.
   We assume that the driving behaviour along an edge does not need to be complex in order to be effective, so low expansion orders might suffice for a relatively good result (e.g. $n = 1, 2, 3$).
-  The problem of finding the optimal driving behaviour is then reduced to finding the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ which is already much more straightforward than minimising a functional.
+  The problem of finding the optimal driving behaviour is then reduced to finding the coefficients $\left\{a_{k,\{1,2,3\}}^{(i,j)}\right\}_{k\in\N_0}$ which is already much more straightforward than minimising a functional.
   An approach of this form can generally be regarded as a spectral method.
 
   \subsection{Shortest Path Finding}
@@ -338,10 +338,10 @@ until convergence, repeat
   Finally, Type-4 was added to allow for much larger changes using a NetworkX subroutine yielding a simple path between two vertices which were neighbours in the previous route. Consider for example \Cref{fig:perturbations}.
 
   The key idea here is to perturb charging stations in- and out of the route and compare results after performing the numerical simulation described in \Cref{sec:simulator}.
-  This simulation done at every \gls{mcmc} iteration is generally highly expensive, but experiments showed that we can use a fairly large time-step $\Delta t$ and therefore speed up the simulation by a great deal, without sacrificing all too much accuracy.
+  This simulation done at every \gls{mcmc} iteration is generally highly expensive, but experiments showed that we can use a fairly large time-step $\Delta t$, therefore speeding up the simulation by a significant amount without sacrificing all too much accuracy.
 
   So the Monte-Carlo method explores the state-space to some extent, and returns the best route!
-  Not only that, the optimal driving strategy $a_m$ can be found by incorporating the coefficients $\{a_{k,\{1,2,3\}}\}_{k\in\N_0}$ into the Monte-Carlo state variable $\vec{x}^{n}$ and perturbing these by sampling from a probability distribution.
+  Not only that, the optimal driving strategy $a_m$ can be found by incorporating the coefficients $\left\{a_{k,\{1,2,3\}}^{(i,j)}\right\}_{k\in\N_0}$ into the Monte-Carlo state variable $\vec{x}^{n}$ and perturbing these by sampling from a probability distribution.
   Because this is an iterative optimisation method, larger scales / maps (e.g. England) are not a problem! The Mathematical Institute's Linux machines are capable of handling a route between Cavan and Dublin (in Ireland) within half an hour of running time and return a reasonable result.
   Of course that is still far from optimal for a routing application where customers are used to running times below a second.
   The code is written in Python and therefore not as fast as it could be, but more remarkable performance gains can be made by further extensions and improvements to the method itself, as briefly discussed in \Cref{sec:discussion}.
