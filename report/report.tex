@@ -64,7 +64,7 @@
   Later on, we also considered aging effects of the battery through usage over time, which resulted in an additional differential equation in the system of \glstext{ode}s.
 
   Based on the model we obtained, verified and validated on new pulse test data, the next step was to apply the model to a real-world application, namely that of \gls{ev} routing.
-  For this purpose, we obtain graph data of the road network of choice (users may enter new localitys as a text input) from \gls{osm} \parencite{osm}.
+  For this purpose, we obtain graph data of the road network of choice (users may enter new localities as a text input) from \gls{osm} \parencite{osm}.
   In order to find the best route from A to B, the algorithm then performs a classical routing algorithm called $A^*$ (\emph{A-Star}) to find the (geometrically) shortest path between A and B, which may not yet be a feasible or optimal path to the destination but a good start.
   A good initial condition is all that the remaining algorithm requires, which is a Monte-Carlo iterative method that repeatedly applies small, well-defined, perturbations to the graph route and then obtains a time or cost estimate of the modified trip using the battery (and car) model we introduced.
   If the modified route yields an improvement in the metric of choice, it is accepted as the new state and the process repeats until a satisfactory route was found.
@@ -88,7 +88,7 @@
   Let $c \in \R^+$ denote the cycle, so the number of full discharges of the battery.
 
   From the definition of current $I := \frac{\dd Q}{\ddt}$, we further have that for a single cycle,
-  $$s = \frac{Q}{Q_0} = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \,\dd\tau \,,$$
+  $$s(t) = \frac{Q(t)}{Q_0} = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \,\dd\tau \,,$$
   under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
 
   \subsection{The Equivalent Circuit Model (ECM)}
@@ -102,7 +102,7 @@
     \label{fig:hppc-pulse}
   \end{figure}
 
-  Empirically, we know that a battery's voltage output looks roughly as given in \Cref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
+  Empirically, we know that a battery's voltage output for a current pulse looks roughly as given in \Cref{fig:hppc-pulse}, which is part of a standardised cycle characterisation procedure taking the battery from ``fully charged'' ($s=1$) to ``completely empty'' ($s=0$). Data is due to \cite{panasonicnums}.
   As one can see from the voltage curve, the battery exerts a ``time-relaxation'' behaviour on high-frequency changes in the current.
   One way of modelling this is through an RC circuit, confer \Cref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
   Additional ohmic impedance is modelled through $R_0$.
@@ -402,7 +402,7 @@ until convergence, repeat
 
   While this paper may cover a lot of definitions and introductions, many of these can be simplified away later on and brought back into consideration when necessary.
 
-  An even more sophisticated model could introduce the effects of other drivers influencing one's own driving behaviour.
+  For future work, an even more sophisticated model could introduce the effects of other drivers influencing one's own driving behaviour.
   For example, it is neither realistic to assume one can drive at their own pace (consider traffic jams for example) nor that turning takes up no time when in many cases, crossings make up for a large portion of the driving time.
 
   \pagebreak
