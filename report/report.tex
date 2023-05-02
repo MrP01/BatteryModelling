@@ -13,9 +13,6 @@
 \author{Candidate \candidatenumber}
 \date{\today}
 
-% TODO: check all figures - good captions?
-% TODO: check all figures - are they referenced?
-
 \begin{document}
   \pagestyle{plain}
   \mmscSpecialHeader[casestudy]
@@ -256,7 +253,9 @@
 
   The simulator then iteratively updates the state $\vec{x}^n$ comprised of position $x$, velocity $v$, acceleration $a$, state of charge $s$, currents $I$ and $I_{R1}$, voltage $V$, current edge $(v_i, v_j) \in E$ to name the most central components, in time using \Cref{eq:forward-euler}.
   In the implementation, we assume that power output $P = IV$ of the battery is directly proportional to mechanical acceleration $a_m$ using a factor.
-  We model friction by $$a_f = a_{\rm drag} v^2 + a_{\rm friction}\,,\quad a_{\rm drag}, a_{\rm friction} \in \R^-$$ which then results in $a = a_m + a_f$.
+  We model friction by
+  $$a_f = a_{\rm drag} v^2 + a_{\rm friction}\,,\quad a_{\rm drag}, a_{\rm friction} \in \R^-\,,$$
+  which then results in $a = a_m + a_f$.
   Integrating results in velocity and position.
 
   Next up, we will consider the route finding approach and optimisation procedure.
@@ -268,7 +267,7 @@
 
   In order to find good / optimal driving behaviour $a_m$ along the route, we consider the following function basis expansion:
   \begin{equation}
-    a_m(x, s, t) = \sum_{k=0}^{n} a_{k,1} T_k(x) + a_{k,2} T_k(s) + a_{k,3} T_k(t)\,, \text{ for each edge } (v_i, v_j)
+    a_m(x, s, t) = \sum_{k=0}^{n} a_{k,1} T_k(x) + a_{k,2} T_k(s) + a_{k,3} T_k(t)\,, \text{ for each edge } (v_i, v_j)\,,
     \label{eq:spectral-expansion}
   \end{equation}
   where $\{T_k\}_{k\in \N_0}$ may be any function basis, for instance the Chebyshev polynomials defined by $T_k(\cos \theta) = \cos(k\theta)$.
