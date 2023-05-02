@@ -9,6 +9,13 @@
 \newcommand{\candidatenumber}{1072462}
 \newcommand{\course}{Mathematical Modelling}
 
+\makenoidxglossaries
+\newacronym{ev}{EV}{Electric Vehicle}
+\newacronym{ecm}{ECM}{Equivalent Circuit Model}
+\newacronym{ode}{ODE}{Ordinary Differential Equations}
+\newacronym{soc}{SoC}{State of Charge}
+\newacronym{soh}{SoH}{State of Health}
+
 \title{\topictitle}
 \author{Candidate \candidatenumber}
 \date{\today}
@@ -19,11 +26,11 @@
 
   \begin{abstract}
     \label{abstract}
-    This work will attempt to devise a mathematical model for Lithium-Ion batteries (cf. \Cref{fig:model-overview}) and, building on it, one for electric vehicles (EVs).
-    We implement the EV model, which is just a first-order system of ODEs, using known solvers as well as a numerical forward integration scheme.
+    This work will attempt to devise a mathematical model for Lithium-Ion batteries (cf. \Cref{fig:model-overview}) and, building on it, a model for an \gls{ev}.
+    We implement the \gls{ev} model, which is just a first-order system of \glstext{ode}s, using known solvers as well as a numerical forward integration scheme.
     We will use the implemented numerical simulator to make progress in a complex route finding problem using real-world road network data fetched from OpenStreetMap.
 
-    The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route finding and optimisation problem in the context of electric vehicles.
+    The first part of this report will focus on the model for the battery which was the focus of our project. The second part is the route finding and optimisation problem in the context of \glstext{ev}s.
 
     Our model was implemented in Python and MATLAB and there is a graphical user interface available with it that provides live insight into the model (cf. \Cref{fig:user-interface}).
   \end{abstract}
@@ -31,7 +38,7 @@
   \begin{figure}[H]
     \centering
     \inputtikz{battery-model-overview}
-    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding state of health $h(t)$ due to battery degradation (aging). The core part of the model is an equivalent circuit model (ECM), while aging is modelled by the capacity model.}
+    \caption{Schematic overview of the battery model introduced in this report. A current input $I(t)$ is converted into an output voltage $V(t)$ and corresponding state of health $h(t)$ due to battery degradation (aging). The core part of the model is an \gls{ecm}, while aging is modelled by the capacity model.}
     \label{fig:model-overview}
   \end{figure}
 
@@ -44,19 +51,19 @@
   Clearly, electric batteries are largely important for various industries today and demand for them is ever-growing.
   This includes, especially, the renewable energy sector due to the unpredictability of energy supplies such as wind and solar power where short-term storage is a necessary evil.
   Similar relevance may be found in the car industry where one aims for highly (space-)efficient mobile storage of energy.
-  In many countries / regions, Electric Vehicles (EVs) still lack a well-enlarged network of charging stations, for various reasons including for example, incompatibilties between charging station suppliers.
-  Using methods introduced in the present report, we aim to optimise the customer experience of an electric vehicle owner through a routing application that takes electric battery peculiarities and battery life-time into account.
+  In many countries / regions, \glstext{ev}s still lack a well-enlarged network of charging stations, for various reasons including for example, incompatibilties between charging station suppliers.
+  Using methods introduced in the present report, we aim to optimise the customer experience of an \gls{ev} owner through a routing application that takes electric battery peculiarities and battery life-time into account.
 
   In this report, we will consider how to model a Lithium-Ion battery, more specifically the Panasonic 18650PF for which there is some characteristic data available in the public domain \parencite{panasonicnums}.
-  To do this, we will consider an Equivalent Circuit Model (ECM), namely the Thevenin ECM, which may be found in \Cref{fig:ecm}.
+  To do this, we will consider the Thevenin \gls{ecm}, which may be found in \Cref{fig:ecm}.
   The key idea here is to model the voltage output $V(t)$ given a current profile $I(t)$.
-  This model not only depends on current and time, but also keeps track of internal quantities like the state of charge (SoC, $s \in [0, 1]$) and state of health (SoH, $h \in [0, 1]$).
+  This model not only depends on current and time, but also keeps track of internal quantities like the \gls{soc} $s \in [0, 1]$ and \gls{soh} $h \in [0, 1]$.
   It can be reduced to a system of ordinary differential equations, for which, using given profiles, we find parameters $R_0$, $R_1$, $C_1$ and more by a fitting procedure.
-  Later on, we also considered aging effects of the battery through usage over time, which resulted in an additional differential equation in the ODE system.
+  Later on, we also considered aging effects of the battery through usage over time, which resulted in an additional differential equation in the system of \glstext{ode}s.
 
-  Based on the model we obtained, verified and validated on new pulse test data, the next step was to apply the model to a real-world application, namely that of electric vehicle routing.
+  Based on the model we obtained, verified and validated on new pulse test data, the next step was to apply the model to a real-world application, namely that of \gls{ev} routing.
   For this purpose, we obtain graph data of the road network of choice (users may enter new localitys as a text input) from OpenStreetMap \parencite{osm}.
-  In order to find the best route from A to B, the algorithm then performs a classical routing algorithm called \emph{A-Star} to find the (geometrically) shortest path between A and B, which may not yet be a feasible or optimal path to the destination but a good start.
+  In order to find the best route from A to B, the algorithm then performs a classical routing algorithm called $A^*$ (\emph{A-Star}) to find the (geometrically) shortest path between A and B, which may not yet be a feasible or optimal path to the destination but a good start.
   A good initial condition is all that the remaining algorithm requires, which is a Monte-Carlo iterative method that repeatedly applies small, well-defined, perturbations to the graph route and then obtains a time or cost estimate of the modified trip using the battery (and car) model we introduced.
   If the modified route yields an improvement in the metric of choice, it is accepted as the new state and the process repeats until a satisfactory route was found.
 
@@ -66,8 +73,8 @@
   \subsection{The Isolated Battery}
   In order to model a Lithium-Ion battery in and of itself, we consider the following (physical) quantities:
   Let
-  $s \in [0, 1]$ denote the \textit{state of charge} (SoC) of the battery,
-  $h \in [0, 1]$ the \textit{state of health} (SoH),
+  $s \in [0, 1]$ denote the \glsdesc{soc} of the battery,
+  $h \in [0, 1]$ the \glsdesc{soh},
   $Q \in \R^+$ the charge,
   $Q_{00} \in \R^+$ the maximum possible charge at the time of production (\textcolor{gray}{in Coulombs}),
   $V \in \R$ the voltage across the battery (\textcolor{gray}{in Volts}) with
@@ -82,7 +89,7 @@
   $$s = \frac{Q}{Q_0} = 1 - \frac{1}{Q_0} \int_0^t I(\tau) \,\dd\tau \,,$$
   under the assumption that $Q_0$, and therefore $h$, stays constant during that cycle.
 
-  \subsection{The Equivalent Circuit Model}
+  \subsection{The Equivalent Circuit Model (ECM)}
   As mentioned earlier, we want to model the battery as an electrical component which exerts specific behaviour in an electrical circuit.
   In electrical engineering, such models of more complicated components are frequently represented by equivalent circuits which only consist of basic components, mostly resistors, diodes, transistors, capacitors and inductors.
 
@@ -97,7 +104,7 @@
   As one can see from the voltage curve, the battery exerts a ``time-relaxation'' behaviour on high-frequency changes in the current.
   One way of modelling this is through an RC circuit, confer \Cref{fig:ecm}: the parallel circuit of $R_1$ and $C_1$ is responsible for an exponential-looking behaviour in the voltage curve given (near-)jumps in the current.
   Additional ohmic impedance is modelled through $R_0$.
-  The ``heart'' of the equivalent circuit model is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
+  The ``heart'' of the \gls{ecm} is the open-circuit voltage $V_{OC}$ which behaves like a voltage source but strongly depends on parameters $s$, $h$ and $T$.
   We modelled it accordingly, using a polynomial ansatz including cross-terms $$V_{OC}(s, h, T) = c_1 s + c_2 h + c_3 T + c_4 sh + c_5 sT + c_6 hT + c_7 shT + \mathcal{O}(s^2, h^2, T^2, ...)\,,$$
   and similar polynomials are chosen for $R_0$, $R_1$ and $C_1$, completing the model.
   Using the abovementioned dataset \parencite{panasonicnums}, these fits were obtained numerically using a least-squares fitting procedure. An example of the dependency on the state of charge $s$ can be found in \Cref{fig:parameters}.
@@ -106,7 +113,7 @@
     \centering
     \inputtikz{ecm-model}
     \caption{
-      The Thevenin equivalent circuit model (ECM) with parameters $R_0 \in \R^+$, $R_1 \in \R^+$ and $C_1 \in \R^+$ and $V_{\rm OC} \in \R^+$ the \textit{open circuit voltage} which behaves according to a function $V_{\rm OC}(s, h, T)$ dependent on $s$, $h$ and $T$.
+      The Thevenin \gls{ecm} with parameters $R_0 \in \R^+$, $R_1 \in \R^+$ and $C_1 \in \R^+$ and $V_{\rm OC} \in \R^+$ the \textit{open circuit voltage} which behaves according to a function $V_{\rm OC}(s, h, T)$ dependent on $s$, $h$ and $T$.
     }
     \label{fig:ecm}
   \end{figure}
@@ -118,13 +125,13 @@
   \begin{figure}[H]
     \captionsetup[subfigure]{justification=centering}
     \centering
-    \subfloat[Fit of $R_0$ as a function of the SoC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
-    \subfloat[Fit of $R_1$ as a function of the SoC ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
+    \subfloat[Fit of $R_0$ as a function of the \gls{soc} ($s$).]{\includegraphics[width=.5\linewidth]{figures/r0fit.png}}\hfill
+    \subfloat[Fit of $R_1$ as a function of the \gls{soc} ($s$).]{\includegraphics[width=.5\linewidth]{figures/r1fit.png}}\par
     \caption{Dependencies of the Thevenin equivalent circuit (\Cref{fig:ecm}) model's parameters $R_0$ and $R_1$ on the state of charge with a polynomial fit through the data points. Data is again due to \cite{panasonicnums}.}
     \label{fig:parameters}
   \end{figure}
 
-  Let us consider an application of this model in an electric vehicle next.
+  Let us consider an application of this model in an \glsdesc{ev} next.
 
   \subsection{Battery in an Electric Vehicle (EV)}
   In order to model a road network, let us first consider the definition of an undirected graph $G = (V_G, E)$. We take an undirected graph for simplicity, assuming that cars may go in arbitrary direction along each edge.
@@ -219,27 +226,25 @@
     \tightlist
     \item $T = T_{\rm env} = \rm const. = \SI{10}{\degreeCelsius}$ and therefore $P_{\rm heat} = 0$ to ignore the motor heating component. We neglected temperature changes in the environment and a respective battery heating strategy $P_{\rm heat}(x, v, t, s, h, T_{\rm env}, ...)$, $P_{\rm heat} \in \cC(\P)$.
     \item $P_{\rm diss} = 0$ as this is an easily implementable extension to the existing model.
-          % \item $a_f = 0$ to ignore friction terms in the acceleration. Then $a = a_m$ is the first argument of the functional $F[a, E_R, V_C, t_C]$ we are trying to minimise.
     \item $v_{{\rm max}, ij} = \infty \,\forall\, i, j$ so there is no speed limit.
   \end{itemize}
 
   \section{Numerical Simulation of a Car}
   \label{sec:simulator}
   Now that the model is defined, it remains to be implemented.
-  The resulting ODE system can be solved using a known ODE solver such as \texttt{ode15s} in MATLAB.
+  The resulting \gls{ode} system can be solved using a known \gls{ode} solver such as \texttt{ode15s} in MATLAB.
   While this is the more accurate approach, it is harder to generalise it to a graph where environmental conditions change along different edges of the network.
   Nevertheless, given the problem settings, it is well possible.
   We will however not focus on it within the scope of this report.
   Our solver uses a simple Forward Euler discretisation.
 
-  % \subsection{Forward Euler Simulation}
-  For a first-order (nonlinear) ODE system $\dot{\vec{x}} = \vec{f}(\vec{x})$, a solution may be approximated by the Forward Euler scheme
+  For a first-order (nonlinear) \gls{ode} system $\dot{\vec{x}} = \vec{f}(\vec{x})$, a solution may be approximated by the Forward Euler scheme
   \begin{equation}
     \frac{1}{\Delta t} \left(\vec{x}_{n+1} - \vec{x}_{n}\right) = \vec{f}(\vec{x}_n), \quad \text{ so } \quad \vec{x}_{n+1} = \vec{x}_{n} + \Delta t \cdot \vec{f}(\vec{x}_n)\,,
     \label{eq:forward-euler}
   \end{equation}
   to get the approximant $\vec{x}^n$ at the $n$-th timestep with parameter $\Delta t$ and some initial condition $\vec{x}_{0}$.
-  Our code used this scheme to solve the ODE system resulting from the equivalent cicuit model. More information on the code can be found in \Cref{sec:code}.
+  Our code used this scheme to solve the \gls{ode} system resulting from the \gls{ecm}. More information on the code can be found in \Cref{sec:code}.
   Along with the numerical simulator and optimiser, we implemented a graphical user interface (cf. \Cref{fig:user-interface}) for the problem, capable of loading any graph.
 
   \begin{figure}[H]
@@ -339,7 +344,7 @@ until convergence, repeat
   \subsection{Special Case: Granny's House}
   From a more analytical rather than numerical / simulative perspective, we considered the ``Granny's House problem'' (cf. \Cref{fig:grannys-idealised-problem-setting,fig:grannys-stations}).
   For such a simple graph, many results can be derived much more directly but they will not be presented here.
-  Especially battery degradation (aging) can be much better considered in this simple setting, where we found that for young batteries it is best to run them at a high SoC and store at a moderate charge. Similarly, for old batteries it is best to avoid usage close to the extremes $s = 0$ and $s = 1$.
+  Especially battery degradation (aging) can be much better considered in this simple setting, where we found that for young batteries it is best to run them at a high \gls{soc} and store at a moderate charge. Similarly, for old batteries it is best to avoid usage close to the extremes $s = 0$ and $s = 1$.
 
   \begin{figure}[H]
     \centering
@@ -355,7 +360,7 @@ until convergence, repeat
     \label{fig:grannys-stations}
   \end{figure}
 
-  \subsection{Routing in Jericho}
+  \subsection{Special Case: Routing in Jericho}
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.45\linewidth]{figures/jericho.png}
@@ -383,7 +388,7 @@ until convergence, repeat
 
   \section{Conclusion}
   \label{sec:discussion}
-  In this report, we introduced a battery model based on the Thevenin equivalent circuit model (\Cref{fig:ecm}) which we equipped with adaptive parameters based on real-world data from a Panasonic battery product.
+  In this report, we introduced a battery model based on the Thevenin \gls{ecm} (\Cref{fig:ecm}) which we equipped with adaptive parameters based on real-world data from a Panasonic battery product.
   We also discussed aging of the battery and how to model it effectively.
 
   The battery model laid the foundation for the discussion of a route finding problem on real-world road networks, which we tackled by finding the shortest route using the $A^*$-algorithm and then optimising from there using a Monte-Carlo Markov Chain simulation.
@@ -511,4 +516,6 @@ def perturbRoute(self, route: tuple) -> tuple:
         generator = networkx.all_simple_paths(self, nodeA, nodeB)
         return route[:indexA] + tuple(next(generator)) + route[indexB + 1 :]
   \end{minted}
+
+  \printnoidxglossary[type=acronym, title={Acronyms}]
 \end{document}
