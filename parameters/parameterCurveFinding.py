@@ -158,14 +158,6 @@ def plot_curves(df):
     return
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == "__main__":
-    print("Running")
-    df = load_data()
-    # plot_curves(df)
-    plot_curves_no_temperature_data(df)
-
-
 ##
 def getPresentationPlots(df):
     plt.figure(figsize=(8, 6))
@@ -194,21 +186,28 @@ def getPresentationPlots(df):
     plt.show()
 
 
-getPresentationPlots(df)
-##
-measuredCurrent = pd.read_csv("measuredCurrent.csv")
-measuredVoltage = pd.read_csv("measuredVoltage.csv")
-predictedVoltage = pd.read_csv("predictedVoltage.csv")
-times = 0.01 * np.arange(len(measuredVoltage))
-##
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), constrained_layout=True)
-ax1.plot(times, measuredVoltage, "r", label="Measured Voltage")
-# ax1.plot(times, predictedVoltage, "g", label="Predicted Voltage via ECM Model")
-ax1.set(xlabel="Time (s)", ylabel="Voltage (V)")
-ax1.set_title("Voltage on a Single HPPC Pulse")
-ax1.legend(loc="best")
-ax2.plot(times, measuredCurrent, "r", label="Current Profile")
-ax2.set(xlabel="Time (s)", ylabel="Current (A)")
-ax2.set_title("Current Profile")
-ax2.legend(loc="best")
-plt.show()
+# Press the green button in the gutter to run the script.
+if __name__ == "__main__":
+    print("Running")
+    df = load_data()
+    # plot_curves(df)
+    plot_curves_no_temperature_data(df)
+
+    getPresentationPlots(df)
+    ##
+    measuredCurrent = pd.read_csv("measuredCurrent.csv")
+    measuredVoltage = pd.read_csv("measuredVoltage.csv")
+    predictedVoltage = pd.read_csv("predictedVoltage.csv")
+    times = 0.01 * np.arange(len(measuredVoltage))
+    ##
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), constrained_layout=True)
+    ax1.plot(times, measuredVoltage, "r", label="Measured Voltage")
+    # ax1.plot(times, predictedVoltage, "g", label="Predicted Voltage via ECM Model")
+    ax1.set(xlabel="Time (s)", ylabel="Voltage (V)")
+    ax1.set_title("Voltage on a Single HPPC Pulse")
+    ax1.legend(loc="best")
+    ax2.plot(times, measuredCurrent, "r", label="Current Profile")
+    ax2.set(xlabel="Time (s)", ylabel="Current (A)")
+    ax2.set_title("Current Profile")
+    ax2.legend(loc="best")
+    plt.show()

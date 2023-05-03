@@ -1,4 +1,5 @@
 import numpy as np
+
 from simulator.batmobile import BatMobile
 
 
@@ -33,8 +34,7 @@ class headless:
             self.iterate()
 
 
-h = headless()
-h.runMe(len(currentJumps) * h.dt)
-##
 currentProfile = np.arange(1, 10)
 currentJumps = np.ediff1d(currentProfile)
+h = headless()
+h.runMe(len(currentJumps) * h.dt)
