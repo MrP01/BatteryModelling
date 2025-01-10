@@ -151,9 +151,9 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         buttonLayout.addWidget(self.singleOptimiseBtn)
         buttonLayout.addStretch()
         layout.addLayout(buttonLayout, 1, 1)
-        # graphLayout = QtWidgets.QHBoxLayout()
-        # graphLayout.addWidget(self.batteryPlots)
-        # layout.addLayout(graphLayout, 2, 0, 1, 2)
+        graphLayout = QtWidgets.QHBoxLayout()
+        graphLayout.addWidget(self.batteryPlots)
+        layout.addLayout(graphLayout, 2, 0, 1, 2)
         self.setLayout(layout)
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):

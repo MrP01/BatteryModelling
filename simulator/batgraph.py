@@ -3,7 +3,6 @@ import random
 
 import networkx as nx
 import osmnx
-import osmnx.utils_graph
 from networkx.algorithms import shortest_paths
 
 
