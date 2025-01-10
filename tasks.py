@@ -11,13 +11,13 @@ from simulator.simulation import Simulation
 
 
 @invoke.task()
-def run_trial(ctx, model="lithium-ion"):
+def run_trial(ctx, model="lithium-ion") -> None:
     """Runs pybamm."""
     ctx.run(f"{sys.executable} playground/pybamm_trial.py {model}")
 
 
 @invoke.task()
-def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
+def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0) -> None:
     """Runs the simulation for some given test setting."""
     simulation = Simulation()
     log = []
@@ -34,7 +34,7 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
                 simulation.batmobile.battery.voltage,
                 simulation.batmobile.battery.current,
                 simulation.batmobile.battery.soc,
-            )
+            ),
         )
     log = np.array(log)
     t = np.linspace(0, T_max, log.shape[0])
@@ -57,18 +57,16 @@ def run_simulation(ctx, name="current-bump-1.5A", T_max=6.0):
 
 
 @invoke.task()
-def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom", start=None, end=None, N=20):
+def optimise(ctx, locality: str = "Jericho, Oxfordshire, England, United Kingdom", start=None, end=None, N=20) -> None:
     """Optimise the route."""
     optimiser = Optimiser(graph=BatGraph.fromName(locality))
     nodes = list(optimiser.simulator.batgraph.nodes())
     optimiser.initialise(start or random.choice(nodes), end or random.choice(nodes))
-    print("Shortest path:", optimiser.route, optimiser.testedRoutes[optimiser.route])
-    for i in range(N):
+    for _i in range(N):
         optimiser.mcmcStep()
 
 
 @invoke.task()
-def mitja_is_a_bit_silly_sometimes(ctx):
+def mitja_is_a_bit_silly_sometimes(ctx) -> None:
     """CTX is a variable which stands for context."""
     ctx.run("echo 'Hi Mitja! This is Bash!'")
-    print("Hi Mitja! This is Python print.")

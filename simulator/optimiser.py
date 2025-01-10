@@ -10,7 +10,7 @@ class Optimiser:
         self.testedRoutes = {}
         self.temperature = 1.0
 
-    def initialise(self, source, destination):
+    def initialise(self, source, destination) -> None:
         """Simulates (measures) the shortest possible route, ignoring charging stations, etc."""
         if not self.simulator.batgraph.has_node(source):
             source = int(source)
@@ -30,7 +30,7 @@ class Optimiser:
         self.testedRoutes[route] = self.metric()
         return self.testedRoutes[route]
 
-    def mcmcStep(self):
+    def mcmcStep(self) -> None:
         """Perform a Monte-Carlo Markov-Chain, Metropolis-Hastings iteration step."""
         perturbationAttempt = 0
         while True:
@@ -43,7 +43,6 @@ class Optimiser:
                 pass
             perturbationAttempt += 1
             if perturbationAttempt > 20:
-                print("Giving up perturbation.")
                 return
 
         # a negative delta is good!!
@@ -52,6 +51,5 @@ class Optimiser:
         acceptanceProbability = min(1, math.exp(-delta / self.temperature))
         if random.random() < acceptanceProbability:
             self.route = newRoute
-            print(f"Accepted new route {newRoute} with delta: {delta:.2f}. Total: {self.testedRoutes[newRoute]:.2f}.")
         else:
-            print(f"Rejected route {newRoute} with delta: {delta:.2f}.")
+            pass

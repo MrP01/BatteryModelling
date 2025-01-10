@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-"""Welcome to the main simulation file, running me starts up the battery simulator! :)
+"""Welcome to the main simulation file, running me starts up the battery simulator.
+
 The interface code is contained within interface/mainwindow.py.
 Get to know the code by starting from there (or simulator/simulation.py).
 """
+
 import argparse
 import sys
 

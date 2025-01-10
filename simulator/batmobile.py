@@ -10,7 +10,7 @@ class BatMobile:
     friction = -120.0
     currentJump = 0.1
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.battery = Battery()
 
         self.position: float = 0  # meters
@@ -24,7 +24,7 @@ class BatMobile:
         self.sourceNode: Optional[str] = None  # one of the nodes of the BatGraph
         self.destinationNode: Optional[str] = None  # another node of the BatGraph
 
-    def iterate(self, dt):
+    def iterate(self, dt) -> None:
         self.battery.iterate(dt)
 
         self.motorAcceleration = self.accelerationPerWatt * self.battery.voltage * self.battery.current
@@ -37,20 +37,19 @@ class BatMobile:
         self.velocity = max(self.velocity, 0)  # velocity is at least 0..
         self.position += self.velocity * dt
 
-    def accelerate(self, currentIncrease):
+    def accelerate(self, currentIncrease) -> None:
         """Increases the current through the motor by the given amount in Amps,
         therefore accelerating the car based on battery output.
         """
         self.battery.current += currentIncrease
 
-    def simulateDrag(self):
+    def simulateDrag(self) -> None:
         """Computes the drag acceleration which increases with v²."""
         self.dragAcceleration = -6e-3 * self.velocity**2 + self.friction
 
-    def halt(self):
+    def halt(self) -> None:
         self.battery.current = 0
         self.velocity = 0
 
-    def chargeUp(self):
+    def chargeUp(self) -> None:
         self.battery.soc = 1
-        print("Charged up!")

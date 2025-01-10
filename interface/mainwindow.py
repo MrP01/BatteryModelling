@@ -1,4 +1,5 @@
 """The graphical interface / visualisation layer of our simulation!"""
+
 import random
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -22,7 +23,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
 
     STEPS_PER_FRAME = 25
 
-    def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom"):
+    def __init__(self, locality="Jericho, Oxfordshire, England, United Kingdom") -> None:
         super().__init__(graph=BatGraph.fromName(locality))
         self.batmap = BatMap(self.batgraph, self.batmobile, self)
         self.setWindowTitle("Battery Modelling in the BatMobile")
@@ -30,7 +31,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.userSelectedTurnIndex = None
         self.optimiser = None
 
-    def iterate(self):
+    def iterate(self) -> None:
         """The iteration method of the simulation, representing a single numerical integration step in time by dt.
         We slightly modify it here on the visualisation layer, but our superclass's iterate() method is still called by
         super().iterate().
@@ -39,7 +40,6 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             self.userSelectedTurnIndex is None
             and self.batmobile.position >= self.batgraph.edges[self.currentEdge()]["length"]
         ):
-            print("Turning time")
             self.turnLabel.setText("Where would you like to turn? Press 1, 2, 3, etc.")
             self.startOrStop()
             return
@@ -50,13 +50,13 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             f"Position: {self.batmobile.position:.2f} m\n"
             f"Velocity: {self.batmobile.velocity:.2f} m/s\n"
             f"Acceleration: {self.batmobile.acceleration:.2f} m/s²\n"
-            f"Motor Consumption: {self.batmobile.P_motor:.2f} W"
+            f"Motor Consumption: {self.batmobile.P_motor:.2f} W",
         )
 
         if self.step % self.STEPS_PER_FRAME == 1:
             self.updatePlots()
 
-    def iterateOptimiser(self):
+    def iterateOptimiser(self) -> None:
         if self.optimiser is None:
             self.optimiser = Optimiser(self.batgraph)
             self.optimiser.initialise(self.sourceDrowdown.currentText(), self.destinationDropdown.currentText())
@@ -67,7 +67,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         if self.optimiseBtn.text() != "Monte-Carlo away":
             QtCore.QTimer.singleShot(0, self.iterateOptimiser)
 
-    def updatePlots(self):
+    def updatePlots(self) -> None:
         """Updates the plots and redraws them. This is an expensive operation, so we run it outside the main thread."""
         measurement = self.batmobile.battery.measurement()
         measurement.time = self.totalTimeElapsed
@@ -75,7 +75,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         # TODO: could add finely-grained data here in batch (instead of just one measurement!)
         self.threadPool.start(lambda: self.batteryPlots.addMeasurement(measurement))
 
-    def startOrStop(self):
+    def startOrStop(self) -> None:
         if self.controlBtn.text() == "Start":
             self.iterationTimerId = self.startTimer(20)
             self.controlBtn.setText("Stop")
@@ -84,7 +84,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             self.killTimer(self.iterationTimerId)
             self.controlBtn.setText("Start")
 
-    def startOptimiser(self):
+    def startOptimiser(self) -> None:
         if self.optimiseBtn.text() == "Monte-Carlo away":
             # self.optimisingTimerId = self.startTimer(250)
             self.optimiseBtn.setText("Stop it!")
@@ -102,7 +102,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         #     # self.threadPool.start(self.iterateOptimiser)
         return super().timerEvent(event)
 
-    def buildUI(self):
+    def buildUI(self) -> None:
         self.controlBtn = QtWidgets.QPushButton("Start", self)
         self.resetBtn = QtWidgets.QPushButton("Reset", self)
         self.exportBtn = QtWidgets.QPushButton("Export", self)
@@ -113,7 +113,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             "Click 'Start' to begin the simulation.\n"
             "Use Up/Down arrow keys to drive.\n"
             "Press 'H' to halt the car.\n"
-            "Press 'S' as a shortcut to start/stop."
+            "Press 'S' as a shortcut to start/stop.",
         )
         self.statsLabel = QtWidgets.QLabel()
         self.turnLabel = QtWidgets.QLabel("Welcome to the Electric Vehicle Simulator.")
@@ -175,7 +175,7 @@ class MainWindow(Simulation, QtWidgets.QWidget):
             connections = self.getOnwardDestinations()
             self.turnLabel.setText(
                 f"Selected destination {connections[self.userSelectedTurnIndex]}! "
-                "Click 'Start' or press 'S' to resume."
+                "Click 'Start' or press 'S' to resume.",
             )
         return super().keyPressEvent(event)
 
@@ -185,6 +185,6 @@ class MainWindow(Simulation, QtWidgets.QWidget):
         self.turnLabel.setText("Continue driving")
         return index
 
-    def handleSourceDestinationChange(self, name):
+    def handleSourceDestinationChange(self, name) -> None:
         self.optimiser = None
         self.batmap.highlightNode(name)

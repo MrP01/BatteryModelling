@@ -21,22 +21,19 @@ import numpy as np
 
 
 def calendarDegradationFactor(soc, timeInSeconds, temp=10):
-    """
-    Given an SOC that the battery is kept at, as well as the duration of storage,
-    calculates the calendar aging that occurs
+    """Given an SOC that the battery is kept at, as well as the duration of storage,
+    calculates the calendar aging that occurs.
     """
     socFactor = np.cosh(0.4 * soc - 0.15)  # (1.5 * soc - 0.5) ** 4 + 1
     if temp > 20:
         timeInMonths = 3.805e-7 * timeInSeconds
         return np.max(2.9 * (1 - 0.2 * timeInMonths * socFactor / 3), 0)
-    else:
-        timeInYears = 3.171e-8 * timeInSeconds
-        return np.max(2.9 * (1 - 0.2 * timeInYears * socFactor), 0)
+    timeInYears = 3.171e-8 * timeInSeconds
+    return np.max(2.9 * (1 - 0.2 * timeInYears * socFactor), 0)
 
 
 def currentScalingFactor(current):
-    """
-    Returns the "current scaling factor" (CSF).
+    """Returns the "current scaling factor" (CSF).
     See 'currentScalingFunction.py' for details.
     Expected behaviour is as current increases, CSF decreases from 1 to 0.
     """
@@ -51,8 +48,7 @@ def currentScalingFactor(current):
 
 
 def totalDegradation(cycles, current, soc=0.65, timeInSecs=1e7):
-    """
-    Given a number of cycles run for, with the current ran at,
+    """Given a number of cycles run for, with the current ran at,
     as well as battery aging time in seconds along with the (average) SOC
     that the battery is stored at, calculates degradation.
 
@@ -62,16 +58,13 @@ def totalDegradation(cycles, current, soc=0.65, timeInSecs=1e7):
     CDF = 2.9 - calendarDegradationFactor(soc, timeInSecs)
     if CSF == -1:
         return 2.9 - CDF
-    else:
-        # To view background for CACDF view:
-        # 'generateCurrentAgnosticDegradation.py'
-        CACDF = 2.9 * 4.58e-04 * cycles * (1 + (1 / 4.58e-04) * np.exp(5.07e-02 * (cycles - 700)))
-        print(CACDF)
-        capacityAfterDegradation = np.maximum(
-            2.9 - (CACDF / CSF) - CDF,
-            0,
-        )
-        return capacityAfterDegradation
+    # To view background for CACDF view:
+    # 'generateCurrentAgnosticDegradation.py'
+    CACDF = 2.9 * 4.58e-04 * cycles * (1 + (1 / 4.58e-04) * np.exp(5.07e-02 * (cycles - 700)))
+    return np.maximum(
+        2.9 - (CACDF / CSF) - CDF,
+        0,
+    )
 
 
 # The code above is all that is needed for our degradation model.
@@ -112,7 +105,7 @@ x = generatePlots()
 
 
 ##
-def generateDQPlot():
+def generateDQPlot() -> None:
     socs = np.linspace(0, 1, 200)
     dvals = -0.4 * abs(np.sinh(0.4 * socs - 0.15))
     plt.figure(figsize=(8, 6))
@@ -124,7 +117,6 @@ def generateDQPlot():
     plt.grid(visible=True, which="major", c="#dddddd", lw=2, ls="-")
     plt.ylabel("$(Q_s)_{t,T,I}$ (Ah)")
     plt.show()
-    return
 
 
 # generateDQPlot()

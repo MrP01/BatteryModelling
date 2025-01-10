@@ -16,21 +16,21 @@ class Simulation:
 
     dt = 0.01
 
-    def __init__(self, graph=None):
+    def __init__(self, graph=None) -> None:
         super().__init__()
         if graph is None:
             graph = BatGraph.exampleGraph()
         self.batgraph = graph
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self.batmobile = BatMobile()
         self.batmobile.sourceNode = next(iter(self.batgraph.nodes))
         self.batmobile.destinationNode = next(self.batgraph.neighbors(self.batmobile.sourceNode))
         self.totalTimeElapsed = 0
         self.step = 0
 
-    def iterate(self):
+    def iterate(self) -> None:
         """The main iteration representing a single time-step forwards.
         Passes further details on to batmobile and battery.
         """
@@ -41,12 +41,12 @@ class Simulation:
         self.totalTimeElapsed += self.dt
         self.step += 1
 
-    def run(self, stoppingTime):
+    def run(self, stoppingTime) -> None:
         """Main function of the simulation, when used without an interface."""
         while self.totalTimeElapsed < stoppingTime:
             self.iterate()
 
-    def runOnPath(self, route: tuple, current):
+    def runOnPath(self, route: tuple, current) -> None:
         """Simulates the car driving on a given path.
         Can be used to obtain some goal metric (i.e. totalTimeElapsed) and minimise that over the inputs.
         Could in turn be used for a Monte Carlo simulation to find the optimal path
@@ -61,11 +61,9 @@ class Simulation:
             self.batmobile.battery.current = current(self.totalTimeElapsed, self.batmobile.battery.soc)
             self.iterate()
             if self.batmobile.battery.soc == 0.0:
-                print("Batmobile ran out of battery without reaching the destination on this route.")
                 break
 
-    def chooseTurnIndex(self):
-        print("Turned at the next best corner")
+    def chooseTurnIndex(self) -> int:
         return 0
 
     def getOnwardDestinations(self):
@@ -77,7 +75,7 @@ class Simulation:
     def chooseNextDestination(self):
         return self.getOnwardDestinations()[self.chooseTurnIndex()]
 
-    def turnBatMobile(self):
+    def turnBatMobile(self) -> None:
         destNode = self.batmobile.destinationNode
         self.batmobile.destinationNode = self.chooseNextDestination()
         self.batmobile.sourceNode = destNode

@@ -10,7 +10,7 @@ def load_data():
     return pd.read_csv("finalOutputWithOCV.txt")
 
 
-def plot_curves_no_temperature_data(df):
+def plot_curves_no_temperature_data(df) -> None:
     # Function to help append run number as an integer as a column. Helps to filter out
     # large current pulses
     def tempfunc(x):
@@ -19,13 +19,13 @@ def plot_curves_no_temperature_data(df):
     # Adding columns/cleaning up data
     df["RunNum"] = df["Run"].apply(tempfunc)
     try:
-        df.drop(df.index[df["T"] != 10], axis=0, inplace=True)  # Only working with 10deg Celsius
+        df = df.drop(df.index[df["T"] != 10], axis=0)  # Only working with 10deg Celsius
     except Exception:
-        df.drop(df.index[df["#T"] != 10], axis=0, inplace=True)  # I don't know why it is saved as #T sometimes
-    df.drop(df.index[df["R1"] < 0], axis=0, inplace=True)  # No negative resistances
-    df.drop(df.index[df["C1"] < 100], axis=0, inplace=True)  # Bad data
-    df.drop(df.index[df["RunNum"] % 5 == 0], axis=0, inplace=True)  # Get rid of high current runs because messes up R1
-    df.drop(df.index[df["SOC"] <= 0.1], axis=0, inplace=True)  # one bad data point in R1
+        df = df.drop(df.index[df["#T"] != 10], axis=0)  # I don't know why it is saved as #T sometimes
+    df = df.drop(df.index[df["R1"] < 0], axis=0)  # No negative resistances
+    df = df.drop(df.index[df["C1"] < 100], axis=0)  # Bad data
+    df = df.drop(df.index[df["RunNum"] % 5 == 0], axis=0)  # Get rid of high current runs because messes up R1
+    df = df.drop(df.index[df["SOC"] <= 0.1], axis=0)  # one bad data point in R1
 
     # Start plotting
     plt.figure(1, figsize=(16, 16))
@@ -39,7 +39,6 @@ def plot_curves_no_temperature_data(df):
     plt.xlabel("State of Charge (Unitless)")
     plt.ylabel(r"$R_0$ ($\Omega$)")
     plt.title("$R_0$")
-    print("R0 Fit: " + str(myTemp))
 
     #     # Plot of residuals
     #     plt.subplot(2, 4, 1 + 4)
@@ -54,7 +53,6 @@ def plot_curves_no_temperature_data(df):
     plt.xlabel("State of Charge (Unitless)")
     plt.ylabel(r"$R_1$ ($\Omega$)")
     plt.title("$R_1$")
-    print("R1 Fit:" + str(myTemp))
 
     #     # Plot of residuals
     #     plt.subplot(2, 4, 2 + 4)
@@ -71,7 +69,6 @@ def plot_curves_no_temperature_data(df):
     plt.ylabel("$C_1$ (kF)")
     plt.title("$C_1$")
     # plt.rcParams.update({'font.size': 28})
-    print("C1 Fit: " + str(myTemp))
 
     #     # Plot of residuals
     #     plt.subplot(2, 4, 3 + 4)
@@ -86,7 +83,6 @@ def plot_curves_no_temperature_data(df):
     plt.xlabel("State of Charge (Unitless)")
     plt.ylabel("$V_{OC}$ (V)")
     plt.title("$V_{OC}$")
-    print("OCV Fit: " + str(myTemp))
 
     #     # Plot of residuals
     #     plt.subplot(2, 4, 4 + 4)
@@ -95,7 +91,7 @@ def plot_curves_no_temperature_data(df):
     plt.savefig("paramsNoTemp.png")
 
 
-def plot_curves(df):
+def plot_curves(df) -> None:
     def tempfunc(x):
         return int(x.split("_")[0][3:]) if x.split("_")[0][-1] != "_" else int(x.split("_")[0][3:-1])
 
@@ -155,11 +151,10 @@ def plot_curves(df):
     plt.figlegend(["Current: " + str(i) for i in range(1, 6)], ncol=5, loc=(0.3, 0.95))
 
     plt.savefig("exampleParameters.png")
-    return
 
 
 ##
-def getPresentationPlots(df):
+def getPresentationPlots(df) -> None:
     plt.figure(figsize=(8, 6))
     plt.tight_layout()
     plt.scatter(df["SOC"], df["R0"], color="green", label="Optimal Data Points to HPPC Curves")
@@ -170,7 +165,6 @@ def getPresentationPlots(df):
     plt.ylabel(r"$R_0$ ($\Omega$)")
     plt.title("Fitting of $R_0$ as a Function of State of Charge\n at 10C")
     plt.legend(loc="best")
-    print("R0 Fit: " + str(myTemp))
     plt.show()
     plt.figure(figsize=(8, 6))
     plt.tight_layout()
@@ -182,13 +176,11 @@ def getPresentationPlots(df):
     plt.ylabel(r"$R_1$ ($\Omega$)")
     plt.title("Fitting of $R_1$ as a Function of State of Charge\n at 10C")
     plt.legend(loc="best")
-    print("R0 Fit: " + str(myTemp))
     plt.show()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == "__main__":
-    print("Running")
     df = load_data()
     # plot_curves(df)
     plot_curves_no_temperature_data(df)

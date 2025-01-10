@@ -1,7 +1,7 @@
 import evaluateCostFunctions as ttf
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.integrate as integrate
+from scipy import integrate
 
 
 def getModelParams():  # Should read from file but I am just copying from other program--parameterCurveFinding.py
@@ -15,7 +15,7 @@ def getModelParams():  # Should read from file but I am just copying from other 
             0.52165477,
             -0.24699246,
             0.08733394,
-        ]
+        ],
     )
     R1 = np.array(
         [
@@ -26,7 +26,7 @@ def getModelParams():  # Should read from file but I am just copying from other 
             38.4476705,
             -7.8265193,
             0.64865373,
-        ]
+        ],
     )
     C1 = np.array(
         [
@@ -35,13 +35,15 @@ def getModelParams():  # Should read from file but I am just copying from other 
             -2065305.40823765,
             906760.09622885,
             -101216.29866021,
-        ]
+        ],
     )
     OCV = np.array([10.59735953, -33.51599917, 40.16840115, -22.18084932, 6.28065451, 2.80646924])
     return R0, R1, C1, OCV
 
 
-def computePowerAtGivenCycle(current, cycle, R0, R1, C1, OCV, operationBand=[1, 0.2]):
+def computePowerAtGivenCycle(current, cycle, R0, R1, C1, OCV, operationBand=None):
+    if operationBand is None:
+        operationBand = [1, 0.2]
     Qn = ttf.cycleAgeBattery(cycle, current)
 
     def V(SOC):

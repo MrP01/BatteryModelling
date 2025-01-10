@@ -17,7 +17,7 @@ INTERFACE_DIRECTORY = pathlib.Path(__file__).parent
 class BatMap(QLabel):
     PLAY_SOUND = False
 
-    def __init__(self, batgraph: BatGraph, batmobile: BatMobile, parent: Optional[QWidget] = None):
+    def __init__(self, batgraph: BatGraph, batmobile: BatMobile, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.graph = batgraph
         self.batmobile = batmobile
@@ -37,7 +37,7 @@ class BatMap(QLabel):
             self.effect = QtMultimedia.QSoundEffect()
             self.effect.setSource(QtCore.QUrl.fromLocalFile(INTERFACE_DIRECTORY / "assets" / "vroom-vroom.wav"))
 
-    def render(self):
+    def render(self) -> None:
         self.canvas.fill(self.backgroundColor)
         painter = QPainter(self.canvas)
         self.paintBatGraph(painter)
@@ -65,7 +65,7 @@ class BatMap(QLabel):
             event.accept()
         return super().keyPressEvent(event)
 
-    def paintBatMobile(self, painter: QPainter):
+    def paintBatMobile(self, painter: QPainter) -> None:
         src = self.graph.nodes[self.batmobile.sourceNode]
         dest = self.graph.nodes[self.batmobile.destinationNode]
         edge = self.graph.edges[self.batmobile.sourceNode, self.batmobile.destinationNode]
@@ -80,7 +80,7 @@ class BatMap(QLabel):
         painter.setTransform(transform)
         painter.drawPixmap(0, 0, self.batmobilePix)
 
-    def paintBatGraph(self, painter: QPainter):
+    def paintBatGraph(self, painter: QPainter) -> None:
         originalPen = painter.pen()
         linePen = QtGui.QPen()
         linePen.setWidth(8)
@@ -118,11 +118,10 @@ class BatMap(QLabel):
     def Y(self, y):
         return -(y - self.graph.center[1]) * 0.9 * self.canvas.height() / self.graph.maxDy + 520 // 2
 
-    def highlightNode(self, name):
+    def highlightNode(self, name) -> None:
         data = self.graph.nodes.get(name)
         if data is None:
             data = self.graph.nodes.get(int(name))
-        print("Selected", name, data)
         painter = QPainter(self.canvas)
         pen = QtGui.QPen()
         pen.setWidth(5)
@@ -136,7 +135,7 @@ class BatMap(QLabel):
         painter.end()
         self.setPixmap(self.canvas)
 
-    def drawRoute(self, route):
+    def drawRoute(self, route) -> None:
         painter = QPainter(self.canvas)
         pen = QtGui.QPen()
         pen.setWidth(12)
